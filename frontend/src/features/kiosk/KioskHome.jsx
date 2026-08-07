@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Printer, Wifi, WifiOff, QrCode, Sparkles, Clock, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Printer, Wifi, WifiOff, Sparkles, Clock, ShieldCheck } from 'lucide-react';
 
 import api from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
@@ -38,19 +38,28 @@ const KioskHome = () => {
         if (res.data.success && res.data.ads.length > 0) {
           setAds(res.data.ads);
         } else {
-          // Fallback promotional slides
+          // Fallback vibrant promotional slides
           setAds([
             {
               id: 'fallback-1',
-              title: 'Scan QR Code to Print Instantly from Mobile',
-              media_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
-              media_type: 'image'
+              title: 'Metro Prints - Fast High-Speed Printing',
+              media_url: 'https://images.unsplash.com/photo-1562654501-a0ccc0fc3fb1?auto=format&fit=crop&w=1200&q=80',
+              media_type: 'image',
+              bg_gradient: 'from-cyan-900/80 to-slate-900'
             },
             {
               id: 'fallback-2',
-              title: 'High-Speed B&W & Color Laser Printing',
-              media_url: 'https://images.unsplash.com/photo-1562654501-a0ccc0fc3fb1?auto=format&fit=crop&w=1200&q=80',
-              media_type: 'image'
+              title: 'Scan QR Code to Print Instantly from Mobile',
+              media_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+              media_type: 'image',
+              bg_gradient: 'from-indigo-900/80 to-slate-900'
+            },
+            {
+              id: 'fallback-3',
+              title: 'Special Student Discount on Bulk Document Printing',
+              media_url: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80',
+              media_type: 'image',
+              bg_gradient: 'from-purple-900/80 to-slate-900'
             }
           ]);
         }
@@ -172,16 +181,16 @@ const KioskHome = () => {
       <main className="relative z-10 grid grid-cols-12 gap-8 my-auto h-[calc(100vh-170px)] py-4">
         {/* LEFT COLUMN: Advertisement Slider */}
         <div className="col-span-7 flex flex-col justify-between bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl p-6 relative overflow-hidden group">
-          <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+          <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800/80">
             <AnimatePresence mode="wait">
               {ads.length > 0 && (
                 <motion.div
                   key={ads[currentAdIndex]?.id || currentAdIndex}
-                  initial={{ opacity: 0, scale: 1.05 }}
+                  initial={{ opacity: 0, scale: 1.03 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.8 }}
-                  className="relative w-full h-full"
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.6 }}
+                  className="relative w-full h-full flex items-center justify-center"
                 >
                   {ads[currentAdIndex]?.media_type === 'video' ? (
                     <video
@@ -195,16 +204,18 @@ const KioskHome = () => {
                     <img
                       src={ads[currentAdIndex]?.media_url}
                       alt={ads[currentAdIndex]?.title}
-                      className="w-full h-full object-cover rounded-2xl"
+                      className="w-full h-full object-cover rounded-2xl brightness-95"
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
+
+                  {/* Gradient Overlay for Text Readability at Bottom 40% */}
+                  <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent pointer-events-none rounded-b-2xl" />
                   
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <span className="px-3 py-1 bg-cyan-500/80 backdrop-blur-md text-slate-950 text-xs font-bold uppercase tracking-wider rounded-md mb-2 inline-block">
+                  <div className="absolute bottom-6 left-6 right-6 z-10">
+                    <span className="px-3 py-1 bg-cyan-500 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-md mb-2 inline-block shadow-cyan-glow">
                       Featured Offer
                     </span>
-                    <h3 className="text-2xl font-bold text-white leading-snug drop-shadow-md">
+                    <h3 className="text-2xl font-extrabold text-white leading-snug drop-shadow-xl font-heading">
                       {ads[currentAdIndex]?.title}
                     </h3>
                   </div>
@@ -250,14 +261,6 @@ const KioskHome = () => {
               size={240}
               level="H"
               includeMargin={true}
-              imageSettings={{
-                src: '/favicon.svg',
-                x: undefined,
-                y: undefined,
-                height: 40,
-                width: 40,
-                excavate: true,
-              }}
             />
           </div>
 
