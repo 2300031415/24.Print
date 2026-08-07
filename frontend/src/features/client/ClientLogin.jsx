@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, Loader2, Building } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, Building, ShieldCheck, Monitor } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
 
@@ -49,7 +49,7 @@ const ClientLogin = () => {
             Client Owner Portal
           </h1>
           <p className="text-sm text-slate-400 mt-1">
-            Track Revenue, Kiosks & Promotional Ads
+            Track Revenue, Devices & Promotional Ads
           </p>
         </div>
 
@@ -97,14 +97,27 @@ const ClientLogin = () => {
             disabled={loading}
             className="w-full py-4 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-extrabold rounded-xl transition-all shadow-cyan-glow btn-touch text-base flex items-center justify-center gap-2 mt-4"
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Sign In to Portal</span>}
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Sign In to Client Portal</span>}
           </button>
         </form>
 
-        <div className="mt-8 text-center border-t border-slate-800/80 pt-4">
-          <p className="text-xs text-slate-500">
-            Demo Client Credentials: <span className="text-cyan-400">owner@metroprints.com</span> / <span className="text-cyan-400">Client@123</span>
-          </p>
+        {/* Switcher Links */}
+        <div className="mt-8 pt-6 border-t border-slate-800/80 flex flex-col gap-2.5">
+          <Link
+            to="/admin/login"
+            className="w-full py-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-semibold text-cyan-400 flex items-center justify-center gap-2 transition-all"
+          >
+            <ShieldCheck className="w-4 h-4 text-cyan-400" />
+            <span>Switch to Super Admin Portal Login</span>
+          </Link>
+
+          <Link
+            to="/kiosk/KIOSK-001"
+            className="w-full py-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-semibold text-slate-400 flex items-center justify-center gap-2 transition-all"
+          >
+            <Monitor className="w-4 h-4 text-slate-400" />
+            <span>View Kiosk Touch Screen</span>
+          </Link>
         </div>
       </motion.div>
     </div>
