@@ -1,0 +1,12 @@
+const express = require('express');
+const router = express.Router();
+const machineController = require('../controllers/machineController');
+const { authenticateToken, requireAdmin } = require('../middlewares/auth');
+
+router.get('/', authenticateToken, machineController.getMachines);
+router.get('/code/:machineCode', machineController.getMachineByCode);
+router.get('/code/:machineCode/ads', machineController.getMachineAds);
+router.post('/', authenticateToken, requireAdmin, machineController.createMachine);
+router.put('/code/:machine_code/printer-status', machineController.updatePrinterStatus);
+
+module.exports = router;

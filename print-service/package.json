@@ -1,0 +1,16 @@
+{
+  "name": "windows-kiosk-print-daemon",
+  "version": "1.0.0",
+  "description": "Windows 11 Silent Print Daemon and Printer Status Monitor for Kiosk System",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "pdf-to-printer": "^5.6.0",
+    "socket.io-client": "^4.8.1"
+  }
+}
