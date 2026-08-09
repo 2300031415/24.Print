@@ -9,9 +9,14 @@ require('dotenv').config();
 const { getPrinterStatus } = require('./printerMonitor');
 const { startUSBMonitoring, listDriveFiles, readDriveFile } = require('./usbMonitor');
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://lowcostfreedom.com';
+// Force cloud backend URL unless an explicit production URL is provided
+const rawUrl = process.env.BACKEND_URL || '';
+const BACKEND_URL = (rawUrl.startsWith('https://') || rawUrl.includes('lowcostfreedom'))
+    ? rawUrl
+    : 'https://lowcostfreedom.com';
+
 const MACHINE_CODE = process.env.MACHINE_CODE || 'KIOSK-001';
-const PRINTER_NAME = process.env.PRINTER_NAME || '';  // Set in .env — run: Get-Printer | Select Name
+const PRINTER_NAME = process.env.PRINTER_NAME || '';
 const tempDir = path.join(__dirname, '../temp_print');
 
 if (!fs.existsSync(tempDir)) {
@@ -19,6 +24,7 @@ if (!fs.existsSync(tempDir)) {
 }
 
 console.log(`🖨️ Windows Silent Print Daemon initializing... Machine Code: [${MACHINE_CODE}]`);
+console.log(`🌐 Target Backend Server: [${BACKEND_URL}]`);
 
 const socket = io(BACKEND_URL, {
     reconnection: true,
@@ -28,23 +34,18 @@ const socket = io(BACKEND_URL, {
 const printQueue = [];
 let isProcessingQueue = false;
 
-// ──────────────────────────────────────────────────────────────
-// SOCKET.IO — CONNECTION & CORE EVENTS
-// ──────────────────────────────────────────────────────────────
-
 socket.on('connect', () => {
-    console.log('✅ Connected to Xerox Central Server Socket.IO!');
+    console.log(`✅ Connected to Xerox Central Server (${BACKEND_URL}) Socket.IO!`);
     socket.emit('REGISTER_DAEMON', { machineCode: MACHINE_CODE });
     startPrinterMonitoring();
 
-    // Start USB drive detection on kiosk PC
     startUSBMonitoring({
         onInserted: (drive) => {
-            console.log(`🔌 USB Inserted: ${drive.driveLetter} (${drive.volumeName})`);
+            console.log(`🔌 USB Inserted: ${drive.driveLetter} (${drive.volumeName}) → Sending event to ${BACKEND_URL}`);
             socket.emit('USB_DRIVE_CONNECTED', { machineCode: MACHINE_CODE, drive });
         },
         onRemoved: (driveLetter) => {
-            console.log(`🔌 USB Removed: ${driveLetter}`);
+            console.log(`🔌 USB Removed: ${driveLetter} → Sending event to ${BACKEND_URL}`);
             socket.emit('USB_DRIVE_DISCONNECTED', { machineCode: MACHINE_CODE, driveLetter });
         }
     });
@@ -54,19 +55,11 @@ socket.on('disconnect', () => {
     console.warn('⚠️ Disconnected from Xerox Central Server. Attempting reconnect...');
 });
 
-// ──────────────────────────────────────────────────────────────
-// PRINT JOB — from backend dispatch
-// ──────────────────────────────────────────────────────────────
-
 socket.on('DO_SILENT_PRINT', (jobData) => {
     console.log(`📥 Received Silent Print Dispatch: Job ID [${jobData.printJobId}], File: [${jobData.originalFilename}]`);
     printQueue.push(jobData);
     processQueue();
 });
-
-// ──────────────────────────────────────────────────────────────
-// USB — Kiosk UI requests file list for a drive
-// ──────────────────────────────────────────────────────────────
 
 socket.on('USB_LIST_FILES', async (data) => {
     const { driveLetter } = data || {};
@@ -80,10 +73,6 @@ socket.on('USB_LIST_FILES', async (data) => {
     }
 });
 
-// ──────────────────────────────────────────────────────────────
-// USB — Kiosk user selects a file → upload to backend
-// ──────────────────────────────────────────────────────────────
-
 socket.on('USB_SELECT_FILE', async (data) => {
     const { filePath, fileName } = data || {};
     if (!filePath || !fileName) return;
@@ -92,11 +81,9 @@ socket.on('USB_SELECT_FILE', async (data) => {
     try {
         socket.emit('USB_UPLOAD_PROGRESS', { machineCode: MACHINE_CODE, status: 'reading', fileName });
 
-        // Read file buffer from USB drive (local filesystem)
         const fileBuffer = readDriveFile(filePath);
         const ext = path.extname(fileName).toLowerCase();
 
-        // Build multipart form-data — same endpoint as mobile upload
         const formData = new FormData();
         formData.append('file', fileBuffer, {
             filename: fileName,
@@ -119,7 +106,6 @@ socket.on('USB_SELECT_FILE', async (data) => {
         if (uploadRes.data && uploadRes.data.success) {
             console.log(`✅ USB file uploaded. Token: ${uploadRes.data.uploadToken}`);
             socket.emit('USB_UPLOAD_PROGRESS', { machineCode: MACHINE_CODE, status: 'done', fileName });
-            // Backend will emit FILE_UPLOADED to machine room → kiosk navigates to preview automatically
         } else {
             throw new Error('Backend upload returned failure');
         }
@@ -133,10 +119,6 @@ socket.on('USB_SELECT_FILE', async (data) => {
         });
     }
 });
-
-// ──────────────────────────────────────────────────────────────
-// PRINT QUEUE PROCESSOR (existing logic preserved)
-// ──────────────────────────────────────────────────────────────
 
 async function processQueue() {
     if (isProcessingQueue || printQueue.length === 0) return;
@@ -180,21 +162,16 @@ async function processQueue() {
                 options.printer = resolvedPrinter;
             }
 
-            console.log(`🖨️ Target Printer: [${options.printer || 'System Default Printer'}]`);
-
-            // 3-Tier Robust Silent Print
             try {
                 await pdfPrinter.print(localPath, options);
                 console.log(`✅ Silent printing dispatched to spooler!`);
             } catch (printErr) {
-                console.warn(`Tier 1 failed (${printErr.message}). Trying Tier 2 (System Default)...`);
                 try {
                     const defaultOptions = { ...options };
                     delete defaultOptions.printer;
                     await pdfPrinter.print(localPath, defaultOptions);
                     console.log(`✅ Dispatched to default printer spooler!`);
                 } catch (err2) {
-                    console.warn(`Tier 2 failed (${err2.message}). Trying Tier 3 (Edge)...`);
                     const { execSync } = require('child_process');
                     const targetP = options.printer ? `"${options.printer}"` : '';
                     if (targetP) {
@@ -210,7 +187,6 @@ async function processQueue() {
 
             await updateJobStatus(job.printJobId, 'completed');
             success = true;
-            console.log(`🎉 Job [${job.printJobId}] completed!`);
         } catch (err) {
             console.error(`❌ Print failed on attempt ${retryCount}:`, err.message);
             if (retryCount >= MAX_RETRIES) {
@@ -236,10 +212,6 @@ async function updateJobStatus(printJobId, status, errorMessage = null) {
     }
 }
 
-// ──────────────────────────────────────────────────────────────
-// PRINTER HEALTH MONITOR (every 15 seconds)
-// ──────────────────────────────────────────────────────────────
-
 function startPrinterMonitoring() {
     setInterval(async () => {
         try {
@@ -252,8 +224,6 @@ function startPrinterMonitoring() {
             await axios.put(`${BACKEND_URL}/api/v1/machines/code/${MACHINE_CODE}/printer-status`, {
                 printer_status: statusObj.status
             }).catch(() => {});
-        } catch (err) {
-            // Ignore background monitor error
-        }
+        } catch (err) {}
     }, 15000);
 }
