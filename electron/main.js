@@ -20,7 +20,7 @@ function createWindow() {
         }
     });
 
-    const targetUrl = process.env.ELECTRON_START_URL || 'http://200.97.164.27:5173/kiosk/KIOSK-001';
+    const targetUrl = process.env.ELECTRON_START_URL || 'https://lowcostfreedom.com/kiosk/KIOSK-001';
     console.log(`🌐 Electron Kiosk loading Cloud Server URL: ${targetUrl}`);
     
     // Load Cloud Server Kiosk Screen
@@ -37,6 +37,14 @@ function createWindow() {
             mainWindow.setKiosk(true);
             mainWindow.setFullScreen(true);
         }
+    });
+
+    // Register F5 & Ctrl+R to reload kiosk page inside Electron
+    globalShortcut.register('F5', () => {
+        if (mainWindow) mainWindow.reload();
+    });
+    globalShortcut.register('CommandOrControl+R', () => {
+        if (mainWindow) mainWindow.reload();
     });
 
     mainWindow.on('closed', () => {
