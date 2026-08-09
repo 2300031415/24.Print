@@ -226,15 +226,7 @@ const KioskHome = () => {
             {/* Standby Header Bar */}
             <div className="relative z-10 flex items-center justify-between bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 rounded-2xl px-6 py-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-cyan-glow">
-                  <Printer className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold tracking-tight text-white font-heading">
-                    Print<span className="text-cyan-400">Pulse</span>
-                  </h1>
-                  <p className="text-xs text-slate-300">Self-Service Printing Kiosk</p>
-                </div>
+                <img src="/logo.png" alt="EasyXerox" className="h-12 w-auto object-contain drop-shadow-md" />
               </div>
 
               {/* Live Clock & Printer Status */}
