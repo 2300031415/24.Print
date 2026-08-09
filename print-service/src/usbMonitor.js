@@ -7,7 +7,13 @@ const path = require('path');
  * Detects both already-inserted drives on daemon startup AND new insertions.
  */
 
-const SUPPORTED_EXTENSIONS = ['.txt'];
+const SUPPORTED_EXTENSIONS = [
+    '.pdf',
+    '.doc', '.docx',
+    '.txt', '.rtf',
+    '.jpg', '.jpeg', '.png', '.bmp', '.webp', '.tiff'
+];
+
 const CHECK_LETTERS = ['D:', 'E:', 'F:', 'G:', 'H:', 'I:', 'J:', 'K:', 'L:', 'M:', 'N:', 'O:', 'P:', 'Q:', 'R:', 'S:', 'T:', 'U:', 'V:', 'W:', 'X:', 'Y:', 'Z:'];
 
 let _knownDrives = new Map(); // driveLetter -> driveInfo object
@@ -57,18 +63,18 @@ function checkConnectedDrives() {
 }
 
 /**
- * Lists all printable files on the specified drive (root + 1 level deep)
+ * Recursive directory scanner to find all printable files (root + subfolders up to 4 levels deep)
  */
-async function listDriveFiles(driveLetter) {
+function scanDirectory(dirPath, depth = 0, folderName = null, allFiles = []) {
+    if (depth > 4) return allFiles;
     try {
-        const root = `${driveLetter}\\`;
-        const allFiles = [];
-
-        if (!fs.existsSync(root)) return [];
-
-        const rootItems = fs.readdirSync(root, { withFileTypes: true });
-        for (const item of rootItems) {
-            const fullPath = path.join(root, item.name);
+        const items = fs.readdirSync(dirPath, { withFileTypes: true });
+        for (const item of items) {
+            // Ignore system/hidden folders
+            if (item.name.startsWith('.') || item.name.startsWith('$') || item.name === 'System Volume Information' || item.name === 'RECYCLER') {
+                continue;
+            }
+            const fullPath = path.join(dirPath, item.name);
             if (item.isFile()) {
                 const ext = path.extname(item.name).toLowerCase();
                 if (SUPPORTED_EXTENSIONS.includes(ext)) {
@@ -77,45 +83,34 @@ async function listDriveFiles(driveLetter) {
                         allFiles.push({
                             name: item.name,
                             path: fullPath,
-                            relativePath: item.name,
+                            relativePath: folderName ? `${folderName}/${item.name}` : item.name,
                             size: formatSize(stat.size),
                             sizeBytes: stat.size,
                             extension: ext.replace('.', '').toUpperCase(),
                             modified: stat.mtime.toISOString(),
-                            folder: null
+                            folder: folderName
                         });
                     } catch (_) {}
                 }
-            } else if (item.isDirectory() && !item.name.startsWith('.') && !item.name.startsWith('$')) {
-                // Scan 1 level subfolder
-                try {
-                    const subItems = fs.readdirSync(fullPath, { withFileTypes: true });
-                    for (const sub of subItems) {
-                        if (sub.isFile()) {
-                            const ext = path.extname(sub.name).toLowerCase();
-                            if (SUPPORTED_EXTENSIONS.includes(ext)) {
-                                const subFullPath = path.join(fullPath, sub.name);
-                                try {
-                                    const stat = fs.statSync(subFullPath);
-                                    allFiles.push({
-                                        name: sub.name,
-                                        path: subFullPath,
-                                        relativePath: `${item.name}/${sub.name}`,
-                                        size: formatSize(stat.size),
-                                        sizeBytes: stat.size,
-                                        extension: ext.replace('.', '').toUpperCase(),
-                                        modified: stat.mtime.toISOString(),
-                                        folder: item.name
-                                    });
-                                } catch (_) {}
-                            }
-                        }
-                    }
-                } catch (_) {}
+            } else if (item.isDirectory()) {
+                scanDirectory(fullPath, depth + 1, folderName ? `${folderName}/${item.name}` : item.name, allFiles);
             }
         }
+    } catch (_) {}
+    return allFiles;
+}
 
-        // Sort: PDFs first
+/**
+ * Lists all printable files on the specified drive (root + nested subfolders)
+ */
+async function listDriveFiles(driveLetter) {
+    try {
+        const root = `${driveLetter}\\`;
+        if (!fs.existsSync(root)) return [];
+
+        const allFiles = scanDirectory(root, 0, null, []);
+
+        // Sort: PDFs first, then alphabetically
         allFiles.sort((a, b) => {
             if (a.extension === 'PDF' && b.extension !== 'PDF') return -1;
             if (a.extension !== 'PDF' && b.extension === 'PDF') return 1;
@@ -144,19 +139,16 @@ function formatSize(bytes) {
 
 /**
  * Starts USB monitoring. Checks every 1.5 seconds.
- * Triggers `onInserted` for both existing drives on startup AND new insertions.
  */
 function startUSBMonitoring({ onInserted, onRemoved }) {
     console.log('🔌 USB Drive Monitor active (instant drive scan every 1.5s)...');
 
-    // Start with empty map so any already-plugged-in drive fires onInserted immediately!
     _knownDrives = new Map();
 
     const scan = () => {
         try {
             const currentDrives = checkConnectedDrives();
 
-            // Check newly inserted or already connected on startup
             for (const [letter, drive] of currentDrives.entries()) {
                 if (!_knownDrives.has(letter)) {
                     console.log(`🔌 USB Drive INSERTED: ${letter} (${drive.volumeName})`);
@@ -167,7 +159,6 @@ function startUSBMonitoring({ onInserted, onRemoved }) {
                 }
             }
 
-            // Check removed
             for (const [letter, drive] of _knownDrives.entries()) {
                 if (!currentDrives.has(letter)) {
                     console.log(`🔌 USB Drive REMOVED: ${letter}`);
@@ -180,9 +171,7 @@ function startUSBMonitoring({ onInserted, onRemoved }) {
         } catch (_) {}
     };
 
-    // Run initial scan immediately on daemon start
     scan();
-
     _monitorInterval = setInterval(scan, 1500);
 }
 
@@ -209,4 +198,3 @@ module.exports = {
     readDriveFile,
     getCurrentDrivesList
 };
-
