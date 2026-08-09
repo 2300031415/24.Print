@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Monitor, Tv, DollarSign, Percent, BarChart3, 
-  History, LogOut, Printer, Shield, ChevronRight, FileText
+  History, LogOut, Printer, Shield, ChevronRight, FileText, Key
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
@@ -32,6 +32,7 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
     { name: 'My Machines', path: '/client/machines', icon: Monitor },
     { name: 'Print Pricing', path: '/client/pricing', icon: DollarSign },
     { name: 'GST Settings', path: '/client/gst', icon: Percent },
+    { name: 'Payment API Keys', path: '/client/settings', icon: Key },
     { name: 'Promotional Ads', path: '/client/ads', icon: Tv },
     { name: 'Transactions', path: '/client/transactions', icon: FileText }
   ];

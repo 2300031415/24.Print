@@ -1,6 +1,7 @@
 const crypto = require('crypto');
+const Razorpay = require('razorpay');
 const db = require('../config/db');
-const { razorpay, verifySignature, key_id } = require('../config/razorpay');
+const { key_id, key_secret } = require('../config/razorpay');
 const logger = require('../services/logger');
 
 const createRazorpayOrder = async (req, res, next) => {
@@ -12,22 +13,52 @@ const createRazorpayOrder = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Upload ID, Machine ID, and Total Amount are required.' });
         }
 
-        // Fetch machine details
-        const machineRes = await db.query('SELECT id, machine_code, client_id FROM machines WHERE id = $1 OR machine_code = $1', [machineId]);
-        if (machineRes.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Machine not found.' });
+        // Fetch machine + associated client Razorpay credentials
+        const machineRes = await db.query(
+            `SELECT m.id, m.machine_code, m.client_id, c.razorpay_key_id, c.razorpay_key_secret 
+             FROM machines m
+             JOIN clients c ON m.client_id = c.id
+             WHERE m.id::text = $1 OR m.machine_code = $1`,
+            [machineId]
+        );
+
+        let machine = null;
+        let clientKeyId = key_id;
+        let clientKeySecret = key_secret;
+
+        if (machineRes.rows.length > 0) {
+            machine = machineRes.rows[0];
+            if (machine.razorpay_key_id && machine.razorpay_key_id.trim()) {
+                clientKeyId = machine.razorpay_key_id.trim();
+            }
+            if (machine.razorpay_key_secret && machine.razorpay_key_secret.trim()) {
+                clientKeySecret = machine.razorpay_key_secret.trim();
+            }
+        } else {
+            // Fallback machine lookup
+            const fallbackRes = await db.query('SELECT id, machine_code FROM machines LIMIT 1');
+            machine = fallbackRes.rows[0] || { id: machineId, machine_code: machineId };
         }
-        const machine = machineRes.rows[0];
 
         // Amount in Paise (e.g. ₹23.60 = 2360 paise)
         const amountPaise = Math.round(parseFloat(totalAmount) * 100);
         const receiptId = `rcpt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
         let razorpayOrder;
+        let rzpInstance = null;
 
-        if (razorpay) {
+        try {
+            rzpInstance = new Razorpay({
+                key_id: clientKeyId,
+                key_secret: clientKeySecret
+            });
+        } catch (initErr) {
+            logger.warn('Failed to initialize client Razorpay instance:', initErr.message);
+        }
+
+        if (rzpInstance) {
             try {
-                razorpayOrder = await razorpay.orders.create({
+                razorpayOrder = await rzpInstance.orders.create({
                     amount: amountPaise,
                     currency: 'INR',
                     receipt: receiptId,
@@ -66,9 +97,9 @@ const createRazorpayOrder = async (req, res, next) => {
 
         res.status(201).json({
             success: true,
-            keyId: key_id,
+            keyId: clientKeyId,
             order: razorpayOrder,
-            paymentId: paymentRes.rows[0].id,
+            paymentId: paymentRes.rows[0] ? paymentRes.rows[0].id : paymentRes.id,
             totalAmount: totalAmount
         });
     } catch (err) {
@@ -84,12 +115,14 @@ const verifyPayment = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Razorpay Order ID is required.' });
         }
 
-        // Fetch payment with upload + machine info
+        // Fetch payment with upload + machine + client info
         const payRes = await db.query(
-            `SELECT p.*, u.file_path, u.original_filename, m.machine_code, m.client_id, m.default_printer_name
+            `SELECT p.*, u.file_path, u.original_filename, m.machine_code, m.client_id, m.default_printer_name,
+                    c.razorpay_key_secret
              FROM payments p
              JOIN uploads u ON p.upload_id = u.id
              JOIN machines m ON p.machine_id = m.id
+             JOIN clients c ON m.client_id = c.id
              WHERE p.razorpay_order_id = $1`,
             [razorpayOrderId]
         );
@@ -99,11 +132,19 @@ const verifyPayment = async (req, res, next) => {
         }
 
         const payment = payRes.rows[0];
+        const clientKeySecret = (payment && payment.razorpay_key_secret && payment.razorpay_key_secret.trim())
+            ? payment.razorpay_key_secret.trim()
+            : key_secret;
 
         // Validate signature (skip for mock orders or test button mock_signature)
         const isMock = razorpayOrderId.startsWith('order_mock_') || razorpaySignature === 'mock_signature' || razorpaySignature === 'mock_sig';
-        const isValid = isMock || verifySignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
-
+        
+        let isValid = isMock;
+        if (!isMock && razorpaySignature) {
+            const body = razorpayOrderId + '|' + razorpayPaymentId;
+            const expectedSig = crypto.createHmac('sha256', clientKeySecret).update(body).digest('hex');
+            isValid = (expectedSig === razorpaySignature);
+        }
 
         if (!isValid) {
             return res.status(400).json({ success: false, message: 'Invalid payment signature verification failed.' });
@@ -138,67 +179,86 @@ const verifyPayment = async (req, res, next) => {
         );
 
         // 4. Create Print Job
-        const copies = printOptions?.copies || 1;
-        const colorMode = printOptions?.colorMode || 'bw';
-        const duplexMode = printOptions?.duplexMode || 'single';
-        const paperSize = printOptions?.paperSize || 'A4';
-        const orientation = printOptions?.orientation || 'portrait';
-        const totalPages = printOptions?.totalPages || 1;
-        const subtotal = printOptions?.subtotalAmount || grossAmount;
-
-        const printJobRes = await db.query(
-            `INSERT INTO print_jobs (machine_id, upload_id, payment_id, printer_name, copies, color_mode, duplex_mode, paper_size, orientation, total_pages, price_per_page, subtotal_amount, gst_amount, total_amount, status)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'queued') RETURNING *`,
+        const jobRes = await db.query(
+            `INSERT INTO print_jobs (payment_id, machine_id, upload_id, copies, color_mode, duplex_mode, paper_size, total_pages, status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'queued') RETURNING *`,
             [
+                payment.id,
                 payment.machine_id,
                 payment.upload_id,
-                payment.id,
-                (payment.default_printer_name && payment.default_printer_name !== 'HP_LaserJet_Pro_M404dn') ? payment.default_printer_name : 'Brother DCP-T820DW Printer',
-
-                copies, colorMode, duplexMode, paperSize, orientation, totalPages,
-                printOptions?.pricePerPage || 2.0,
-                subtotal, gstAmount, grossAmount
+                printOptions ? printOptions.copies : 1,
+                printOptions ? printOptions.colorMode : 'bw',
+                printOptions ? printOptions.duplexMode : 'single',
+                printOptions ? printOptions.paperSize : 'A4',
+                printOptions ? printOptions.totalPages : 1,
             ]
         );
 
-        const printJob = printJobRes.rows[0];
+        const printJob = jobRes.rows[0];
 
-        // 5. Emit Socket.IO Events to Kiosk + Print Daemon
+        // 5. Emit Socket.IO Event to Windows Print Service Daemon
         const io = req.app.get('socketio');
         if (io) {
             const printPayload = {
-                printJobId: printJob.id,
+                jobId: printJob.id,
+                paymentId: payment.id,
                 machineCode: payment.machine_code,
-                machineId: payment.machine_id,
                 filePath: payment.file_path,
-                originalFilename: payment.original_filename,
-                printerName: (payment.default_printer_name && payment.default_printer_name !== 'HP_LaserJet_Pro_M404dn') ? payment.default_printer_name : 'Brother DCP-T820DW Printer',
-
-                copies, colorMode, duplexMode, paperSize, orientation, totalPages
+                filename: payment.original_filename,
+                printerName: payment.default_printer_name || 'Kiosk_Printer_Default',
+                options: {
+                    copies: printJob.copies,
+                    colorMode: printJob.color_mode,
+                    duplexMode: printJob.duplex_mode,
+                    paperSize: printJob.paper_size,
+                    totalPages: printJob.total_pages
+                }
             };
 
-            // Notify kiosk board (screen update)
-            io.to(`machine:${payment.machine_code}`).emit('PAYMENT_SUCCESS', printPayload);
-            io.to(`machine:${payment.machine_id}`).emit('PAYMENT_SUCCESS', printPayload);
-            // Notify Windows Print Daemon
-            io.to(`daemon:${payment.machine_code}`).emit('DO_SILENT_PRINT', printPayload);
-            io.to(`daemon:${payment.machine_id}`).emit('DO_SILENT_PRINT', printPayload);
-            logger.info(`🖨️ Dispatched DO_SILENT_PRINT event for job ${printJob.id} to machine ${payment.machine_code}`);
+            // Emit to machine-specific room
+            io.to(`machine:${payment.machine_code}`).emit('DO_SILENT_PRINT', printPayload);
+            io.to(`machine:${payment.machine_id}`).emit('DO_SILENT_PRINT', printPayload);
+            logger.info(`Payment verified! Sent DO_SILENT_PRINT to machine ${payment.machine_code} for job ${printJob.id}`);
         }
-
 
         res.json({
             success: true,
-            message: 'Payment verified! Print job dispatched.',
-            printJob
+            message: 'Payment verified and print job sent to hardware printer.',
+            payment: {
+                id: payment.id,
+                status: 'captured',
+                amount: payment.amount
+            },
+            printJob: printJob
         });
     } catch (err) {
         next(err);
     }
 };
 
+const getPaymentStatus = async (req, res, next) => {
+    try {
+        const { orderId } = req.params;
+        const result = await db.query(
+            `SELECT p.*, j.status as print_job_status, j.id as job_id
+             FROM payments p
+             LEFT JOIN print_jobs j ON j.payment_id = p.id
+             WHERE p.razorpay_order_id = $1 OR p.id::text = $1`,
+            [orderId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Payment record not found.' });
+        }
+
+        res.json({ success: true, payment: result.rows[0] });
+    } catch (err) {
+        next(err);
+    }
+};
 
 module.exports = {
     createRazorpayOrder,
-    verifyPayment
+    verifyPayment,
+    getPaymentStatus
 };

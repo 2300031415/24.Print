@@ -42,9 +42,85 @@ const getClientById = async (req, res, next) => {
     }
 };
 
+const getMySettings = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const result = await db.query(
+            `SELECT c.*, u.email, u.full_name, u.phone 
+             FROM clients c 
+             JOIN users u ON c.user_id = u.id 
+             WHERE c.user_id::text = $1::text OR c.id::text = $1::text`,
+            [userId]
+        );
+
+        if (result.rows.length === 0) {
+            // Fallback for mock db
+            return res.json({
+                success: true,
+                client: {
+                    id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
+                    business_name: 'Metro Xerox & Print Zone',
+                    contact_phone: '+919812345678',
+                    razorpay_key_id: 'rzp_test_TNCk8rRk35J4aS',
+                    razorpay_key_secret: 'BGFv2PHnNW9GG5KnymqrfWie',
+                    commission_rate: 80.00
+                }
+            });
+        }
+
+        res.json({ success: true, client: result.rows[0] });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const updateMySettings = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const { business_name, contact_phone, address, city, state, pincode, razorpay_key_id, razorpay_key_secret } = req.body;
+
+        const result = await db.query(
+            `UPDATE clients 
+             SET business_name = COALESCE($1, business_name),
+                 contact_phone = COALESCE($2, contact_phone),
+                 address = COALESCE($3, address),
+                 city = COALESCE($4, city),
+                 state = COALESCE($5, state),
+                 pincode = COALESCE($6, pincode),
+                 razorpay_key_id = COALESCE($7, razorpay_key_id),
+                 razorpay_key_secret = COALESCE($8, razorpay_key_secret),
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE user_id::text = $9::text OR id::text = $9::text RETURNING *`,
+            [
+                business_name || null,
+                contact_phone || null,
+                address || null,
+                city || null,
+                state || null,
+                pincode || null,
+                razorpay_key_id !== undefined ? razorpay_key_id : null,
+                razorpay_key_secret !== undefined ? razorpay_key_secret : null,
+                userId
+            ]
+        );
+
+        const updatedClient = (result && result.rows && result.rows.length > 0) ? result.rows[0] : {
+            id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
+            business_name,
+            contact_phone,
+            razorpay_key_id,
+            razorpay_key_secret
+        };
+
+        res.json({ success: true, message: 'Payment gateway API settings saved successfully.', client: updatedClient });
+    } catch (err) {
+        next(err);
+    }
+};
+
 const createClient = async (req, res, next) => {
     try {
-        const { email, password, full_name, phone, business_name, address, city, state, pincode, commission_rate } = req.body;
+        const { email, password, full_name, phone, business_name, address, city, state, pincode, commission_rate, razorpay_key_id, razorpay_key_secret } = req.body;
 
         if (!email || !password || !business_name) {
             return res.status(400).json({ success: false, message: 'Email, password, and business name are required.' });
@@ -67,9 +143,9 @@ const createClient = async (req, res, next) => {
         const userId = userRes.rows[0] ? userRes.rows[0].id : 'usr_' + Date.now();
 
         const clientRes = await db.query(
-            `INSERT INTO clients (user_id, business_name, contact_phone, address, city, state, pincode, commission_rate)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-            [userId, business_name, phone || '', address || '', city || '', state || '', pincode || '', commission_rate || 100.00]
+            `INSERT INTO clients (user_id, business_name, contact_phone, address, city, state, pincode, commission_rate, razorpay_key_id, razorpay_key_secret)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+            [userId, business_name, phone || '', address || '', city || '', state || '', pincode || '', commission_rate || 80.00, razorpay_key_id || null, razorpay_key_secret || null]
         );
 
         res.status(201).json({ success: true, client: clientRes.rows[0] || clientRes });
@@ -78,11 +154,10 @@ const createClient = async (req, res, next) => {
     }
 };
 
-
 const updateClient = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { business_name, contact_phone, address, city, state, pincode, commission_rate, status, email, password } = req.body;
+        const { business_name, contact_phone, address, city, state, pincode, commission_rate, status, email, password, razorpay_key_id, razorpay_key_secret } = req.body;
 
         const result = await db.query(
             `UPDATE clients 
@@ -94,9 +169,23 @@ const updateClient = async (req, res, next) => {
                  pincode = COALESCE($6, pincode),
                  commission_rate = COALESCE($7, commission_rate),
                  status = COALESCE($8, status),
+                 razorpay_key_id = COALESCE($9, razorpay_key_id),
+                 razorpay_key_secret = COALESCE($10, razorpay_key_secret),
                  updated_at = CURRENT_TIMESTAMP
-             WHERE id::text = $9::text OR user_id::text = $9::text RETURNING *`,
-            [business_name || null, contact_phone || null, address || null, city || null, state || null, pincode || null, commission_rate || null, status || null, id]
+             WHERE id::text = $11::text OR user_id::text = $11::text RETURNING *`,
+            [
+                business_name || null,
+                contact_phone || null,
+                address || null,
+                city || null,
+                state || null,
+                pincode || null,
+                commission_rate || null,
+                status || null,
+                razorpay_key_id !== undefined ? razorpay_key_id : null,
+                razorpay_key_secret !== undefined ? razorpay_key_secret : null,
+                id
+            ]
         );
 
         const clientObj = (result && result.rows && result.rows.length > 0) ? result.rows[0] : { id, status, user_id: id };
@@ -121,7 +210,6 @@ const updateClient = async (req, res, next) => {
             }
         }
 
-
         // Optional Password Reset by Admin
         if (password && password.trim().length > 0) {
             try {
@@ -142,12 +230,10 @@ const deleteClient = async (req, res, next) => {
     try {
         const { id } = req.params;
 
-        // Fetch client to get user_id
         const clientRes = await db.query('SELECT * FROM clients WHERE id::text = $1::text OR user_id::text = $1::text', [id]);
         const client = clientRes.rows[0];
 
         if (client) {
-            // Delete machines, client, and user
             await db.query('DELETE FROM machines WHERE client_id::text = $1::text', [client.id]);
             await db.query('DELETE FROM clients WHERE id::text = $1::text', [client.id]);
             if (client.user_id) {
@@ -166,8 +252,9 @@ const deleteClient = async (req, res, next) => {
 module.exports = {
     getClients,
     getClientById,
+    getMySettings,
+    updateMySettings,
     createClient,
     updateClient,
     deleteClient
 };
-

@@ -29,6 +29,7 @@ import ClientDashboard from './features/client/ClientDashboard';
 import ClientMachines from './features/client/ClientMachines';
 import ClientAds from './features/client/ClientAds';
 import ClientTransactions from './features/client/ClientTransactions';
+import ClientSettings from './features/client/ClientSettings';
 
 // Protected Route Guard
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -76,6 +77,7 @@ function App() {
           <Route path="/client/machines" element={<ProtectedRoute allowedRoles={['client', 'admin']}><ClientMachines /></ProtectedRoute>} />
           <Route path="/client/pricing" element={<ProtectedRoute allowedRoles={['client', 'admin']}><AdminPricing role="client" /></ProtectedRoute>} />
           <Route path="/client/gst" element={<ProtectedRoute allowedRoles={['client', 'admin']}><AdminGst role="client" /></ProtectedRoute>} />
+          <Route path="/client/settings" element={<ProtectedRoute allowedRoles={['client', 'admin']}><ClientSettings /></ProtectedRoute>} />
           <Route path="/client/ads" element={<ProtectedRoute allowedRoles={['client', 'admin']}><ClientAds /></ProtectedRoute>} />
           <Route path="/client/transactions" element={<ProtectedRoute allowedRoles={['client', 'admin']}><ClientTransactions /></ProtectedRoute>} />
 
