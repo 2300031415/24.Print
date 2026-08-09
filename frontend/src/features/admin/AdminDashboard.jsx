@@ -50,11 +50,11 @@ const AdminDashboard = () => {
               </div>
             </div>
             <h3 className="text-3xl font-extrabold text-white mt-4 font-mono">
-              ₹{stats.totalRevenue.toLocaleString()}
+              ₹{(stats?.totalRevenue || 0).toLocaleString()}
             </h3>
             <p className="text-xs text-emerald-400 font-semibold mt-2 flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5" />
-              Today: ₹{stats.todayRevenue.toLocaleString()}
+              Today: ₹{(stats?.todayRevenue || 0).toLocaleString()}
             </p>
           </div>
 
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             <h3 className="text-3xl font-extrabold text-white mt-4 font-mono">
-              {stats.onlineMachines} / {stats.totalMachines}
+              {stats?.onlineMachines || 0} / {stats?.totalMachines || 0}
             </h3>
             <p className="text-xs text-cyan-400 font-semibold mt-2">
               Online Hardware Pings Active
@@ -83,7 +83,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             <h3 className="text-3xl font-extrabold text-white mt-4 font-mono">
-              {stats.totalPagesPrinted.toLocaleString()}
+              {(stats?.totalPagesPrinted || 0).toLocaleString()}
             </h3>
             <p className="text-xs text-indigo-400 font-semibold mt-2">
               Pages Delivered Silently
@@ -102,7 +102,7 @@ const AdminDashboard = () => {
               {stats.totalClients}
             </h3>
             <p className="text-xs text-purple-400 font-semibold mt-2">
-              {stats.pendingAdsCount} Ads Pending Review
+              Active Xerox Partners
             </p>
           </div>
         </div>

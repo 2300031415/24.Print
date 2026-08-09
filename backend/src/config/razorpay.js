@@ -1,8 +1,9 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_mockKey12345';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'mockSecret67890';
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_TNCk8rRk35J4aS';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'BGFv2PHnNW9GG5KnymqrfWie';
+
 
 let instance = null;
 
@@ -11,8 +12,9 @@ try {
         key_id: RAZORPAY_KEY_ID,
         key_secret: RAZORPAY_KEY_SECRET,
     });
+    console.log(`✅ Razorpay SDK Initialized successfully with Key ID: ${RAZORPAY_KEY_ID}`);
 } catch (err) {
-    console.warn('Razorpay SDK initialization warning (Mock mode active):', err.message);
+    console.warn('Razorpay SDK initialization warning:', err.message);
 }
 
 const verifySignature = (orderId, paymentId, signature) => {
@@ -37,5 +39,6 @@ module.exports = {
     razorpay: instance,
     verifySignature,
     verifyWebhookSignature,
-    key_id: RAZORPAY_KEY_ID
+    key_id: RAZORPAY_KEY_ID,
+    key_secret: RAZORPAY_KEY_SECRET
 };

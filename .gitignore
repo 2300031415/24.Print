@@ -6,6 +6,9 @@ dist/
 build/
 *.log
 
+# Electron build output (too large for GitHub — use releases instead)
+dist_electron/
+
 # Environment variables
 .env
 .env.local

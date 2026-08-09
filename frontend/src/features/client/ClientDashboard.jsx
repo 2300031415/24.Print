@@ -31,7 +31,12 @@ const ClientDashboard = () => {
       }
     };
     fetchClientDashboard();
+
+    // Live Auto-Refresh every 5 seconds
+    const interval = setInterval(fetchClientDashboard, 5000);
+    return () => clearInterval(interval);
   }, []);
+
 
   return (
     <PortalLayout title="Client Partner Revenue Dashboard" role="client">
@@ -41,7 +46,7 @@ const ClientDashboard = () => {
           <div className="glass-panel p-6 rounded-3xl border border-slate-800">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Today's Revenue</span>
             <h3 className="text-3xl font-extrabold text-emerald-400 mt-3 font-mono">
-              ₹{stats.todayRevenue.toLocaleString()}
+              ₹{(stats?.todayRevenue || 0).toLocaleString()}
             </h3>
             <p className="text-xs text-slate-400 mt-2">Client Net Earnings Today</p>
           </div>
@@ -49,7 +54,7 @@ const ClientDashboard = () => {
           <div className="glass-panel p-6 rounded-3xl border border-slate-800">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Monthly Revenue</span>
             <h3 className="text-3xl font-extrabold text-cyan-400 mt-3 font-mono">
-              ₹{stats.monthlyRevenue.toLocaleString()}
+              ₹{(stats?.monthlyRevenue || 0).toLocaleString()}
             </h3>
             <p className="text-xs text-slate-400 mt-2">This Month's Settlement</p>
           </div>
@@ -57,7 +62,7 @@ const ClientDashboard = () => {
           <div className="glass-panel p-6 rounded-3xl border border-slate-800">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">My Kiosks</span>
             <h3 className="text-3xl font-extrabold text-white mt-3 font-mono">
-              {stats.onlineMachines} / {stats.totalMachines}
+              {stats?.onlineMachines || 0} / {stats?.totalMachines || 0}
             </h3>
             <p className="text-xs text-emerald-400 mt-2 font-semibold">Online & Operational</p>
           </div>
@@ -65,7 +70,7 @@ const ClientDashboard = () => {
           <div className="glass-panel p-6 rounded-3xl border border-slate-800">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pages Printed</span>
             <h3 className="text-3xl font-extrabold text-indigo-400 mt-3 font-mono">
-              {stats.totalPagesPrinted.toLocaleString()}
+              {(stats?.totalPagesPrinted || 0).toLocaleString()}
             </h3>
             <p className="text-xs text-slate-400 mt-2">Total Pages Printed</p>
           </div>
@@ -88,7 +93,7 @@ const ClientDashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
-                {recentTxns.map((tx) => (
+                {(recentTxns || []).map((tx) => (
                   <tr key={tx.id} className="hover:bg-slate-800/40">
                     <td className="py-3.5 px-4 font-bold text-white">{tx.machine_name}</td>
                     <td className="py-3.5 px-4 font-mono">₹{tx.gross_amount}</td>

@@ -24,15 +24,20 @@ const updatePrintJobStatus = async (req, res, next) => {
 
         const job = jobRes.rows[0];
 
-        // Notify Kiosk HMI via Socket.IO
+        // Notify Kiosk HMI via Socket.IO across all machine rooms
         const io = req.app.get('socketio');
         if (io) {
-            io.to(`machine:${job.machine_id}`).emit('PRINT_STATUS_UPDATE', {
+            const updatePayload = {
                 printJobId: job.id,
                 status: job.status,
                 errorMessage: job.error_message
-            });
+            };
+            io.to(`machine:${job.machine_id}`).emit('PRINT_STATUS_UPDATE', updatePayload);
+            io.to(`machine:${job.machine_code || 'KIOSK-001'}`).emit('PRINT_STATUS_UPDATE', updatePayload);
+            io.to(`machine:KIOSK-001`).emit('PRINT_STATUS_UPDATE', updatePayload);
+            logger.info(`📢 Broadcasted PRINT_STATUS_UPDATE [${job.status}] for job ${job.id}`);
         }
+
 
         // If completed or failed, cleanup local PDF file per workflow rules
         if (status === 'completed' || status === 'failed') {

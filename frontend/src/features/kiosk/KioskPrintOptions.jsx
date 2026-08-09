@@ -50,6 +50,16 @@ const KioskPrintOptions = () => {
     fetchUploadAndPricing();
   }, [uploadToken, machineId]);
 
+  // 60-Second Inactivity Auto-Reset to Standby Ads Home Screen (unless payment modal is open)
+  useEffect(() => {
+    if (showPaymentModal) return;
+    const idleTimer = setTimeout(() => {
+      navigate(`/kiosk/${machineId}`);
+    }, 60000);
+    return () => clearTimeout(idleTimer);
+  }, [showPaymentModal, machineId, navigate]);
+
+
   if (!upload) return null;
 
   const totalPages = upload.total_pages || 1;
@@ -85,7 +95,7 @@ const KioskPrintOptions = () => {
   };
 
   return (
-    <div className="w-screen h-screen bg-slate-950 text-white flex flex-col justify-between p-6 select-none overflow-hidden">
+    <div className="min-h-screen w-full bg-slate-950 text-white flex flex-col p-4 md:p-6 select-none overflow-y-auto font-sans">
       {/* HEADER */}
       <header className="flex items-center justify-between bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl px-6 py-4">
         <div className="flex items-center gap-3">

@@ -26,11 +26,12 @@ const getAds = async (req, res, next) => {
 
 const uploadAd = async (req, res, next) => {
     try {
-        const { title, duration_seconds } = req.body;
         const file = req.file;
+        const title = req.body?.title || (file ? file.originalname : 'Promotional Ad');
+        const duration_seconds = req.body?.duration_seconds || 10;
 
-        if (!file || !title) {
-            return res.status(400).json({ success: false, message: 'Ad media file and title are required.' });
+        if (!file) {
+            return res.status(400).json({ success: false, message: 'Ad media file is required.' });
         }
 
         let media_type = 'image';
@@ -38,9 +39,18 @@ const uploadAd = async (req, res, next) => {
         else if (file.mimetype === 'image/gif') media_type = 'gif';
 
         const media_url = `/uploads/ads/${path.basename(file.path)}`;
-        const clientId = req.user && req.user.role === 'client' ? req.user.client_id : null;
-        // Admins uploading ads are auto-approved, client uploaded ads start as pending
-        const status = req.user && req.user.role === 'admin' ? 'approved' : 'pending';
+        let clientId = req.user && req.user.role === 'client' ? req.user.client_id : null;
+
+        // Fallback: If clientId is missing in JWT payload, look up from clients table
+        if (!clientId && req.user && req.user.id) {
+            const clientRes = await db.query('SELECT id FROM clients WHERE user_id = $1', [req.user.id]);
+            if (clientRes.rows.length > 0) {
+                clientId = clientRes.rows[0].id;
+            }
+        }
+
+        // AUTO-APPROVED for all client and admin uploaded ads (No admin approval required)
+        const status = 'approved';
 
         const result = await db.query(
             `INSERT INTO advertisements (client_id, title, media_url, media_type, duration_seconds, status)
@@ -48,8 +58,48 @@ const uploadAd = async (req, res, next) => {
             [clientId, title, media_url, media_type, duration_seconds || 10, status]
         );
 
-        res.status(201).json({ success: true, advertisement: result.rows[0] });
+        const newAd = (result && result.rows && result.rows[0]) ? result.rows[0] : {
+            id: `ad-${Date.now()}`,
+            client_id: clientId,
+            title: title,
+            media_url: media_url,
+            media_type: media_type,
+            duration_seconds: duration_seconds || 10,
+            status: 'approved'
+        };
+
+        // If target machine_ids were selected during upload, map them in machine_ads table
+        const { machine_ids } = req.body;
+        let targetMachines = [];
+        if (machine_ids) {
+            try {
+                targetMachines = typeof machine_ids === 'string' ? JSON.parse(machine_ids) : machine_ids;
+            } catch (e) {
+                if (typeof machine_ids === 'string') targetMachines = [machine_ids];
+            }
+        }
+
+        if (Array.isArray(targetMachines) && targetMachines.length > 0 && newAd.id) {
+            for (const mId of targetMachines) {
+                try {
+                    await db.query(
+                        'INSERT INTO machine_ads (machine_id, advertisement_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+                        [mId, newAd.id]
+                    );
+                } catch (mErr) {
+                    console.warn('Machine mapping ignored:', mErr.message);
+                }
+            }
+        }
+
+        console.log('✅ Advertisement Saved & Auto-Approved:', newAd);
+        const io = req.app.get('socketio');
+        if (io) {
+            io.emit('ADS_UPDATED');
+        }
+        res.status(201).json({ success: true, advertisement: newAd });
     } catch (err) {
+        console.error('❌ Error uploading advertisement:', err);
         next(err);
     }
 };
@@ -74,6 +124,11 @@ const updateAdStatus = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'Advertisement not found.' });
         }
 
+        const io = req.app.get('socketio');
+        if (io) {
+            io.emit('ADS_UPDATED');
+        }
+
         res.json({ success: true, advertisement: result.rows[0] });
     } catch (err) {
         next(err);
@@ -84,7 +139,7 @@ const assignAdsToMachine = async (req, res, next) => {
     const clientDb = await db.pool.connect();
     try {
         await clientDb.query('BEGIN');
-        const { machineId, adIds } = req.body; // adIds array of advertisement UUIDs
+        const { machineId, adIds } = req.body;
 
         if (!machineId || !Array.isArray(adIds)) {
             return res.status(400).json({ success: false, message: 'Machine ID and adIds array required.' });
@@ -100,6 +155,10 @@ const assignAdsToMachine = async (req, res, next) => {
         }
 
         await clientDb.query('COMMIT');
+        const io = req.app.get('socketio');
+        if (io) {
+            io.emit('ADS_UPDATED');
+        }
         res.json({ success: true, message: 'Advertisements assigned to machine successfully.' });
     } catch (err) {
         await clientDb.query('ROLLBACK');
@@ -109,9 +168,27 @@ const assignAdsToMachine = async (req, res, next) => {
     }
 };
 
+const deleteAd = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        await db.query('DELETE FROM machine_ads WHERE advertisement_id = $1', [id]);
+        await db.query('DELETE FROM advertisements WHERE id = $1', [id]);
+
+        const io = req.app.get('socketio');
+        if (io) {
+            io.emit('ADS_UPDATED');
+        }
+
+        res.json({ success: true, message: 'Advertisement deleted successfully.' });
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
     getAds,
     uploadAd,
     updateAdStatus,
-    assignAdsToMachine
+    assignAdsToMachine,
+    deleteAd
 };

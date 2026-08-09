@@ -8,9 +8,17 @@ export const SocketProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const socketInstance = io(window.location.origin, {
+    const { hostname, port, protocol } = window.location;
+    const socketUrl = hostname === 'localhost'
+      ? window.location.origin
+      : (port === '5173' || port === '5174')
+        ? `http://${hostname}:5000`           // Direct :5173 → backend :5000
+        : `${protocol}//${hostname}`;         // Via Nginx → same host, proxied to :5000
+
+    const socketInstance = io(socketUrl, {
       reconnectionDelay: 2000,
-      reconnectionAttempts: 10
+      reconnectionAttempts: 10,
+      path: '/socket.io/'
     });
 
     socketInstance.on('connect', () => {

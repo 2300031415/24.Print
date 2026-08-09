@@ -14,14 +14,13 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
 
   const handleLogout = () => {
     logout();
-    navigate(role === 'admin' ? '/admin/login' : '/client/login');
+    navigate('/login');
   };
 
   const adminNav = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Clients Mgt', path: '/admin/clients', icon: Users },
     { name: 'Kiosk Machines', path: '/admin/machines', icon: Monitor },
-    { name: 'Ads Approval', path: '/admin/ads', icon: Tv },
     { name: 'Print Pricing', path: '/admin/pricing', icon: DollarSign },
     { name: 'GST Settings', path: '/admin/gst', icon: Percent },
     { name: 'Revenue Reports', path: '/admin/reports', icon: BarChart3 },
@@ -31,9 +30,12 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
   const clientNav = [
     { name: 'Dashboard', path: '/client/dashboard', icon: LayoutDashboard },
     { name: 'My Machines', path: '/client/machines', icon: Monitor },
+    { name: 'Print Pricing', path: '/client/pricing', icon: DollarSign },
+    { name: 'GST Settings', path: '/client/gst', icon: Percent },
     { name: 'Promotional Ads', path: '/client/ads', icon: Tv },
     { name: 'Transactions', path: '/client/transactions', icon: FileText }
   ];
+
 
   const navItems = role === 'admin' ? adminNav : clientNav;
 

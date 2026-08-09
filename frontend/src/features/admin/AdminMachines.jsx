@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Monitor, Plus, QrCode, MapPin, Printer, Wifi, ShieldCheck, X } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 import PortalLayout from '../../components/PortalLayout';
 import api from '../../services/api';
@@ -18,7 +19,7 @@ const AdminMachines = () => {
     city: 'New Delhi',
     state: 'Delhi',
     pincode: '110001',
-    default_printer_name: 'HP_LaserJet_Pro_M404dn'
+    default_printer_name: 'Brother DCP-T820DW Printer'
   });
 
   const fetchData = async () => {
@@ -53,6 +54,35 @@ const AdminMachines = () => {
     } catch (err) {
       alert(err.response?.data?.message || 'Error registering machine.');
     }
+  };
+
+  const handlePrintQr = () => {
+    const printWindow = window.open('', '_blank');
+    const qrUrl = `https://lowcostfreedom.com/upload/${selectedQrMachine.machine_code}`;
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Kiosk QR Code - ${selectedQrMachine.machine_code}</title>
+          <style>
+            body { font-family: sans-serif; text-align: center; padding: 40px; }
+            .card { border: 3px solid #000; border-radius: 20px; padding: 30px; display: inline-block; }
+            h1 { margin: 0 0 10px 0; font-size: 28px; }
+            h2 { color: #0088cc; margin: 0 0 20px 0; font-size: 20px; }
+            p { font-size: 14px; margin-top: 15px; color: #555; }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          <div class="card">
+            <h1>🖨️ SCAN TO PRINT</h1>
+            <h2>${selectedQrMachine.name} (${selectedQrMachine.machine_code})</h2>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrUrl)}" width="250" height="250" />
+            <p>Scan with Phone Camera or WhatsApp to Upload Document</p>
+            <p><strong>${qrUrl}</strong></p>
+          </div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   return (
@@ -98,7 +128,7 @@ const AdminMachines = () => {
                   </div>
                   <div className="flex justify-between text-slate-400">
                     <span>Default Printer</span>
-                    <span className="text-cyan-400 font-mono">{machine.default_printer_name}</span>
+                    <span className="text-cyan-400 font-mono">{machine.default_printer_name || 'Brother DCP-T820DW Printer'}</span>
                   </div>
                   <div className="flex justify-between text-slate-400">
                     <span>Printed Jobs</span>
@@ -128,15 +158,29 @@ const AdminMachines = () => {
               <X className="w-6 h-6" />
             </button>
             <h3 className="text-xl font-bold text-white font-heading">{selectedQrMachine.name}</h3>
-            <p className="text-xs text-cyan-400 font-mono mt-1">{selectedQrMachine.machine_code}</p>
+            <p className="text-xs text-cyan-400 font-mono mt-1 mb-4">{selectedQrMachine.machine_code}</p>
 
-            <div className="my-6 p-4 bg-white rounded-2xl inline-block shadow-2xl">
-              <img src={selectedQrMachine.qr_code_url} alt="Kiosk QR" className="w-56 h-56 mx-auto" />
+            <div className="p-4 bg-white rounded-2xl inline-block shadow-2xl mb-4">
+              <QRCodeSVG
+                value={`https://lowcostfreedom.com/upload/${selectedQrMachine.machine_code}`}
+                size={200}
+                level="H"
+                includeMargin={true}
+              />
             </div>
 
-            <p className="text-xs text-slate-400">
-              Scan URL: <span className="text-cyan-300 font-mono">{window.location.origin}/upload/{selectedQrMachine.machine_code}</span>
+            <p className="text-xs text-slate-400 mb-4">
+              Scan URL: <br />
+              <span className="text-cyan-300 font-mono text-[11px]">https://lowcostfreedom.com/upload/{selectedQrMachine.machine_code}</span>
             </p>
+
+            <button
+              onClick={handlePrintQr}
+              className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl text-xs flex items-center justify-center gap-2 shadow-cyan-glow btn-touch"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Print QR Code Sticker</span>
+            </button>
           </div>
         </div>
       )}

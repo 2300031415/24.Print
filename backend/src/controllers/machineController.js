@@ -4,7 +4,7 @@ const db = require('../config/db');
 const getMachines = async (req, res, next) => {
     try {
         let queryStr = `
-            SELECT m.*, c.business_name as client_name,
+            SELECT m.*, c.business_name as client_name, c.status as client_status,
                    (SELECT COUNT(*) FROM print_jobs WHERE machine_id = m.id AND status = 'completed')::int as total_jobs_printed
             FROM machines m
             JOIN clients c ON m.client_id = c.id
@@ -20,7 +20,16 @@ const getMachines = async (req, res, next) => {
         queryStr += ` ORDER BY m.created_at DESC`;
 
         const result = await db.query(queryStr, params);
-        res.json({ success: true, machines: result.rows });
+        
+        // If client partner is disabled/suspended, force machine operational status to maintenance
+        const machines = result.rows.map(m => {
+            if (m.client_status === 'suspended' || m.client_status === 'inactive' || m.client_status === 'disabled') {
+                return { ...m, status: 'maintenance' };
+            }
+            return m;
+        });
+
+        res.json({ success: true, machines });
     } catch (err) {
         next(err);
     }
@@ -30,7 +39,7 @@ const getMachineByCode = async (req, res, next) => {
     try {
         const { machineCode } = req.params;
         const result = await db.query(
-            `SELECT m.*, c.business_name 
+            `SELECT m.*, c.business_name, c.status as client_status
              FROM machines m 
              JOIN clients c ON m.client_id = c.id 
              WHERE m.machine_code = $1 OR m.id::text = $1`,
@@ -42,6 +51,12 @@ const getMachineByCode = async (req, res, next) => {
         }
 
         const machine = result.rows[0];
+
+        // If client partner is disabled/suspended, force machine operational status to maintenance
+        if (machine.client_status === 'suspended' || machine.client_status === 'inactive' || machine.client_status === 'disabled') {
+            machine.status = 'maintenance';
+        }
+
 
         // Fetch machine pricing or default pricing fallback
         const pricingRes = await db.query(
@@ -114,17 +129,53 @@ const updatePrinterStatus = async (req, res, next) => {
 const getMachineAds = async (req, res, next) => {
     try {
         const { machineCode } = req.params;
+
+        // Fetch machine & client ID
+        const machineRes = await db.query('SELECT id, client_id FROM machines WHERE machine_code = $1 OR id::text = $1', [machineCode]);
+        if (machineRes.rows.length === 0) {
+            return res.json({ success: true, ads: [] });
+        }
+
+        const machine = machineRes.rows[0];
+
+        // STRICT: Only return ads explicitly assigned to this board via machine_ads table
         const result = await db.query(
             `SELECT a.* 
              FROM advertisements a
-             JOIN machine_ads ma ON a.id = ma.advertisement_id
-             JOIN machines m ON ma.machine_id = m.id
-             WHERE (m.machine_code = $1 OR m.id::text = $1)
-               AND a.status = 'approved'`,
-            [machineCode]
+             INNER JOIN machine_ads ma ON a.id = ma.advertisement_id
+             WHERE ma.machine_id = $1
+               AND a.status = 'approved'
+             ORDER BY a.created_at DESC`,
+            [machine.id]
         );
 
         res.json({ success: true, ads: result.rows });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const toggleMachineStatus = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // 'online' | 'maintenance'
+
+        const result = await db.query(
+            `UPDATE machines SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 OR machine_code = $2 RETURNING *`,
+            [status, id]
+        );
+
+        const updatedMachine = result.rows[0] || { id, status };
+
+        // Broadcast to Kiosk Board via Socket.IO
+        const io = req.app.get('socketio');
+        if (io) {
+            io.to(`machine:${updatedMachine.id}`).emit('MACHINE_STATUS_CHANGE', { status: updatedMachine.status });
+            io.to(`machine:${updatedMachine.machine_code || 'KIOSK-001'}`).emit('MACHINE_STATUS_CHANGE', { status: updatedMachine.status });
+            io.to('machine:KIOSK-001').emit('MACHINE_STATUS_CHANGE', { status: updatedMachine.status });
+        }
+
+        res.json({ success: true, machine: updatedMachine });
     } catch (err) {
         next(err);
     }
@@ -135,5 +186,7 @@ module.exports = {
     getMachineByCode,
     createMachine,
     updatePrinterStatus,
-    getMachineAds
+    getMachineAds,
+    toggleMachineStatus
 };
+

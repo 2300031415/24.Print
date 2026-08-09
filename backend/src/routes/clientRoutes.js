@@ -7,5 +7,7 @@ router.get('/', authenticateToken, requireAdmin, clientController.getClients);
 router.get('/:id', authenticateToken, clientController.getClientById);
 router.post('/', authenticateToken, requireAdmin, clientController.createClient);
 router.put('/:id', authenticateToken, requireAdmin, clientController.updateClient);
+router.delete('/:id', authenticateToken, requireAdmin, clientController.deleteClient);
 
 module.exports = router;
+

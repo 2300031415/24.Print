@@ -31,6 +31,15 @@ const KioskPdfPreview = () => {
     fetchUploadDetails();
   }, [uploadToken]);
 
+  // 60-Second Inactivity Auto-Reset to Standby Ads Home Screen
+  useEffect(() => {
+    const idleTimer = setTimeout(() => {
+      navigate(`/kiosk/${machineId}`);
+    }, 60000);
+    return () => clearTimeout(idleTimer);
+  }, [machineId, navigate]);
+
+
   const handleCancel = () => {
     navigate(`/kiosk/${machineId}`);
   };
@@ -41,7 +50,7 @@ const KioskPdfPreview = () => {
 
   if (loading) {
     return (
-      <div className="w-screen h-screen bg-slate-950 text-white flex flex-col items-center justify-center">
+      <div className="w-screen min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center">
         <Loader2 className="w-14 h-14 text-cyan-500 animate-spin mb-4" />
         <h2 className="text-xl font-bold font-heading text-slate-200">Opening Document Preview...</h2>
       </div>
@@ -50,7 +59,7 @@ const KioskPdfPreview = () => {
 
   if (!upload) {
     return (
-      <div className="w-screen h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6">
+      <div className="w-screen min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6">
         <AlertCircle className="w-16 h-16 text-rose-500 mb-4 animate-bounce" />
         <h2 className="text-2xl font-bold font-heading text-white">Upload Record Expired or Invalid</h2>
         <p className="text-slate-400 mt-2">Please rescan the QR code on the kiosk home screen.</p>
@@ -64,19 +73,22 @@ const KioskPdfPreview = () => {
     );
   }
 
-  const fileUrl = `${window.location.origin}${upload.file_path}`;
+  const backendBase = window.location.hostname === 'localhost'
+    ? window.location.origin
+    : `http://${window.location.hostname}:5000`;
+  const fileUrl = `${backendBase}${upload.file_path}`;
   const fileSizeMb = (upload.file_size_bytes / (1024 * 1024)).toFixed(2);
 
   return (
-    <div className="w-screen h-screen bg-slate-950 text-white flex flex-col justify-between p-6 select-none overflow-hidden">
+    <div className="min-h-screen w-full bg-slate-950 text-white flex flex-col p-4 md:p-6 select-none overflow-y-auto font-sans">
       {/* HEADER */}
-      <header className="flex items-center justify-between bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl px-6 py-4">
+      <header className="flex flex-wrap items-center justify-between bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl px-6 py-4 mb-4 gap-4">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-cyan-500/20 text-cyan-400 rounded-xl border border-cyan-500/30">
             <FileText className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white font-heading truncate max-w-md">
+            <h1 className="text-xl font-bold text-white font-heading truncate max-w-xs md:max-w-md">
               {upload.original_filename}
             </h1>
             <p className="text-xs text-slate-400">Document Uploaded Successfully</p>
@@ -84,7 +96,7 @@ const KioskPdfPreview = () => {
         </div>
 
         {/* File Metadata Badges */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="px-4 py-2 bg-slate-950 rounded-xl border border-slate-800 text-xs font-semibold text-slate-300">
             Total Pages: <span className="text-cyan-400 font-bold">{upload.total_pages}</span>
           </div>
@@ -95,14 +107,14 @@ const KioskPdfPreview = () => {
       </header>
 
       {/* MAIN DOCUMENT PREVIEW BODY */}
-      <main className="relative grid grid-cols-12 gap-6 my-auto h-[calc(100vh-190px)] py-3">
+      <main className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 mb-4">
         {/* PDF CANVAS VIEWER */}
-        <div className="col-span-8 h-full flex flex-col">
+        <div className="lg:col-span-8 min-h-[500px] flex flex-col bg-slate-900/50 border border-slate-800 rounded-2xl p-4">
           <PDFCanvasViewer fileUrl={fileUrl} totalPages={upload.total_pages} />
         </div>
 
         {/* SUMMARY & ACTION SIDEBAR */}
-        <div className="col-span-4 flex flex-col justify-between bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div className="lg:col-span-4 flex flex-col justify-between bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-widest mb-3">
               <Sparkles className="w-4 h-4" />
@@ -117,10 +129,10 @@ const KioskPdfPreview = () => {
             </p>
 
             {/* Document Info Card */}
-            <div className="mt-6 space-y-3 bg-slate-950/80 p-4 rounded-xl border border-slate-800 text-sm">
+            <div className="mt-4 space-y-3 bg-slate-950/80 p-4 rounded-xl border border-slate-800 text-sm">
               <div className="flex justify-between py-1 border-b border-slate-800/60">
                 <span className="text-slate-400">File Name</span>
-                <span className="font-semibold text-white truncate max-w-[180px]">{upload.original_filename}</span>
+                <span className="font-semibold text-white truncate max-w-[160px]">{upload.original_filename}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-800/60">
                 <span className="text-slate-400">Page Count</span>
@@ -136,14 +148,6 @@ const KioskPdfPreview = () => {
           {/* ACTION BUTTONS (Cancel, Review, Continue) */}
           <div className="space-y-3 mt-6">
             <button
-              onClick={() => setShowReviewModal(true)}
-              className="w-full py-4 bg-indigo-600/90 hover:bg-indigo-500 active:scale-98 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-indigo-glow btn-touch text-base"
-            >
-              <Maximize2 className="w-5 h-5" />
-              <span>Review (Zoom / Rotate)</span>
-            </button>
-
-            <button
               onClick={handleContinue}
               className="w-full py-4 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 active:scale-98 text-slate-950 font-extrabold rounded-xl transition-all flex items-center justify-center gap-2 shadow-cyan-glow btn-touch text-lg"
             >
@@ -151,12 +155,14 @@ const KioskPdfPreview = () => {
               <ArrowRight className="w-6 h-6" />
             </button>
 
+
+
             <button
               onClick={handleCancel}
               className="w-full py-3 bg-slate-800 hover:bg-slate-700 active:scale-98 text-slate-300 font-bold rounded-xl transition-all flex items-center justify-center gap-2 btn-touch text-sm"
             >
               <X className="w-4 h-4 text-rose-400" />
-              <span>Cancel</span>
+              <span>Cancel & Start Over</span>
             </button>
           </div>
         </div>
@@ -169,7 +175,7 @@ const KioskPdfPreview = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl flex flex-col p-6"
+            className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl flex flex-col p-6 overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-white font-heading flex items-center gap-2">
@@ -178,14 +184,33 @@ const KioskPdfPreview = () => {
               </h3>
               <button
                 onClick={() => setShowReviewModal(false)}
-                className="p-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl active:scale-95"
+                className="p-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl active:scale-95 flex items-center gap-2 font-bold text-sm"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 text-rose-400" />
+                <span>Close Review</span>
               </button>
             </div>
 
-            <div className="flex-1 w-full overflow-hidden">
+            <div className="flex-1 w-full overflow-hidden min-h-[400px]">
               <PDFCanvasViewer fileUrl={fileUrl} totalPages={upload.total_pages} />
+            </div>
+
+            {/* Bottom Modal Action Bar */}
+            <div className="mt-4 flex items-center justify-between bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+              <button
+                onClick={() => setShowReviewModal(false)}
+                className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl btn-touch text-sm"
+              >
+                Back to Preview Screen
+              </button>
+
+              <button
+                onClick={handleContinue}
+                className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-extrabold rounded-xl btn-touch text-base flex items-center gap-2 shadow-cyan-glow"
+              >
+                <span>Continue to Print Options</span>
+                <ArrowRight className="w-5 h-5" />
+              </button>
             </div>
           </motion.div>
         )}

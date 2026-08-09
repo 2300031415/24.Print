@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { DollarSign, Save, Percent } from 'lucide-react';
+import { DollarSign, Save, Percent, Monitor } from 'lucide-react';
 
 import PortalLayout from '../../components/PortalLayout';
 import api from '../../services/api';
 
-const AdminPricing = () => {
-  const [pricingList, setPricingList] = useState([]);
+const AdminPricing = ({ role = 'admin' }) => {
+  const [machines, setMachines] = useState([]);
+  const [selectedMachineId, setSelectedMachineId] = useState('all');
   const [formData, setFormData] = useState({
     bw_single_page_price: 2.00,
     color_single_page_price: 10.00,
@@ -14,11 +15,25 @@ const AdminPricing = () => {
     paper_size: 'A4'
   });
 
+  useEffect(() => {
+    const fetchMachines = async () => {
+      try {
+        const res = await api.get('/machines');
+        if (res.data.success) {
+          setMachines(res.data.machines || []);
+        }
+      } catch (err) {
+        console.error('Error loading machines list:', err);
+      }
+    };
+    fetchMachines();
+  }, [role]);
+
+
   const fetchPricing = async () => {
     try {
       const res = await api.get('/settings/pricing');
       if (res.data.success && res.data.pricingList.length > 0) {
-        setPricingList(res.data.pricingList);
         const def = res.data.pricingList[0];
         setFormData({
           id: def.id,
@@ -36,14 +51,14 @@ const AdminPricing = () => {
 
   useEffect(() => {
     fetchPricing();
-  }, []);
+  }, [selectedMachineId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/settings/pricing', formData);
+      const res = await api.post('/settings/pricing', { ...formData, machine_id: selectedMachineId });
       if (res.data.success) {
-        alert('Pricing rules updated successfully!');
+        alert(`Pricing rates updated successfully for ${selectedMachineId === 'all' ? 'All Kiosks' : 'Selected Kiosk Product'}!`);
         fetchPricing();
       }
     } catch (err) {
@@ -52,12 +67,35 @@ const AdminPricing = () => {
   };
 
   return (
-    <PortalLayout title="Print Pricing Rate Management" role="admin">
+    <PortalLayout title={role === 'admin' ? 'Global Print Pricing Rate Management' : 'My Kiosks Print Rates Configuration'} role={role}>
       <div className="max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
         <h3 className="text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
           <DollarSign className="w-6 h-6 text-cyan-400" />
-          <span>Global Print Rates Configuration</span>
+          <span>Configure Kiosk Print Pricing</span>
         </h3>
+
+        {/* KIOSK MACHINE / PRODUCT SELECTION */}
+        <div className="mb-6 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+          <label className="text-xs font-bold text-slate-400 block mb-2 flex items-center gap-1.5">
+            <Monitor className="w-4 h-4 text-cyan-400" />
+            <span>Select Target Product / Kiosk Machine</span>
+          </label>
+          <select
+            value={selectedMachineId}
+            onChange={(e) => setSelectedMachineId(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white cursor-pointer focus:border-cyan-500 focus:outline-none"
+          >
+            <option value="all">🌐 All Kiosks (Global Default Rate)</option>
+            {machines.map((m) => (
+              <option key={m.id} value={m.id}>
+                📍 {m.name} ({m.machine_code || 'KIOSK'})
+              </option>
+            ))}
+          </select>
+          <p className="text-[11px] text-slate-400 mt-2">
+            Selecting a specific kiosk allows you to set custom per-page rates for that product only.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
@@ -117,7 +155,7 @@ const AdminPricing = () => {
             className="w-full py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-cyan-glow btn-touch text-base flex items-center justify-center gap-2"
           >
             <Save className="w-5 h-5" />
-            <span>Save Global Rates</span>
+            <span>Save Kiosk Rates</span>
           </button>
         </form>
       </div>
@@ -126,3 +164,4 @@ const AdminPricing = () => {
 };
 
 export default AdminPricing;
+

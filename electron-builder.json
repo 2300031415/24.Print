@@ -1,0 +1,18 @@
+{
+  "appId": "com.printpulse.kiosk",
+  "productName": "PrintPulse Kiosk System",
+  "copyright": "Copyright © 2026 PrintPulse Commercial",
+  "directories": {
+    "output": "dist_electron"
+  },
+  "files": [
+    "electron/**/*",
+    "package.json"
+  ],
+  "extraMetadata": {
+    "main": "electron/main.js"
+  },
+  "win": {
+    "target": "dir"
+  }
+}

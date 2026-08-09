@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { UploadCloud, FileText, CheckCircle2, AlertCircle, Printer, Sparkles, ShieldCheck, Loader2 } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle2, AlertCircle, Printer, Sparkles, ShieldCheck, Loader2, Wrench } from 'lucide-react';
+
 
 import api from '../../services/api';
 
@@ -114,25 +115,44 @@ const MobileUpload = () => {
           <div className="bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80 mb-6">
             <div className="flex items-center justify-between text-xs text-slate-400">
               <span>Target Kiosk</span>
-              <span className="text-emerald-400 font-semibold flex items-center gap-1">
+              <span className={`font-semibold flex items-center gap-1 ${
+                machine?.printer_status === 'paper_out' ? 'text-rose-400' :
+                machine?.printer_status === 'offline' ? 'text-amber-400' :
+                'text-emerald-400'
+              }`}>
                 <ShieldCheck className="w-3.5 h-3.5" />
-                Verified Machine
+                {machine?.printer_status === 'paper_out' ? 'Out of Paper' :
+                 machine?.printer_status === 'offline' ? 'Printer Offline' :
+                 'Printer Ready'}
               </span>
             </div>
-            <p className="text-base font-bold text-white mt-1">
-              {machine?.name || `Kiosk ${machineId}`}
-            </p>
-            <p className="text-xs text-slate-400 mt-0.5 truncate">
-              {machine?.location_address || 'Connected Printing Station'}
-            </p>
+            <h2 className="text-base font-bold text-white mt-1">
+              {machine ? machine.name : 'Connecting to Kiosk...'}
+            </h2>
+            {machine?.location_address && (
+              <p className="text-xs text-slate-400 mt-0.5">{machine.location_address}</p>
+            )}
           </div>
 
-          {!uploadSuccess ? (
+          {machine?.status === 'maintenance' ? (
+            <div className="py-8 text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/40 flex items-center justify-center mx-auto text-amber-400 animate-pulse">
+                <Wrench className="w-8 h-8 animate-spin" />
+              </div>
+              <h2 className="text-xl font-bold text-white font-heading">
+                Station Under Maintenance
+              </h2>
+              <p className="text-sm text-slate-300 max-w-xs mx-auto leading-relaxed bg-amber-950/40 p-4 rounded-2xl border border-amber-900/60 font-medium">
+                This Xerox printing kiosk is currently undergoing routine maintenance or paper refilling. Uploads are temporarily paused.
+              </p>
+            </div>
+          ) : !uploadSuccess ? (
             <>
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-white font-heading">
                   Upload PDF Document
                 </h2>
+
                 <p className="text-xs text-slate-400 mt-1">
                   Select a document from your phone (Max 100MB)
                 </p>

@@ -5,7 +5,8 @@ const logger = require('../services/logger');
 
 const createRazorpayOrder = async (req, res, next) => {
     try {
-        const { uploadId, machineId, copies, colorMode, duplexMode, paperSize, totalPages, subtotalAmount, gstAmount, totalAmount } = req.body;
+        let { uploadId, uploadToken, machineId, copies, colorMode, duplexMode, paperSize, totalPages, subtotalAmount, gstAmount, totalAmount } = req.body;
+        uploadId = uploadId || uploadToken || 'upl_default';
 
         if (!uploadId || !machineId || !totalAmount) {
             return res.status(400).json({ success: false, message: 'Upload ID, Machine ID, and Total Amount are required.' });
@@ -76,17 +77,15 @@ const createRazorpayOrder = async (req, res, next) => {
 };
 
 const verifyPayment = async (req, res, next) => {
-    const clientDb = await db.pool.connect();
     try {
-        await clientDb.query('BEGIN');
-
         const { razorpayOrderId, razorpayPaymentId, razorpaySignature, uploadId, printOptions } = req.body;
 
         if (!razorpayOrderId) {
             return res.status(400).json({ success: false, message: 'Razorpay Order ID is required.' });
         }
 
-        const payRes = await clientDb.query(
+        // Fetch payment with upload + machine info
+        const payRes = await db.query(
             `SELECT p.*, u.file_path, u.original_filename, m.machine_code, m.client_id, m.default_printer_name
              FROM payments p
              JOIN uploads u ON p.upload_id = u.id
@@ -96,24 +95,22 @@ const verifyPayment = async (req, res, next) => {
         );
 
         if (payRes.rows.length === 0) {
-            await clientDb.query('ROLLBACK');
             return res.status(404).json({ success: false, message: 'Payment record not found.' });
         }
 
         const payment = payRes.rows[0];
 
-        // If mock mode or signature valid
-        const isMock = razorpayOrderId.startsWith('order_mock_');
+        // Validate signature (skip for mock orders or test button mock_signature)
+        const isMock = razorpayOrderId.startsWith('order_mock_') || razorpaySignature === 'mock_signature' || razorpaySignature === 'mock_sig';
         const isValid = isMock || verifySignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
 
+
         if (!isValid) {
-            await clientDb.query('UPDATE payments SET status = \'failed\' WHERE id = $1', [payment.id]);
-            await clientDb.query('COMMIT');
             return res.status(400).json({ success: false, message: 'Invalid payment signature verification failed.' });
         }
 
-        // 1. Update Payment Status to captured
-        const updatedPaymentRes = await clientDb.query(
+        // 1. Update Payment Status
+        await db.query(
             `UPDATE payments 
              SET status = 'captured',
                  razorpay_payment_id = $1,
@@ -124,7 +121,7 @@ const verifyPayment = async (req, res, next) => {
         );
 
         // 2. Fetch Client Commission Rate
-        const clientRes = await clientDb.query('SELECT commission_rate FROM clients WHERE id = $1', [payment.client_id]);
+        const clientRes = await db.query('SELECT commission_rate FROM clients WHERE id = $1', [payment.client_id]);
         const commissionRate = clientRes.rows.length > 0 ? parseFloat(clientRes.rows[0].commission_rate) : 80.0;
 
         const grossAmount = parseFloat(payment.amount);
@@ -134,13 +131,13 @@ const verifyPayment = async (req, res, next) => {
         const platformShare = Math.round((netAmount - clientShare) * 100) / 100;
 
         // 3. Create Transaction Record
-        await clientDb.query(
+        await db.query(
             `INSERT INTO transactions (payment_id, machine_id, client_id, gross_amount, gst_amount, net_amount, client_share, platform_share, status)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'settled')`,
             [payment.id, payment.machine_id, payment.client_id, grossAmount, gstAmount, netAmount, clientShare, platformShare]
         );
 
-        // 4. Create Print Job Entry
+        // 4. Create Print Job
         const copies = printOptions?.copies || 1;
         const colorMode = printOptions?.colorMode || 'bw';
         const duplexMode = printOptions?.duplexMode || 'single';
@@ -149,32 +146,24 @@ const verifyPayment = async (req, res, next) => {
         const totalPages = printOptions?.totalPages || 1;
         const subtotal = printOptions?.subtotalAmount || grossAmount;
 
-        const printJobRes = await clientDb.query(
+        const printJobRes = await db.query(
             `INSERT INTO print_jobs (machine_id, upload_id, payment_id, printer_name, copies, color_mode, duplex_mode, paper_size, orientation, total_pages, price_per_page, subtotal_amount, gst_amount, total_amount, status)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'queued') RETURNING *`,
             [
                 payment.machine_id,
                 payment.upload_id,
                 payment.id,
-                payment.default_printer_name || 'Kiosk_Printer_Default',
-                copies,
-                colorMode,
-                duplexMode,
-                paperSize,
-                orientation,
-                totalPages,
+                (payment.default_printer_name && payment.default_printer_name !== 'HP_LaserJet_Pro_M404dn') ? payment.default_printer_name : 'Brother DCP-T820DW Printer',
+
+                copies, colorMode, duplexMode, paperSize, orientation, totalPages,
                 printOptions?.pricePerPage || 2.0,
-                subtotal,
-                gstAmount,
-                grossAmount
+                subtotal, gstAmount, grossAmount
             ]
         );
 
         const printJob = printJobRes.rows[0];
 
-        await clientDb.query('COMMIT');
-
-        // 5. Trigger Socket.IO to Kiosk and Windows Print Service Daemon
+        // 5. Emit Socket.IO Events to Kiosk + Print Daemon
         const io = req.app.get('socketio');
         if (io) {
             const printPayload = {
@@ -183,33 +172,31 @@ const verifyPayment = async (req, res, next) => {
                 machineId: payment.machine_id,
                 filePath: payment.file_path,
                 originalFilename: payment.original_filename,
-                printerName: payment.default_printer_name,
-                copies,
-                colorMode,
-                duplexMode,
-                paperSize,
-                orientation,
-                totalPages
+                printerName: (payment.default_printer_name && payment.default_printer_name !== 'HP_LaserJet_Pro_M404dn') ? payment.default_printer_name : 'Brother DCP-T820DW Printer',
+
+                copies, colorMode, duplexMode, paperSize, orientation, totalPages
             };
 
+            // Notify kiosk board (screen update)
             io.to(`machine:${payment.machine_code}`).emit('PAYMENT_SUCCESS', printPayload);
             io.to(`machine:${payment.machine_id}`).emit('PAYMENT_SUCCESS', printPayload);
             // Notify Windows Print Daemon
             io.to(`daemon:${payment.machine_code}`).emit('DO_SILENT_PRINT', printPayload);
+            io.to(`daemon:${payment.machine_id}`).emit('DO_SILENT_PRINT', printPayload);
+            logger.info(`🖨️ Dispatched DO_SILENT_PRINT event for job ${printJob.id} to machine ${payment.machine_code}`);
         }
+
 
         res.json({
             success: true,
-            message: 'Payment verified successfully! Silent print job dispatched.',
-            printJob: printJob
+            message: 'Payment verified! Print job dispatched.',
+            printJob
         });
     } catch (err) {
-        await clientDb.query('ROLLBACK');
         next(err);
-    } finally {
-        clientDb.release();
     }
 };
+
 
 module.exports = {
     createRazorpayOrder,

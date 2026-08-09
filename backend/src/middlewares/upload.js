@@ -2,14 +2,24 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const uploadsDir = path.join(__dirname, '../../uploads');
+// Absolute path to backend/uploads directory
+const uploadsDir = path.resolve(__dirname, '../../uploads');
+const adsDir = path.resolve(__dirname, '../../uploads/ads');
 
+// Ensure upload directories exist
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
+if (!fs.existsSync(adsDir)) {
+    fs.mkdirSync(adsDir, { recursive: true });
+}
 
+// Storage for PDF Documents
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
         cb(null, uploadsDir);
     },
     filename: (req, file, cb) => {
@@ -36,13 +46,11 @@ const uploadPdf = multer({
 });
 
 // Storage for Advertisement Media (Images, Videos, GIFs)
-const adsDir = path.join(__dirname, '../../uploads/ads');
-if (!fs.existsSync(adsDir)) {
-    fs.mkdirSync(adsDir, { recursive: true });
-}
-
 const adStorage = multer.diskStorage({
     destination: (req, file, cb) => {
+        if (!fs.existsSync(adsDir)) {
+            fs.mkdirSync(adsDir, { recursive: true });
+        }
         cb(null, adsDir);
     },
     filename: (req, file, cb) => {
