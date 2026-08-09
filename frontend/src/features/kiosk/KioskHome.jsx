@@ -434,11 +434,12 @@ const KioskHome = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
 
-    {/* USB Pendrive Detection — toast + file explorer overlay */}
-    <USBDriveModal machineId={machineId} />
+      {/* USB Pendrive Detection — toast + file explorer overlay */}
+      <USBDriveModal machineId={machineId} />
+    </div>
   );
 };
+
 
 export default KioskHome;
