@@ -6,8 +6,8 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    background-color: #0B0D12;
-    color: #F8FAFC;
+    background-color: #fff9ee;
+    color: #1e293b;
   }
 
   h1, h2, h3, h4, .font-heading {
@@ -15,13 +15,22 @@
   }
 }
 
+/* Custom Color Tokens */
+:root {
+  --color-crimson: #a12d33;
+  --color-crimson-dark: #802026;
+  --color-cream: #fff9ee;
+  --color-amber-gold: #ffc107;
+  --color-pure-white: #ffffff;
+}
+
 /* EasyXerox White Glass Logo Badge */
 .logo-badge {
-  background: rgba(255, 255, 255, 0.98);
+  background: #ffffff;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(217, 119, 6, 0.5);
-  box-shadow: 0 8px 25px -2px rgba(217, 119, 6, 0.35);
+  border: 2px solid #ffc107;
+  box-shadow: 0 8px 25px -2px rgba(161, 45, 51, 0.25);
   padding: 6px 18px;
   border-radius: 16px;
   display: inline-flex;
@@ -32,46 +41,50 @@
 
 .logo-badge:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px -2px rgba(217, 119, 6, 0.5);
+  box-shadow: 0 12px 32px -2px rgba(161, 45, 51, 0.35);
 }
 
-/* Custom Glassmorphism Cards with Rich Brown & Black Gradients */
+/* Custom Cards */
 .glass-panel {
-  background: rgba(28, 20, 15, 0.85);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(217, 119, 6, 0.3);
+  border: 1.5px solid rgba(161, 45, 51, 0.2);
+  box-shadow: 0 10px 30px rgba(161, 45, 51, 0.08);
 }
 
-.glass-panel-light {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(180, 83, 9, 0.2);
+.glass-panel-dark {
+  background: #a12d33;
+  color: #ffffff;
+  border: 1.5px solid #ffc107;
+  box-shadow: 0 12px 40px rgba(161, 45, 51, 0.3);
 }
 
 .glass-card {
-  background: linear-gradient(135deg, rgba(61, 35, 20, 0.85) 0%, rgba(18, 21, 29, 0.95) 100%);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(217, 119, 6, 0.25);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+  background: #ffffff;
+  border: 1.5px solid rgba(161, 45, 51, 0.15);
+  box-shadow: 0 10px 35px 0 rgba(161, 45, 51, 0.12);
 }
 
 /* Glowing Accent Shadows */
 .shadow-gold-glow {
-  box-shadow: 0 0 30px -3px rgba(217, 119, 6, 0.5);
+  box-shadow: 0 0 30px -3px rgba(255, 193, 7, 0.6);
+}
+
+.shadow-crimson-glow {
+  box-shadow: 0 0 30px -3px rgba(161, 45, 51, 0.4);
 }
 
 .shadow-amber-glow {
-  box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.45);
+  box-shadow: 0 0 25px -4px rgba(255, 193, 7, 0.5);
 }
 
 .shadow-blue-glow {
-  box-shadow: 0 0 25px -3px rgba(0, 102, 255, 0.45);
+  box-shadow: 0 0 25px -3px rgba(161, 45, 51, 0.3);
 }
 
 .shadow-cyan-glow {
-  box-shadow: 0 0 25px -5px rgba(217, 119, 6, 0.4);
+  box-shadow: 0 0 25px -5px rgba(255, 193, 7, 0.5);
 }
 
 .shadow-emerald-glow {
@@ -79,7 +92,7 @@
 }
 
 .shadow-indigo-glow {
-  box-shadow: 0 0 25px -5px rgba(217, 119, 6, 0.4);
+  box-shadow: 0 0 25px -5px rgba(161, 45, 51, 0.3);
 }
 
 /* Touch Friendly Button Active Scale */
@@ -98,12 +111,12 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(18, 21, 29, 0.8);
+  background: #fff9ee;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(180, 83, 9, 0.7);
+  background: #a12d33;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(217, 119, 6, 1);
+  background: #802026;
 }

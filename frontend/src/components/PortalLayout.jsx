@@ -41,16 +41,16 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
   const navItems = role === 'admin' ? adminNav : clientNav;
 
   return (
-    <div className="min-h-screen bg-[#0B0D12] text-slate-100 flex overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#fff9ee] text-slate-900 flex overflow-hidden font-sans">
       {/* SIDEBAR NAVIGATION */}
-      <aside className="w-72 bg-stone-950/95 border-r border-amber-500/20 flex flex-col justify-between p-6 shrink-0 backdrop-blur-xl">
+      <aside className="w-72 bg-[#a12d33] border-r-2 border-[#ffc107] flex flex-col justify-between p-6 shrink-0 shadow-2xl">
         <div>
           {/* Logo */}
           <div className="flex flex-col mb-8 px-2 gap-2">
-            <div className="logo-badge self-start py-2 px-4 shadow-gold-glow">
+            <div className="logo-badge self-start py-2 px-4 shadow-xl border-2 border-[#ffc107]">
               <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
             </div>
-            <span className="text-[10px] uppercase font-bold tracking-widest text-amber-400 block pl-1">
+            <span className="text-[10px] uppercase font-black tracking-widest text-[#ffc107] block pl-1">
               {role === 'admin' ? 'Super Admin Portal' : 'Client Owner Portal'}
             </span>
           </div>
@@ -64,17 +64,17 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-amber-500/20 to-amber-900/30 text-amber-300 border border-amber-500/40 shadow-gold-glow'
-                      : 'text-stone-400 hover:text-white hover:bg-stone-900/80'
+                      ? 'bg-[#ffc107] text-[#a12d33] shadow-gold-glow border border-white/40'
+                      : 'text-white/85 hover:text-white hover:bg-[#802026]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-amber-400' : 'text-stone-500'}`} />
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-[#a12d33]' : 'text-[#ffc107]'}`} />
                     <span>{item.name}</span>
                   </div>
-                  {isActive && <ChevronRight className="w-4 h-4 text-amber-400" />}
+                  {isActive && <ChevronRight className="w-4 h-4 text-[#a12d33]" />}
                 </Link>
               );
             })}
@@ -82,9 +82,9 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
         </div>
 
         {/* User Footer Profile & Logout */}
-        <div className="pt-6 border-t border-amber-500/20">
+        <div className="pt-6 border-t border-white/20">
           <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-9 h-9 rounded-full bg-amber-950/80 border border-amber-500/40 flex items-center justify-center font-bold text-amber-400">
+            <div className="w-9 h-9 rounded-full bg-[#ffc107] border border-white flex items-center justify-center font-black text-[#a12d33]">
               {user?.full_name?.charAt(0) || 'U'}
             </div>
             <div className="overflow-hidden">
