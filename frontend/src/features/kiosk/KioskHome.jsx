@@ -224,7 +224,7 @@ const KioskHome = () => {
             </div>
 
             {/* Standby Header Bar */}
-            <div className="relative z-10 flex items-center justify-between bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 rounded-2xl px-6 py-4">
+            <div className="relative z-10 flex items-center justify-between bg-gradient-to-r from-stone-950/90 via-slate-950/90 to-amber-950/80 backdrop-blur-xl border border-amber-500/30 rounded-2xl px-6 py-4 shadow-gold-glow">
               <div className="flex items-center gap-3">
                 <div className="logo-badge">
                   <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
@@ -233,9 +233,9 @@ const KioskHome = () => {
 
               {/* Live Clock & Printer Status */}
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 bg-slate-950/80 border border-slate-800 px-5 py-2.5 rounded-xl">
-                  <Clock className="w-5 h-5 text-cyan-400 animate-pulse" />
-                  <span className="text-xl font-bold font-mono text-cyan-300">
+                <div className="flex items-center gap-2 bg-stone-950/80 border border-amber-500/30 px-5 py-2.5 rounded-xl">
+                  <Clock className="w-5 h-5 text-amber-400 animate-pulse" />
+                  <span className="text-xl font-bold font-mono text-amber-300">
                     {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </span>
                 </div>
@@ -252,7 +252,7 @@ const KioskHome = () => {
 
             {/* Featured Ad Headline at Bottom Left */}
             <div className="relative z-10 max-w-2xl">
-              <span className="px-3.5 py-1.5 bg-cyan-500 text-slate-950 text-xs font-extrabold uppercase tracking-widest rounded-lg mb-3 inline-block shadow-cyan-glow">
+              <span className="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-xs font-extrabold uppercase tracking-widest rounded-lg mb-3 inline-block shadow-gold-glow">
                 Promotional Offer
               </span>
               <h2 className="text-4xl font-extrabold text-white leading-tight font-heading drop-shadow-2xl">
@@ -264,17 +264,17 @@ const KioskHome = () => {
             <motion.div
               animate={{ scale: [1, 1.03, 1] }}
               transition={{ repeat: Infinity, duration: 2 }}
-              className="relative z-10 w-full max-w-xl mx-auto bg-gradient-to-r from-cyan-500 via-indigo-600 to-cyan-500 p-0.5 rounded-3xl shadow-cyan-glow"
+              className="relative z-10 w-full max-w-xl mx-auto bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 p-0.5 rounded-3xl shadow-gold-glow"
             >
-              <div className="bg-slate-950/90 backdrop-blur-2xl rounded-[23px] px-8 py-5 flex items-center justify-center gap-4 text-center">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-500 text-slate-950 flex items-center justify-center shadow-cyan-glow animate-bounce">
+              <div className="bg-slate-950/95 backdrop-blur-2xl rounded-[23px] px-8 py-5 flex items-center justify-center gap-4 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-gold-glow animate-bounce">
                   <Hand className="w-7 h-7" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-extrabold text-white font-heading tracking-wide">
                     TOUCH SCREEN TO PRINT
                   </h3>
-                  <p className="text-xs text-cyan-300 font-semibold">
+                  <p className="text-xs text-amber-300 font-semibold">
                     Tap anywhere on screen to scan QR code & upload files
                   </p>
                 </div>
@@ -296,19 +296,19 @@ const KioskHome = () => {
             className="relative z-10 w-full h-full flex flex-col justify-between p-6"
           >
             {/* Background Ambient Lighting */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* HEADER BAR */}
-            <header className="relative z-10 flex items-center justify-between bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl px-6 py-4 shadow-xl">
+            <header className="relative z-10 flex items-center justify-between bg-stone-950/90 backdrop-blur-xl border border-amber-500/30 rounded-2xl px-6 py-4 shadow-gold-glow">
               <div className="flex items-center gap-3">
                 {/* Only show Back to Ads button if there are active ads */}
                 {ads.length > 0 && (
                   <button
                     onClick={() => setKioskState('standby_ad')}
-                    className="p-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl active:scale-95 transition-all flex items-center gap-2 font-bold text-xs"
+                    className="p-3 bg-stone-900 hover:bg-stone-800 text-amber-200 rounded-xl active:scale-95 transition-all flex items-center gap-2 font-bold text-xs border border-amber-500/30"
                   >
-                    <ArrowLeft className="w-4 h-4 text-cyan-400" />
+                    <ArrowLeft className="w-4 h-4 text-amber-400" />
                     <span>Back to Ads</span>
                   </button>
                 )}
@@ -319,12 +319,12 @@ const KioskHome = () => {
               </div>
 
               {/* Center Live Clock */}
-              <div className="flex items-center gap-2 bg-slate-950/70 border border-slate-800 px-5 py-2.5 rounded-xl">
-                <Clock className="w-5 h-5 text-cyan-400 animate-pulse" />
-                <span className="text-2xl font-bold tracking-wider font-mono text-cyan-300">
+              <div className="flex items-center gap-2 bg-slate-950/90 border border-amber-500/30 px-5 py-2.5 rounded-xl">
+                <Clock className="w-5 h-5 text-amber-400 animate-pulse" />
+                <span className="text-2xl font-bold tracking-wider font-mono text-amber-300">
                   {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                 </span>
-                <span className="text-xs text-slate-400 border-l border-slate-700 pl-3 ml-1">
+                <span className="text-xs text-stone-400 border-l border-stone-800 pl-3 ml-1">
                   {currentTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
                 </span>
               </div>
@@ -342,10 +342,10 @@ const KioskHome = () => {
 
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border ${
                   isConnected
-                    ? 'bg-cyan-950/60 text-cyan-400 border-cyan-800'
-                    : 'bg-slate-800 text-slate-400 border-slate-700'
+                    ? 'bg-amber-950/60 text-amber-400 border-amber-800'
+                    : 'bg-stone-800 text-stone-400 border-stone-700'
                 }`}>
-                  {isConnected ? <Wifi className="w-4 h-4 text-cyan-400" /> : <WifiOff className="w-4 h-4 text-rose-400" />}
+                  {isConnected ? <Wifi className="w-4 h-4 text-amber-400" /> : <WifiOff className="w-4 h-4 text-rose-400" />}
                   <span>{isConnected ? 'Online' : 'Offline'}</span>
                 </div>
               </div>
@@ -356,17 +356,17 @@ const KioskHome = () => {
               style={{ gridTemplateColumns: ads.length > 0 ? 'repeat(12, minmax(0, 1fr))' : '1fr' }}>
               {/* LEFT SIDE: Mini Ad Panel — only visible when ads exist */}
               {ads.length > 0 && (
-              <div className="col-span-6 flex flex-col justify-between bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl p-6 relative overflow-hidden">
-                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800">
+              <div className="col-span-6 flex flex-col justify-between bg-stone-950/70 backdrop-blur-md border border-amber-500/20 rounded-3xl p-6 relative overflow-hidden">
+                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-stone-900 to-stone-950 border border-amber-500/30">
                   <img
                     src={getMediaUrl(ads[currentAdIndex]?.media_url)}
                     alt={ads[currentAdIndex]?.title}
                     className="w-full h-full object-cover brightness-90"
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
-                  <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-stone-950 via-stone-950/70 to-transparent pointer-events-none" />
                   <div className="absolute bottom-6 left-6 right-6 z-10">
-                    <span className="px-3 py-1 bg-cyan-500 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-md mb-2 inline-block shadow-cyan-glow">
+                    <span className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-md mb-2 inline-block shadow-gold-glow">
                       Featured Offer
                     </span>
                     <h3 className="text-2xl font-extrabold text-white leading-snug font-heading">
@@ -378,8 +378,8 @@ const KioskHome = () => {
               )}
 
               {/* RIGHT SIDE (or full width if no ads): Prominent Touch QR Code Box */}
-              <div className={`${ads.length > 0 ? 'col-span-6' : 'col-span-12 max-w-xl mx-auto w-full'} flex flex-col items-center justify-center bg-gradient-to-b from-slate-900/90 to-slate-950 border border-cyan-500/40 rounded-3xl p-8 shadow-2xl relative text-center`}>
-                <div className="absolute -top-3 px-4 py-1.5 bg-cyan-500 text-slate-950 text-xs font-extrabold uppercase tracking-widest rounded-full shadow-cyan-glow flex items-center gap-1.5">
+              <div className={`${ads.length > 0 ? 'col-span-6' : 'col-span-12 max-w-xl mx-auto w-full'} flex flex-col items-center justify-center bg-gradient-to-b from-stone-900/95 via-slate-950 to-stone-950 border border-amber-500/40 rounded-3xl p-8 shadow-gold-glow relative text-center`}>
+                <div className="absolute -top-3 px-4 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-xs font-extrabold uppercase tracking-widest rounded-full shadow-gold-glow flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4" />
                   <span>Instant Self-Service</span>
                 </div>
@@ -387,12 +387,12 @@ const KioskHome = () => {
                 <h2 className="text-3xl font-extrabold text-white mt-4 font-heading">
                   Scan QR Code to Print
                 </h2>
-                <p className="text-sm text-slate-400 mt-2 max-w-xs">
+                <p className="text-sm text-amber-200/80 mt-2 max-w-xs font-medium">
                   Open your mobile camera or scanner app to upload your document directly.
                 </p>
 
                 {/* Prominent QR Code SVG */}
-                <div className="relative my-6 p-6 bg-white rounded-3xl shadow-2xl shadow-cyan-500/20 border-4 border-cyan-400">
+                <div className="relative my-6 p-6 bg-white rounded-3xl shadow-2xl shadow-amber-500/30 border-4 border-amber-500">
                   <QRCodeSVG
                     value={uploadUrl}
                     size={240}
@@ -401,7 +401,7 @@ const KioskHome = () => {
                   />
                 </div>
 
-                <div className="flex items-center gap-2 px-4 py-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs text-cyan-300 font-mono tracking-wide">
+                <div className="flex items-center gap-2 px-4 py-2 bg-slate-950/90 rounded-xl border border-amber-500/30 text-xs text-amber-300 font-mono tracking-wide">
                   <ShieldCheck className="w-4 h-4 text-emerald-400" />
                   <span>Machine ID: {machineId}</span>
                 </div>
@@ -409,9 +409,9 @@ const KioskHome = () => {
             </main>
 
             {/* FOOTER BAR */}
-            <footer className="relative z-10 flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/60 pt-4">
+            <footer className="relative z-10 flex items-center justify-between text-xs text-stone-400 border-t border-amber-500/20 pt-4">
               <p>© 2026 EasyXerox Commercial Kiosks. All rights reserved.</p>
-              <div className="flex items-center gap-4 text-slate-400">
+              <div className="flex items-center gap-4 text-amber-200/70">
                 <span>Max File Upload: 100MB</span>
                 <span>•</span>
                 <span>Formats: PDF, Word, Images, Text</span>

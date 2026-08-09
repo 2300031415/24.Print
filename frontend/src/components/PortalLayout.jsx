@@ -41,16 +41,16 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
   const navItems = role === 'admin' ? adminNav : clientNav;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#0B0D12] text-slate-100 flex overflow-hidden font-sans">
       {/* SIDEBAR NAVIGATION */}
-      <aside className="w-72 bg-slate-900/90 border-r border-slate-800 flex flex-col justify-between p-6 shrink-0 backdrop-blur-xl">
+      <aside className="w-72 bg-stone-950/95 border-r border-amber-500/20 flex flex-col justify-between p-6 shrink-0 backdrop-blur-xl">
         <div>
           {/* Logo */}
           <div className="flex flex-col mb-8 px-2 gap-2">
-            <div className="logo-badge self-start py-2 px-4">
+            <div className="logo-badge self-start py-2 px-4 shadow-gold-glow">
               <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
             </div>
-            <span className="text-[10px] uppercase font-bold tracking-widest text-blue-400 block pl-1">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-amber-400 block pl-1">
               {role === 'admin' ? 'Super Admin Portal' : 'Client Owner Portal'}
             </span>
           </div>
@@ -66,15 +66,15 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
                   to={item.path}
                   className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 text-cyan-400 border border-cyan-500/30 shadow-cyan-glow'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-gradient-to-r from-amber-500/20 to-amber-900/30 text-amber-300 border border-amber-500/40 shadow-gold-glow'
+                      : 'text-stone-400 hover:text-white hover:bg-stone-900/80'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-amber-400' : 'text-stone-500'}`} />
                     <span>{item.name}</span>
                   </div>
-                  {isActive && <ChevronRight className="w-4 h-4 text-cyan-400" />}
+                  {isActive && <ChevronRight className="w-4 h-4 text-amber-400" />}
                 </Link>
               );
             })}
@@ -82,9 +82,9 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
         </div>
 
         {/* User Footer Profile & Logout */}
-        <div className="pt-6 border-t border-slate-800">
+        <div className="pt-6 border-t border-amber-500/20">
           <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-cyan-400">
+            <div className="w-9 h-9 rounded-full bg-amber-950/80 border border-amber-500/40 flex items-center justify-center font-bold text-amber-400">
               {user?.full_name?.charAt(0) || 'U'}
             </div>
             <div className="overflow-hidden">
