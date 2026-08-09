@@ -45,16 +45,20 @@ export default function USBDriveModal({ machineId }) {
   // ─── Socket event listeners ────────────────────────────────
 
   const handleDriveConnected = useCallback((data) => {
-    const { drive } = data;
-    setActiveDrive(drive);
-    setShowToast(true);
-    setShowExplorer(false);
-    setFiles([]);
-    setUploadState(null);
-    setSelectedFile(null);
+    console.log('🔌 Kiosk UI received USB_DRIVE_CONNECTED event:', data);
+    const drive = data?.drive || data;
+    if (drive && drive.driveLetter) {
+      setActiveDrive(drive);
+      setShowToast(true);
+      setShowExplorer(false);
+      setFiles([]);
+      setUploadState(null);
+      setSelectedFile(null);
+    }
   }, []);
 
-  const handleDriveDisconnected = useCallback(() => {
+  const handleDriveDisconnected = useCallback((data) => {
+    console.log('🔌 Kiosk UI received USB_DRIVE_DISCONNECTED event:', data);
     setActiveDrive(null);
     setShowToast(false);
     setShowExplorer(false);
@@ -62,6 +66,7 @@ export default function USBDriveModal({ machineId }) {
     setUploadState(null);
     setSelectedFile(null);
   }, []);
+
 
   const handleFilesList = useCallback((data) => {
     setLoadingFiles(false);
