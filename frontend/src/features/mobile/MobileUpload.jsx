@@ -90,7 +90,9 @@ const MobileUpload = () => {
       {/* Mobile Top Header */}
       <header className="w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-xl mt-2">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="EasyXerox" className="h-10 w-auto object-contain drop-shadow-md" />
+          <div className="logo-badge py-1.5 px-3">
+            <img src="/logo.png" alt="EasyXerox" className="h-8 w-auto object-contain" />
+          </div>
         </div>
 
         <div className="px-3 py-1 bg-cyan-950/80 border border-cyan-800 rounded-lg text-xs text-cyan-300 font-mono font-semibold">

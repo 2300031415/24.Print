@@ -57,8 +57,10 @@ const Login = () => {
         className="w-full max-w-md bg-slate-900/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl relative z-10"
       >
         <div className="text-center mb-8">
-          <img src="/logo.png" alt="EasyXerox" className="h-16 mx-auto mb-3 object-contain drop-shadow-lg" />
-          <h1 className="text-xl font-bold font-heading text-slate-300">
+          <div className="logo-badge mb-4 py-3 px-6 shadow-blue-glow">
+            <img src="/logo.png" alt="EasyXerox" className="h-14 w-auto object-contain" />
+          </div>
+          <h1 className="text-xl font-bold font-heading text-slate-200">
             Control & Partner Portal
           </h1>
           <p className="text-xs text-slate-400 mt-1">

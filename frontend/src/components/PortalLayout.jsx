@@ -46,9 +46,11 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
       <aside className="w-72 bg-slate-900/90 border-r border-slate-800 flex flex-col justify-between p-6 shrink-0 backdrop-blur-xl">
         <div>
           {/* Logo */}
-          <div className="flex flex-col mb-8 px-2 gap-1">
-            <img src="/logo.png" alt="EasyXerox" className="h-12 w-auto object-contain self-start drop-shadow-md" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-cyan-400 block pl-1">
+          <div className="flex flex-col mb-8 px-2 gap-2">
+            <div className="logo-badge self-start py-2 px-4">
+              <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
+            </div>
+            <span className="text-[10px] uppercase font-bold tracking-widest text-blue-400 block pl-1">
               {role === 'admin' ? 'Super Admin Portal' : 'Client Owner Portal'}
             </span>
           </div>

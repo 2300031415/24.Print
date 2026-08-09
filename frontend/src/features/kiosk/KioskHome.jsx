@@ -226,7 +226,9 @@ const KioskHome = () => {
             {/* Standby Header Bar */}
             <div className="relative z-10 flex items-center justify-between bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 rounded-2xl px-6 py-4">
               <div className="flex items-center gap-3">
-                <img src="/logo.png" alt="EasyXerox" className="h-12 w-auto object-contain drop-shadow-md" />
+                <div className="logo-badge">
+                  <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
+                </div>
               </div>
 
               {/* Live Clock & Printer Status */}
@@ -311,7 +313,9 @@ const KioskHome = () => {
                   </button>
                 )}
 
-                <img src="/logo.png" alt="EasyXerox" className="h-12 w-auto object-contain drop-shadow-md ml-2" />
+                <div className="logo-badge ml-2">
+                  <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
+                </div>
               </div>
 
               {/* Center Live Clock */}
