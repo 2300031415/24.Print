@@ -46,18 +46,11 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
       <aside className="w-72 bg-slate-900/90 border-r border-slate-800 flex flex-col justify-between p-6 shrink-0 backdrop-blur-xl">
         <div>
           {/* Logo */}
-          <div className="flex items-center gap-3 mb-8 px-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-cyan-glow">
-              <Printer className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-white font-heading">
-                Print<span className="text-cyan-400">Pulse</span>
-              </h1>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-cyan-400 block -mt-1">
-                {role === 'admin' ? 'Super Admin' : 'Client Owner'}
-              </span>
-            </div>
+          <div className="flex flex-col mb-8 px-2 gap-1">
+            <img src="/logo.png" alt="EasyXerox" className="h-12 w-auto object-contain self-start drop-shadow-md" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-cyan-400 block pl-1">
+              {role === 'admin' ? 'Super Admin Portal' : 'Client Owner Portal'}
+            </span>
           </div>
 
           {/* Navigation Items */}

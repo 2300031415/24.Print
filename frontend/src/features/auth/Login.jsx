@@ -57,14 +57,12 @@ const Login = () => {
         className="w-full max-w-md bg-slate-900/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl relative z-10"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-cyan-glow mx-auto mb-4">
-            <Printer className="w-9 h-9 text-white" />
-          </div>
-          <h1 className="text-3xl font-extrabold font-heading text-white">
-            Print<span className="text-cyan-400">Pulse</span> Portal
+          <img src="/logo.png" alt="EasyXerox" className="h-16 mx-auto mb-3 object-contain drop-shadow-lg" />
+          <h1 className="text-xl font-bold font-heading text-slate-300">
+            Control & Partner Portal
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Universal Control & Partner Sign In
+          <p className="text-xs text-slate-400 mt-1">
+            Sign in to access your Xerox & Printing management dashboard
           </p>
         </div>
 

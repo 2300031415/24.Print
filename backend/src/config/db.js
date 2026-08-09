@@ -148,7 +148,7 @@ const mockDb = {
     settings: [
         {
             setting_key: 'company_info',
-            setting_value: { name: "PrintPulse Xerox Systems", logo_url: "/logo.png" }
+            setting_value: { name: "EasyXerox Systems", logo_url: "/logo.png" }
         }
     ]
 };

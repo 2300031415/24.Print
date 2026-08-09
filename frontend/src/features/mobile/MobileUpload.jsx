@@ -90,13 +90,7 @@ const MobileUpload = () => {
       {/* Mobile Top Header */}
       <header className="w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-xl mt-2">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-cyan-glow">
-            <Printer className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-white font-heading">PrintPulse Mobile</h1>
-            <p className="text-xs text-slate-400">Self-Service Document Upload</p>
-          </div>
+          <img src="/logo.png" alt="EasyXerox" className="h-10 w-auto object-contain drop-shadow-md" />
         </div>
 
         <div className="px-3 py-1 bg-cyan-950/80 border border-cyan-800 rounded-lg text-xs text-cyan-300 font-mono font-semibold">
@@ -257,8 +251,8 @@ const MobileUpload = () => {
       </main>
 
       {/* Mobile Footer */}
-      <footer className="w-full max-w-md text-center text-xs text-slate-500 py-3">
-        © 2026 PrintPulse Self-Service Printing Systems
+      <footer className="py-4 text-center text-xs text-slate-500">
+        © 2026 EasyXerox Self-Service Printing Systems
       </footer>
     </div>
   );

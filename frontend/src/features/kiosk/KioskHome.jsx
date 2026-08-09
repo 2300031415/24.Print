@@ -319,15 +319,7 @@ const KioskHome = () => {
                   </button>
                 )}
 
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-cyan-glow ml-2">
-                  <Printer className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold tracking-tight text-white font-heading">
-                    Print<span className="text-cyan-400">Pulse</span>
-                  </h1>
-                  <p className="text-xs font-medium text-slate-400">Self-Service Xerox & Print Kiosk</p>
-                </div>
+                <img src="/logo.png" alt="EasyXerox" className="h-12 w-auto object-contain drop-shadow-md ml-2" />
               </div>
 
               {/* Center Live Clock */}
@@ -422,11 +414,11 @@ const KioskHome = () => {
 
             {/* FOOTER BAR */}
             <footer className="relative z-10 flex items-center justify-between text-xs text-slate-500 border-t border-slate-800/60 pt-4">
-              <p>© 2026 PrintPulse Commercial Xerox Kiosks. All rights reserved.</p>
+              <p>© 2026 EasyXerox Commercial Kiosks. All rights reserved.</p>
               <div className="flex items-center gap-4 text-slate-400">
                 <span>Max File Upload: 100MB</span>
                 <span>•</span>
-                <span>Formats: PDF</span>
+                <span>Formats: PDF, Word, Images, Text</span>
                 <span>•</span>
                 <span>Support: 1800-123-456</span>
               </div>

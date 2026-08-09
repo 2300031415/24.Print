@@ -194,7 +194,7 @@ const KioskPdfPreview = () => {
 
       {/* FOOTER */}
       <footer className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-900">
-        <p>© 2026 PrintPulse Xerox Kiosk Systems</p>
+        <p>© 2026 EasyXerox Kiosk Systems</p>
         <p>Support ID: {machineId}</p>
       </footer>
     </div>

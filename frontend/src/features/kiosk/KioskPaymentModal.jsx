@@ -123,7 +123,7 @@ const KioskPaymentModal = ({ machineId, uploadId, printOptions, onClose }) => {
       key: keyId || razorpayKey,
       amount: order.amount,
       currency: order.currency || 'INR',
-      name: 'PrintPulse Xerox Kiosk',
+      name: 'EasyXerox Kiosk System',
       description: `Print Order (${printOptions.copies} copy, ${printOptions.totalPages} pages)`,
       order_id: order.id,
       handler: async (response) => {
