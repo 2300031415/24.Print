@@ -90,6 +90,7 @@ socket.on('USB_SELECT_FILE', async (data) => {
             contentType: ext === '.pdf'  ? 'application/pdf'
                 : ['.jpg', '.jpeg'].includes(ext) ? 'image/jpeg'
                 : ext === '.png'  ? 'image/png'
+                : ext === '.txt'  ? 'text/plain'
                 : 'application/octet-stream'
         });
         formData.append('machineCode', MACHINE_CODE);

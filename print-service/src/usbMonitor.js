@@ -7,7 +7,7 @@ const path = require('path');
  * Detects both already-inserted drives on daemon startup AND new insertions.
  */
 
-const SUPPORTED_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png', '.docx', '.doc', '.txt'];
+const SUPPORTED_EXTENSIONS = ['.txt'];
 const CHECK_LETTERS = ['D:', 'E:', 'F:', 'G:', 'H:', 'I:', 'J:', 'K:', 'L:', 'M:', 'N:', 'O:', 'P:', 'Q:', 'R:', 'S:', 'T:', 'U:', 'V:', 'W:', 'X:', 'Y:', 'Z:'];
 
 let _knownDrives = new Map(); // driveLetter -> driveInfo object
