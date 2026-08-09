@@ -13,11 +13,13 @@ const PDFCanvasViewer = ({ fileUrl, totalPages: propTotalPages, onPageChange }) 
   const [scale, setScale] = useState(1.2);
   const [rotation, setRotation] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   // Load PDF Document
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
+    setLoadError(false);
 
     const loadingTask = pdfjsLib.getDocument(fileUrl);
     loadingTask.promise.then(
@@ -28,8 +30,11 @@ const PDFCanvasViewer = ({ fileUrl, totalPages: propTotalPages, onPageChange }) 
         setLoading(false);
       },
       (error) => {
-        console.error('Error loading PDF:', error);
-        setLoading(false);
+        console.error('Error loading PDF canvas, activating fallback iframe:', error);
+        if (isMounted) {
+          setLoadError(true);
+          setLoading(false);
+        }
       }
     );
 
@@ -40,7 +45,7 @@ const PDFCanvasViewer = ({ fileUrl, totalPages: propTotalPages, onPageChange }) 
 
   // Render Page to Canvas
   useEffect(() => {
-    if (!pdfDoc || !canvasRef.current) return;
+    if (!pdfDoc || !canvasRef.current || loadError) return;
 
     let renderTask = null;
 
@@ -58,12 +63,14 @@ const PDFCanvasViewer = ({ fileUrl, totalPages: propTotalPages, onPageChange }) 
       };
 
       renderTask = page.render(renderContext);
+    }).catch(err => {
+      console.warn('Canvas render page error:', err);
     });
 
     return () => {
       if (renderTask) renderTask.cancel();
     };
-  }, [pdfDoc, currentPage, scale, rotation]);
+  }, [pdfDoc, currentPage, scale, rotation, loadError]);
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
@@ -150,7 +157,7 @@ const PDFCanvasViewer = ({ fileUrl, totalPages: propTotalPages, onPageChange }) 
         </div>
       </div>
 
-      {/* PDF Viewport Canvas */}
+      {/* PDF Viewport Canvas / Native Iframe Fallback */}
       <div className="relative flex-1 w-full overflow-auto flex items-center justify-center bg-slate-950 rounded-xl border border-slate-800/80 p-4 min-h-[420px]">
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-sm z-10">
@@ -158,7 +165,16 @@ const PDFCanvasViewer = ({ fileUrl, totalPages: propTotalPages, onPageChange }) 
             <p className="text-sm font-medium text-slate-300">Rendering Document Preview...</p>
           </div>
         )}
-        <canvas ref={canvasRef} className="max-w-full shadow-2xl rounded border border-slate-800" />
+
+        {loadError ? (
+          <iframe
+            src={`${fileUrl}#toolbar=0&navpanes=0`}
+            className="w-full h-full min-h-[450px] rounded border-0"
+            title="PDF Document Preview"
+          />
+        ) : (
+          <canvas ref={canvasRef} className="max-w-full shadow-2xl rounded border border-slate-800" />
+        )}
       </div>
     </div>
   );

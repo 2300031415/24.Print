@@ -73,9 +73,13 @@ const KioskPdfPreview = () => {
     );
   }
 
-  const backendBase = window.location.hostname === 'localhost'
-    ? window.location.origin
-    : `http://${window.location.hostname}:5000`;
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+
+  const backendBase = (hostname === 'localhost' || hostname === '127.0.0.1')
+    ? 'http://localhost:5000'
+    : (port === '5173' ? `http://${hostname}:5000` : `${protocol}//${hostname}`);
   const fileUrl = `${backendBase}${upload.file_path}`;
   const fileSizeMb = (upload.file_size_bytes / (1024 * 1024)).toFixed(2);
 
