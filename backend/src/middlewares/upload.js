@@ -119,5 +119,6 @@ const uploadAd = multer({
 module.exports = {
     uploadPdf,
     uploadDocument,
-    uploadAd
+    uploadAd,
+    uploadAdMedia: uploadAd
 };
