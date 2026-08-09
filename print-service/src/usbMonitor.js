@@ -4,7 +4,7 @@ const path = require('path');
 
 /**
  * USB Drive Monitor — Ultra-reliable & instant drive detector for Windows PC.
- * Uses native fs.existsSync + cmd vol check (0ms overhead, zero flickering/timeouts).
+ * Detects both already-inserted drives on daemon startup AND new insertions.
  */
 
 const SUPPORTED_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png', '.docx', '.doc', '.txt'];
@@ -19,7 +19,6 @@ let _monitorInterval = null;
 function getVolumeName(letter) {
     try {
         const stdout = execSync(`cmd /c vol ${letter}`, { timeout: 1500, encoding: 'utf8' });
-        // Output format: "Volume in drive D is KALI LINUX\n Volume Serial Number is..."
         const match = stdout.match(/Volume in drive [A-Z] is (.*)/i);
         if (match && match[1] && match[1].trim()) {
             return match[1].trim();
@@ -38,7 +37,6 @@ function checkConnectedDrives() {
         const rootPath = `${letter}\\`;
         try {
             if (fs.existsSync(rootPath)) {
-                // Confirm drive is readable
                 try {
                     fs.readdirSync(rootPath);
                     const volName = getVolumeName(letter);
@@ -49,7 +47,7 @@ function checkConnectedDrives() {
                         freeSpace: 'Ready'
                     });
                 } catch (_) {
-                    // Unreadable drive (e.g. empty CD drive or locked device), ignore
+                    // Unreadable drive, skip
                 }
             }
         } catch (_) {}
@@ -146,18 +144,19 @@ function formatSize(bytes) {
 
 /**
  * Starts USB monitoring. Checks every 1.5 seconds.
+ * Triggers `onInserted` for both existing drives on startup AND new insertions.
  */
 function startUSBMonitoring({ onInserted, onRemoved }) {
     console.log('🔌 USB Drive Monitor active (instant drive scan every 1.5s)...');
 
-    // Initial scan
-    _knownDrives = checkConnectedDrives();
+    // Start with empty map so any already-plugged-in drive fires onInserted immediately!
+    _knownDrives = new Map();
 
-    _monitorInterval = setInterval(() => {
+    const scan = () => {
         try {
             const currentDrives = checkConnectedDrives();
 
-            // Check newly inserted
+            // Check newly inserted or already connected on startup
             for (const [letter, drive] of currentDrives.entries()) {
                 if (!_knownDrives.has(letter)) {
                     console.log(`🔌 USB Drive INSERTED: ${letter} (${drive.volumeName})`);
@@ -179,7 +178,12 @@ function startUSBMonitoring({ onInserted, onRemoved }) {
                 }
             }
         } catch (_) {}
-    }, 1500);
+    };
+
+    // Run initial scan immediately on daemon start
+    scan();
+
+    _monitorInterval = setInterval(scan, 1500);
 }
 
 function stopUSBMonitoring() {
