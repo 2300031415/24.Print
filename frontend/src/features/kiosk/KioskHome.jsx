@@ -217,14 +217,14 @@ const KioskHome = () => {
                       />
                     )}
                     {/* Gradient Overlay for Readable Text */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#802026]/90 via-black/40 to-[#a12d33]/50" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0040A8]/90 via-black/40 to-[#0066FF]/50" />
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
             {/* Standby Header Bar */}
-            <div className="relative z-10 flex items-center justify-between bg-[#a12d33] backdrop-blur-xl border-2 border-[#ffc107] rounded-2xl px-6 py-4 shadow-crimson-glow text-white">
+            <div className="relative z-10 flex items-center justify-between bg-[#0066FF] backdrop-blur-xl border-2 border-white/40 rounded-2xl px-6 py-4 shadow-blue-glow text-white">
               <div className="flex items-center gap-3">
                 <div className="logo-badge">
                   <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
@@ -233,17 +233,17 @@ const KioskHome = () => {
 
               {/* Live Clock & Printer Status */}
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 bg-[#802026] border border-[#ffc107] px-5 py-2.5 rounded-xl">
-                  <Clock className="w-5 h-5 text-[#ffc107] animate-pulse" />
-                  <span className="text-xl font-bold font-mono text-[#ffc107]">
+                <div className="flex items-center gap-2 bg-[#0052CC] border border-white/30 px-5 py-2.5 rounded-xl">
+                  <Clock className="w-5 h-5 text-white animate-pulse" />
+                  <span className="text-xl font-bold font-mono text-white">
                     {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </span>
                 </div>
 
                 <div className={`px-4 py-2 rounded-xl text-xs font-bold border ${
                   printerStatus === 'ready'
-                    ? 'bg-emerald-900 text-emerald-300 border-emerald-500'
-                    : 'bg-amber-900 text-[#ffc107] border-[#ffc107]'
+                    ? 'bg-emerald-600 text-white border-white/40'
+                    : 'bg-amber-500 text-slate-950 border-white/40'
                 }`}>
                   {printerStatus === 'ready' ? 'Printer Ready' : 'Printer Status Check'}
                 </div>
@@ -252,7 +252,7 @@ const KioskHome = () => {
 
             {/* Featured Ad Headline at Bottom Left */}
             <div className="relative z-10 max-w-2xl">
-              <span className="px-3.5 py-1.5 bg-[#ffc107] text-[#a12d33] text-xs font-extrabold uppercase tracking-widest rounded-lg mb-3 inline-block shadow-gold-glow">
+              <span className="px-3.5 py-1.5 bg-[#0066FF] text-white text-xs font-extrabold uppercase tracking-widest rounded-lg mb-3 inline-block shadow-blue-glow border border-white/30">
                 Promotional Offer
               </span>
               <h2 className="text-4xl font-extrabold text-white leading-tight font-heading drop-shadow-2xl">
@@ -264,17 +264,17 @@ const KioskHome = () => {
             <motion.div
               animate={{ scale: [1, 1.03, 1] }}
               transition={{ repeat: Infinity, duration: 2 }}
-              className="relative z-10 w-full max-w-xl mx-auto bg-[#ffc107] p-1 rounded-3xl shadow-gold-glow"
+              className="relative z-10 w-full max-w-xl mx-auto bg-[#0066FF] p-1 rounded-3xl shadow-blue-glow"
             >
-              <div className="bg-[#a12d33] backdrop-blur-2xl rounded-[23px] px-8 py-5 flex items-center justify-center gap-4 text-center border border-[#ffc107]/50">
-                <div className="w-12 h-12 rounded-2xl bg-[#ffc107] text-[#a12d33] flex items-center justify-center shadow-gold-glow animate-bounce">
-                  <Hand className="w-7 h-7" />
+              <div className="bg-[#0052CC] backdrop-blur-2xl rounded-[23px] px-8 py-5 flex items-center justify-center gap-4 text-center border border-white/40">
+                <div className="w-12 h-12 rounded-2xl bg-white text-[#0066FF] flex items-center justify-center shadow-lg animate-bounce">
+                  <Hand className="w-7 h-7 text-[#0066FF]" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-extrabold text-white font-heading tracking-wide">
                     TOUCH SCREEN TO PRINT
                   </h3>
-                  <p className="text-xs text-[#ffc107] font-bold">
+                  <p className="text-xs text-blue-100 font-semibold">
                     Tap anywhere on screen to scan QR code & upload files
                   </p>
                 </div>
@@ -296,15 +296,15 @@ const KioskHome = () => {
             className="relative z-10 w-full h-full flex flex-col justify-between p-6 bg-[#fff9ee]"
           >
             {/* HEADER BAR */}
-            <header className="relative z-10 flex items-center justify-between bg-[#a12d33] backdrop-blur-xl border-2 border-[#ffc107] rounded-2xl px-6 py-4 shadow-crimson-glow text-white">
+            <header className="relative z-10 flex items-center justify-between bg-[#0066FF] backdrop-blur-xl border-2 border-white/40 rounded-2xl px-6 py-4 shadow-blue-glow text-white">
               <div className="flex items-center gap-3">
                 {/* Only show Back to Ads button if there are active ads */}
                 {ads.length > 0 && (
                   <button
                     onClick={() => setKioskState('standby_ad')}
-                    className="p-3 bg-[#802026] hover:bg-[#601015] text-[#ffc107] rounded-xl active:scale-95 transition-all flex items-center gap-2 font-bold text-xs border border-[#ffc107]"
+                    className="p-3 bg-[#0052CC] hover:bg-[#0040A8] text-white rounded-xl active:scale-95 transition-all flex items-center gap-2 font-bold text-xs border border-white/40"
                   >
-                    <ArrowLeft className="w-4 h-4 text-[#ffc107]" />
+                    <ArrowLeft className="w-4 h-4 text-white" />
                     <span>Back to Ads</span>
                   </button>
                 )}
@@ -315,12 +315,12 @@ const KioskHome = () => {
               </div>
 
               {/* Center Live Clock */}
-              <div className="flex items-center gap-2 bg-[#802026] border border-[#ffc107] px-5 py-2.5 rounded-xl">
-                <Clock className="w-5 h-5 text-[#ffc107] animate-pulse" />
-                <span className="text-2xl font-bold tracking-wider font-mono text-[#ffc107]">
+              <div className="flex items-center gap-2 bg-[#0052CC] border border-white/30 px-5 py-2.5 rounded-xl">
+                <Clock className="w-5 h-5 text-white animate-pulse" />
+                <span className="text-2xl font-bold tracking-wider font-mono text-white">
                   {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                 </span>
-                <span className="text-xs text-white/80 border-l border-white/20 pl-3 ml-1">
+                <span className="text-xs text-blue-100 border-l border-white/20 pl-3 ml-1">
                   {currentTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
                 </span>
               </div>
@@ -329,8 +329,8 @@ const KioskHome = () => {
               <div className="flex items-center gap-4">
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border ${
                   printerStatus === 'ready'
-                    ? 'bg-emerald-900 text-emerald-300 border-emerald-500'
-                    : 'bg-amber-900 text-[#ffc107] border-[#ffc107]'
+                    ? 'bg-emerald-600 text-white border-white/40'
+                    : 'bg-amber-500 text-slate-950 border-white/40'
                 }`}>
                   <Printer className="w-4 h-4" />
                   <span>{printerStatus === 'ready' ? 'Printer Ready' : 'Check Printer'}</span>
@@ -338,10 +338,10 @@ const KioskHome = () => {
 
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border ${
                   isConnected
-                    ? 'bg-[#802026] text-[#ffc107] border-[#ffc107]'
-                    : 'bg-slate-800 text-slate-300 border-slate-700'
+                    ? 'bg-[#0052CC] text-white border-white/40'
+                    : 'bg-slate-700 text-slate-200 border-slate-600'
                 }`}>
-                  {isConnected ? <Wifi className="w-4 h-4 text-[#ffc107]" /> : <WifiOff className="w-4 h-4 text-rose-400" />}
+                  {isConnected ? <Wifi className="w-4 h-4 text-white" /> : <WifiOff className="w-4 h-4 text-rose-400" />}
                   <span>{isConnected ? 'Online' : 'Offline'}</span>
                 </div>
               </div>
@@ -352,17 +352,17 @@ const KioskHome = () => {
               style={{ gridTemplateColumns: ads.length > 0 ? 'repeat(12, minmax(0, 1fr))' : '1fr' }}>
               {/* LEFT SIDE: Mini Ad Panel — only visible when ads exist */}
               {ads.length > 0 && (
-              <div className="col-span-6 flex flex-col justify-between bg-white border-2 border-[#a12d33]/20 rounded-3xl p-6 relative overflow-hidden shadow-xl">
-                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl bg-slate-100 border border-[#a12d33]/20">
+              <div className="col-span-6 flex flex-col justify-between bg-white border-2 border-[#0066FF]/20 rounded-3xl p-6 relative overflow-hidden shadow-xl">
+                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl bg-slate-100 border border-[#0066FF]/20">
                   <img
                     src={getMediaUrl(ads[currentAdIndex]?.media_url)}
                     alt={ads[currentAdIndex]?.title}
                     className="w-full h-full object-cover"
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
-                  <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#a12d33] via-[#a12d33]/80 to-transparent pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#0066FF] via-[#0066FF]/80 to-transparent pointer-events-none" />
                   <div className="absolute bottom-6 left-6 right-6 z-10">
-                    <span className="px-3 py-1 bg-[#ffc107] text-[#a12d33] text-xs font-extrabold uppercase tracking-wider rounded-md mb-2 inline-block shadow-gold-glow">
+                    <span className="px-3 py-1 bg-[#0066FF] text-white text-xs font-extrabold uppercase tracking-wider rounded-md mb-2 inline-block shadow-blue-glow border border-white/30">
                       Featured Offer
                     </span>
                     <h3 className="text-2xl font-extrabold text-white leading-snug font-heading">
@@ -374,13 +374,13 @@ const KioskHome = () => {
               )}
 
               {/* RIGHT SIDE (or full width if no ads): Prominent Touch QR Code Box */}
-              <div className={`${ads.length > 0 ? 'col-span-6' : 'col-span-12 max-w-xl mx-auto w-full'} flex flex-col items-center justify-center bg-[#ffffff] border-3 border-[#a12d33] rounded-3xl p-8 shadow-2xl relative text-center`}>
-                <div className="absolute -top-4 px-5 py-1.5 bg-[#ffc107] text-[#a12d33] text-xs font-black uppercase tracking-widest rounded-full shadow-gold-glow flex items-center gap-1.5 border border-[#a12d33]">
-                  <Sparkles className="w-4 h-4 text-[#a12d33]" />
+              <div className={`${ads.length > 0 ? 'col-span-6' : 'col-span-12 max-w-xl mx-auto w-full'} flex flex-col items-center justify-center bg-[#ffffff] border-3 border-[#0066FF] rounded-3xl p-8 shadow-2xl relative text-center`}>
+                <div className="absolute -top-4 px-5 py-1.5 bg-[#0066FF] text-white text-xs font-black uppercase tracking-widest rounded-full shadow-blue-glow flex items-center gap-1.5 border border-white/40">
+                  <Sparkles className="w-4 h-4 text-white" />
                   <span>Instant Self-Service</span>
                 </div>
 
-                <h2 className="text-3xl font-extrabold text-[#a12d33] mt-4 font-heading">
+                <h2 className="text-3xl font-extrabold text-[#0066FF] mt-4 font-heading">
                   Scan QR Code to Print
                 </h2>
                 <p className="text-sm text-slate-600 mt-2 max-w-xs font-medium">
@@ -388,7 +388,7 @@ const KioskHome = () => {
                 </p>
 
                 {/* Prominent QR Code SVG */}
-                <div className="relative my-6 p-6 bg-white rounded-3xl shadow-2xl border-4 border-[#ffc107]">
+                <div className="relative my-6 p-6 bg-white rounded-3xl shadow-2xl border-4 border-[#0066FF]">
                   <QRCodeSVG
                     value={uploadUrl}
                     size={240}
@@ -397,7 +397,7 @@ const KioskHome = () => {
                   />
                 </div>
 
-                <div className="flex items-center gap-2 px-4 py-2 bg-[#fff9ee] rounded-xl border border-[#a12d33]/40 text-xs text-[#a12d33] font-mono font-bold tracking-wide">
+                <div className="flex items-center gap-2 px-4 py-2 bg-[#E6F0FF] rounded-xl border border-[#0066FF]/30 text-xs text-[#0066FF] font-mono font-bold tracking-wide">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>Machine ID: {machineId}</span>
                 </div>
@@ -405,9 +405,9 @@ const KioskHome = () => {
             </main>
 
             {/* FOOTER BAR */}
-            <footer className="relative z-10 flex items-center justify-between text-xs text-[#a12d33] font-semibold border-t border-[#a12d33]/20 pt-4">
+            <footer className="relative z-10 flex items-center justify-between text-xs text-[#0066FF] font-semibold border-t border-[#0066FF]/20 pt-4">
               <p>© 2026 EasyXerox Commercial Kiosks. All rights reserved.</p>
-              <div className="flex items-center gap-4 text-[#a12d33]/80">
+              <div className="flex items-center gap-4 text-[#0066FF]/80">
                 <span>Max File Upload: 100MB</span>
                 <span>•</span>
                 <span>Formats: PDF, Word, Images, Text</span>

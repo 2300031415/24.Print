@@ -7,7 +7,7 @@
     -webkit-user-select: none;
     touch-action: manipulation;
     background-color: #fff9ee;
-    color: #1e293b;
+    color: #0F172A;
   }
 
   h1, h2, h3, h4, .font-heading {
@@ -15,22 +15,23 @@
   }
 }
 
-/* Custom Color Tokens */
+/* Color Tokens */
 :root {
-  --color-crimson: #a12d33;
-  --color-crimson-dark: #802026;
   --color-cream: #fff9ee;
-  --color-amber-gold: #ffc107;
+  --color-brand-blue: #0066FF;
+  --color-brand-blue-hover: #0052CC;
+  --color-brand-blue-light: #E6F0FF;
   --color-pure-white: #ffffff;
+  --color-slate-dark: #0F172A;
 }
 
-/* EasyXerox White Glass Logo Badge */
+/* EasyXerox White Logo Badge */
 .logo-badge {
   background: #ffffff;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 2px solid #ffc107;
-  box-shadow: 0 8px 25px -2px rgba(161, 45, 51, 0.25);
+  border: 2px solid #0066FF;
+  box-shadow: 0 8px 24px -2px rgba(0, 102, 255, 0.22);
   padding: 6px 18px;
   border-radius: 16px;
   display: inline-flex;
@@ -41,58 +42,42 @@
 
 .logo-badge:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px -2px rgba(161, 45, 51, 0.35);
+  box-shadow: 0 12px 30px -2px rgba(0, 102, 255, 0.35);
 }
 
 /* Custom Cards */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(161, 45, 51, 0.2);
-  box-shadow: 0 10px 30px rgba(161, 45, 51, 0.08);
+  border: 1.5px solid rgba(0, 102, 255, 0.18);
+  box-shadow: 0 10px 30px rgba(0, 102, 255, 0.08);
 }
 
 .glass-panel-dark {
-  background: #a12d33;
+  background: #0066FF;
   color: #ffffff;
-  border: 1.5px solid #ffc107;
-  box-shadow: 0 12px 40px rgba(161, 45, 51, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 102, 255, 0.35);
 }
 
 .glass-card {
   background: #ffffff;
-  border: 1.5px solid rgba(161, 45, 51, 0.15);
-  box-shadow: 0 10px 35px 0 rgba(161, 45, 51, 0.12);
+  border: 1.5px solid rgba(0, 102, 255, 0.15);
+  box-shadow: 0 10px 35px 0 rgba(0, 102, 255, 0.1);
 }
 
 /* Glowing Accent Shadows */
-.shadow-gold-glow {
-  box-shadow: 0 0 30px -3px rgba(255, 193, 7, 0.6);
-}
-
-.shadow-crimson-glow {
-  box-shadow: 0 0 30px -3px rgba(161, 45, 51, 0.4);
-}
-
-.shadow-amber-glow {
-  box-shadow: 0 0 25px -4px rgba(255, 193, 7, 0.5);
-}
-
 .shadow-blue-glow {
-  box-shadow: 0 0 25px -3px rgba(161, 45, 51, 0.3);
+  box-shadow: 0 6px 25px -2px rgba(0, 102, 255, 0.35);
+}
+
+.shadow-gold-glow {
+  box-shadow: 0 6px 25px -2px rgba(0, 102, 255, 0.3);
 }
 
 .shadow-cyan-glow {
-  box-shadow: 0 0 25px -5px rgba(255, 193, 7, 0.5);
-}
-
-.shadow-emerald-glow {
-  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.4);
-}
-
-.shadow-indigo-glow {
-  box-shadow: 0 0 25px -5px rgba(161, 45, 51, 0.3);
+  box-shadow: 0 6px 25px -2px rgba(0, 102, 255, 0.3);
 }
 
 /* Touch Friendly Button Active Scale */
@@ -114,9 +99,9 @@
   background: #fff9ee;
 }
 ::-webkit-scrollbar-thumb {
-  background: #a12d33;
+  background: #0066FF;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #802026;
+  background: #0052CC;
 }

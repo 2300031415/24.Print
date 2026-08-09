@@ -86,16 +86,16 @@ const MobileUpload = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fff9ee] text-slate-800 flex flex-col items-center justify-between p-4 selection:bg-[#ffc107]">
+    <div className="min-h-screen bg-[#fff9ee] text-slate-800 flex flex-col items-center justify-between p-4 selection:bg-[#0066FF]">
       {/* Mobile Top Header */}
-      <header className="w-full max-w-md bg-[#a12d33] border-2 border-[#ffc107] rounded-2xl p-4 flex items-center justify-between shadow-xl mt-2 text-white">
+      <header className="w-full max-w-md bg-[#0066FF] border-2 border-white/40 rounded-2xl p-4 flex items-center justify-between shadow-blue-glow mt-2 text-white">
         <div className="flex items-center gap-3">
-          <div className="logo-badge py-1.5 px-3 border-2 border-[#ffc107] shadow-md">
+          <div className="logo-badge py-1.5 px-3 border-2 border-white/40 shadow-md">
             <img src="/logo.png" alt="EasyXerox" className="h-8 w-auto object-contain" />
           </div>
         </div>
 
-        <div className="px-3 py-1.5 bg-[#ffc107] text-[#a12d33] rounded-xl text-xs font-mono font-black border border-white">
+        <div className="px-3 py-1.5 bg-white text-[#0066FF] rounded-xl text-xs font-mono font-black border border-blue-100 shadow-sm">
           {machineId}
         </div>
       </header>
@@ -105,7 +105,7 @@ const MobileUpload = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#ffffff] border-2 border-[#a12d33]/20 rounded-3xl p-6 shadow-2xl relative overflow-hidden"
+          className="bg-[#ffffff] border-2 border-[#0066FF]/20 rounded-3xl p-6 shadow-2xl relative overflow-hidden"
         >
           {/* Machine Info */}
           <div className="bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80 mb-6">
