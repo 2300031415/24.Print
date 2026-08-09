@@ -45,6 +45,45 @@ const uploadPdf = multer({
     fileFilter: fileFilter
 });
 
+// Storage & Filter for ALL Printable Documents (PDF, DOC, DOCX, TXT, Images)
+const ALLOWED_DOCUMENT_EXTENSIONS = [
+    '.pdf',
+    '.doc', '.docx',
+    '.txt', '.rtf',
+    '.jpg', '.jpeg', '.png', '.bmp', '.webp', '.tiff'
+];
+
+const documentStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, `doc-${uniqueSuffix}${ext || '.pdf'}`);
+    }
+});
+
+const documentFileFilter = (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ALLOWED_DOCUMENT_EXTENSIONS.includes(ext) || (file.mimetype && file.mimetype.startsWith('image/')) || file.mimetype === 'application/pdf') {
+        cb(null, true);
+    } else {
+        cb(new Error(`Unsupported file type (${ext}). Allowed: PDF, Word, Images, Text`), false);
+    }
+};
+
+const uploadDocument = multer({
+    storage: documentStorage,
+    limits: {
+        fileSize: 100 * 1024 * 1024, // 100 MB max
+    },
+    fileFilter: documentFileFilter
+});
+
 // Storage for Advertisement Media (Images, Videos, GIFs)
 const adStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -60,22 +99,25 @@ const adStorage = multer.diskStorage({
     }
 });
 
-const uploadAdMedia = multer({
+const adFileFilter = (req, file, cb) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid ad file type! Only JPG, PNG, GIF, MP4, and WEBM are allowed.'), false);
+    }
+};
+
+const uploadAd = multer({
     storage: adStorage,
     limits: {
-        fileSize: 50 * 1024 * 1024, // 50 MB max
+        fileSize: 200 * 1024 * 1024 // 200 MB for ad videos
     },
-    fileFilter: (req, file, cb) => {
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
-        if (allowedTypes.includes(file.mimetype) || file.originalname.match(/\.(jpg|jpeg|png|gif|webp|mp4|webm)$/i)) {
-            cb(null, true);
-        } else {
-            cb(new Error('Only Images (JPG, PNG, GIF, WEBP) and Videos (MP4, WEBM) are allowed for Ads!'), false);
-        }
-    }
+    fileFilter: adFileFilter
 });
 
 module.exports = {
     uploadPdf,
-    uploadAdMedia
+    uploadDocument,
+    uploadAd
 };
