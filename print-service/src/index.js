@@ -9,7 +9,7 @@ require('dotenv').config();
 const { getPrinterStatus } = require('./printerMonitor');
 const { startUSBMonitoring, listDriveFiles, readDriveFile } = require('./usbMonitor');
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = process.env.BACKEND_URL || 'https://lowcostfreedom.com';
 const MACHINE_CODE = process.env.MACHINE_CODE || 'KIOSK-001';
 const PRINTER_NAME = process.env.PRINTER_NAME || '';  // Set in .env — run: Get-Printer | Select Name
 const tempDir = path.join(__dirname, '../temp_print');
