@@ -7,7 +7,7 @@ const pdfPrinter = require('pdf-to-printer');
 require('dotenv').config();
 
 const { getPrinterStatus } = require('./printerMonitor');
-const { startUSBMonitoring, listDriveFiles, readDriveFile } = require('./usbMonitor');
+const { startUSBMonitoring, listDriveFiles, readDriveFile, getCurrentDrivesList } = require('./usbMonitor');
 
 // Force cloud backend URL unless an explicit production URL is provided
 const rawUrl = process.env.BACKEND_URL || '';
@@ -34,21 +34,38 @@ const socket = io(BACKEND_URL, {
 const printQueue = [];
 let isProcessingQueue = false;
 
+// ──────────────────────────────────────────────────────────────
+// USB MONITORING — Started ONCE on daemon launch
+// ──────────────────────────────────────────────────────────────
+startUSBMonitoring({
+    onInserted: (drive) => {
+        console.log(`🔌 USB Inserted: ${drive.driveLetter} (${drive.volumeName}) → Sending event to ${BACKEND_URL}`);
+        if (socket.connected) {
+            socket.emit('USB_DRIVE_CONNECTED', { machineCode: MACHINE_CODE, drive });
+        }
+    },
+    onRemoved: (driveLetter) => {
+        console.log(`🔌 USB Removed: ${driveLetter} → Sending event to ${BACKEND_URL}`);
+        if (socket.connected) {
+            socket.emit('USB_DRIVE_DISCONNECTED', { machineCode: MACHINE_CODE, driveLetter });
+        }
+    }
+});
+
+// ──────────────────────────────────────────────────────────────
+// SOCKET.IO EVENTS
+// ──────────────────────────────────────────────────────────────
 socket.on('connect', () => {
     console.log(`✅ Connected to Xerox Central Server (${BACKEND_URL}) Socket.IO!`);
     socket.emit('REGISTER_DAEMON', { machineCode: MACHINE_CODE });
     startPrinterMonitoring();
 
-    startUSBMonitoring({
-        onInserted: (drive) => {
-            console.log(`🔌 USB Inserted: ${drive.driveLetter} (${drive.volumeName}) → Sending event to ${BACKEND_URL}`);
-            socket.emit('USB_DRIVE_CONNECTED', { machineCode: MACHINE_CODE, drive });
-        },
-        onRemoved: (driveLetter) => {
-            console.log(`🔌 USB Removed: ${driveLetter} → Sending event to ${BACKEND_URL}`);
-            socket.emit('USB_DRIVE_DISCONNECTED', { machineCode: MACHINE_CODE, driveLetter });
-        }
-    });
+    // Immediately sync any USB drive currently plugged into the PC on connect
+    const activeDrives = getCurrentDrivesList();
+    for (const drive of activeDrives) {
+        console.log(`🔌 Syncing connected USB drive [${drive.driveLetter}] to backend on socket connect...`);
+        socket.emit('USB_DRIVE_CONNECTED', { machineCode: MACHINE_CODE, drive });
+    }
 });
 
 socket.on('disconnect', () => {
@@ -90,7 +107,6 @@ socket.on('USB_SELECT_FILE', async (data) => {
             contentType: ext === '.pdf'  ? 'application/pdf'
                 : ['.jpg', '.jpeg'].includes(ext) ? 'image/jpeg'
                 : ext === '.png'  ? 'image/png'
-                : ext === '.txt'  ? 'text/plain'
                 : 'application/octet-stream'
         });
         formData.append('machineCode', MACHINE_CODE);

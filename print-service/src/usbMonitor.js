@@ -193,9 +193,20 @@ function stopUSBMonitoring() {
     }
 }
 
+function getCurrentDrivesList() {
+    try {
+        const drivesMap = checkConnectedDrives();
+        return Array.from(drivesMap.values());
+    } catch (_) {
+        return [];
+    }
+}
+
 module.exports = {
     startUSBMonitoring,
     stopUSBMonitoring,
     listDriveFiles,
-    readDriveFile
+    readDriveFile,
+    getCurrentDrivesList
 };
+
