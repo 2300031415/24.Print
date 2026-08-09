@@ -13,8 +13,8 @@ const getMachines = async (req, res, next) => {
 
         // If client, restrict to client's machines only
         if (req.user && req.user.role === 'client') {
-            queryStr += ` WHERE m.client_id = $1`;
-            params.push(req.user.client_id);
+            queryStr += ` WHERE m.client_id = $1 OR c.user_id::text = $1`;
+            params.push(req.user.client_id || req.user.id);
         }
 
         queryStr += ` ORDER BY m.created_at DESC`;
@@ -57,7 +57,6 @@ const getMachineByCode = async (req, res, next) => {
             machine.status = 'maintenance';
         }
 
-
         // Fetch machine pricing or default pricing fallback
         const pricingRes = await db.query(
             `SELECT * FROM pricing WHERE machine_id = $1 OR is_default = true ORDER BY machine_id NULLS LAST LIMIT 1`,
@@ -80,7 +79,7 @@ const getMachineByCode = async (req, res, next) => {
 
 const createMachine = async (req, res, next) => {
     try {
-        const { machine_code, name, client_id, location_address, city, state, pincode, default_printer_name } = req.body;
+        const { machine_code, name, client_id, location_address, city, state, pincode, default_printer_name, razorpay_key_id, razorpay_key_secret } = req.body;
 
         if (!machine_code || !name || !client_id) {
             return res.status(400).json({ success: false, message: 'Machine code, name, and client ID are required.' });
@@ -91,12 +90,64 @@ const createMachine = async (req, res, next) => {
         const qrDataUrl = await QRCode.toDataURL(uploadUrl);
 
         const result = await db.query(
-            `INSERT INTO machines (machine_code, name, client_id, location_address, city, state, pincode, qr_code_url, default_printer_name)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-            [machine_code.toUpperCase(), name, client_id, location_address || '', city || '', state || '', pincode || '', qrDataUrl, default_printer_name || 'Kiosk_Printer_Default']
+            `INSERT INTO machines (machine_code, name, client_id, location_address, city, state, pincode, qr_code_url, default_printer_name, razorpay_key_id, razorpay_key_secret)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+            [
+                machine_code.toUpperCase(),
+                name,
+                client_id,
+                location_address || '',
+                city || '',
+                state || '',
+                pincode || '',
+                qrDataUrl,
+                default_printer_name || 'Kiosk_Printer_Default',
+                razorpay_key_id || null,
+                razorpay_key_secret || null
+            ]
         );
 
         res.status(201).json({ success: true, machine: result.rows[0] });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const updateMachine = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { name, location_address, city, state, pincode, default_printer_name, razorpay_key_id, razorpay_key_secret, status } = req.body;
+
+        const result = await db.query(
+            `UPDATE machines 
+             SET name = COALESCE($1, name),
+                 location_address = COALESCE($2, location_address),
+                 city = COALESCE($3, city),
+                 state = COALESCE($4, state),
+                 pincode = COALESCE($5, pincode),
+                 default_printer_name = COALESCE($6, default_printer_name),
+                 razorpay_key_id = COALESCE($7, razorpay_key_id),
+                 razorpay_key_secret = COALESCE($8, razorpay_key_secret),
+                 status = COALESCE($9, status),
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id::text = $10::text OR machine_code = $10 RETURNING *`,
+            [
+                name || null,
+                location_address || null,
+                city || null,
+                state || null,
+                pincode || null,
+                default_printer_name || null,
+                razorpay_key_id !== undefined ? razorpay_key_id : null,
+                razorpay_key_secret !== undefined ? razorpay_key_secret : null,
+                status || null,
+                id
+            ]
+        );
+
+        const updatedMachine = (result && result.rows && result.rows.length > 0) ? result.rows[0] : { id, name, razorpay_key_id, razorpay_key_secret };
+
+        res.json({ success: true, machine: updatedMachine });
     } catch (err) {
         next(err);
     }
@@ -130,7 +181,6 @@ const getMachineAds = async (req, res, next) => {
     try {
         const { machineCode } = req.params;
 
-        // Fetch machine & client ID
         const machineRes = await db.query('SELECT id, client_id FROM machines WHERE machine_code = $1 OR id::text = $1', [machineCode]);
         if (machineRes.rows.length === 0) {
             return res.json({ success: true, ads: [] });
@@ -138,7 +188,6 @@ const getMachineAds = async (req, res, next) => {
 
         const machine = machineRes.rows[0];
 
-        // STRICT: Only return ads explicitly assigned to this board via machine_ads table
         const result = await db.query(
             `SELECT a.* 
              FROM advertisements a
@@ -158,7 +207,7 @@ const getMachineAds = async (req, res, next) => {
 const toggleMachineStatus = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { status } = req.body; // 'online' | 'maintenance'
+        const { status } = req.body;
 
         const result = await db.query(
             `UPDATE machines SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 OR machine_code = $2 RETURNING *`,
@@ -167,7 +216,6 @@ const toggleMachineStatus = async (req, res, next) => {
 
         const updatedMachine = result.rows[0] || { id, status };
 
-        // Broadcast to Kiosk Board via Socket.IO
         const io = req.app.get('socketio');
         if (io) {
             io.to(`machine:${updatedMachine.id}`).emit('MACHINE_STATUS_CHANGE', { status: updatedMachine.status });
@@ -181,12 +229,23 @@ const toggleMachineStatus = async (req, res, next) => {
     }
 };
 
+const deleteMachine = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        await db.query('DELETE FROM machines WHERE id = $1 OR machine_code = $1', [id]);
+        res.json({ success: true, message: 'Machine deleted successfully.' });
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
     getMachines,
     getMachineByCode,
     createMachine,
+    updateMachine,
     updatePrinterStatus,
     getMachineAds,
-    toggleMachineStatus
+    toggleMachineStatus,
+    deleteMachine
 };
-

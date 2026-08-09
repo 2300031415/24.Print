@@ -15,7 +15,9 @@ const createRazorpayOrder = async (req, res, next) => {
 
         // Fetch machine + associated client Razorpay credentials
         const machineRes = await db.query(
-            `SELECT m.id, m.machine_code, m.client_id, c.razorpay_key_id, c.razorpay_key_secret 
+            `SELECT m.id, m.machine_code, m.client_id, 
+                    m.razorpay_key_id as m_key_id, m.razorpay_key_secret as m_key_secret,
+                    c.razorpay_key_id as c_key_id, c.razorpay_key_secret as c_key_secret 
              FROM machines m
              JOIN clients c ON m.client_id = c.id
              WHERE m.id::text = $1 OR m.machine_code = $1`,
@@ -27,12 +29,21 @@ const createRazorpayOrder = async (req, res, next) => {
         let clientKeySecret = key_secret;
 
         if (machineRes.rows.length > 0) {
-            machine = machineRes.rows[0];
-            if (machine.razorpay_key_id && machine.razorpay_key_id.trim()) {
-                clientKeyId = machine.razorpay_key_id.trim();
+            const m = machineRes.rows[0];
+            machine = m;
+
+            // Priority 1: Machine Key ID, Priority 2: Client Default Key ID, Priority 3: System Key ID
+            if (m.m_key_id && m.m_key_id.trim()) {
+                clientKeyId = m.m_key_id.trim();
+            } else if (m.c_key_id && m.c_key_id.trim()) {
+                clientKeyId = m.c_key_id.trim();
             }
-            if (machine.razorpay_key_secret && machine.razorpay_key_secret.trim()) {
-                clientKeySecret = machine.razorpay_key_secret.trim();
+
+            // Priority 1: Machine Secret, Priority 2: Client Default Secret, Priority 3: System Secret
+            if (m.m_key_secret && m.m_key_secret.trim()) {
+                clientKeySecret = m.m_key_secret.trim();
+            } else if (m.c_key_secret && m.c_key_secret.trim()) {
+                clientKeySecret = m.c_key_secret.trim();
             }
         } else {
             // Fallback machine lookup
@@ -118,7 +129,7 @@ const verifyPayment = async (req, res, next) => {
         // Fetch payment with upload + machine + client info
         const payRes = await db.query(
             `SELECT p.*, u.file_path, u.original_filename, m.machine_code, m.client_id, m.default_printer_name,
-                    c.razorpay_key_secret
+                    m.razorpay_key_secret as m_key_secret, c.razorpay_key_secret as c_key_secret
              FROM payments p
              JOIN uploads u ON p.upload_id = u.id
              JOIN machines m ON p.machine_id = m.id
@@ -132,9 +143,12 @@ const verifyPayment = async (req, res, next) => {
         }
 
         const payment = payRes.rows[0];
-        const clientKeySecret = (payment && payment.razorpay_key_secret && payment.razorpay_key_secret.trim())
-            ? payment.razorpay_key_secret.trim()
-            : key_secret;
+        let clientKeySecret = key_secret;
+        if (payment.m_key_secret && payment.m_key_secret.trim()) {
+            clientKeySecret = payment.m_key_secret.trim();
+        } else if (payment.c_key_secret && payment.c_key_secret.trim()) {
+            clientKeySecret = payment.c_key_secret.trim();
+        }
 
         // Validate signature (skip for mock orders or test button mock_signature)
         const isMock = razorpayOrderId.startsWith('order_mock_') || razorpaySignature === 'mock_signature' || razorpaySignature === 'mock_sig';
