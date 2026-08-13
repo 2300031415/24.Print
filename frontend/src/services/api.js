@@ -5,11 +5,9 @@ const port = window.location.port;
 const protocol = window.location.protocol;
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (
-  hostname === 'localhost'
-    ? '/api/v1'
-    : (port === '5173' || port === '5174')
-      ? `http://${hostname}:5000/api/v1`        // Direct access via Vite/serve port → use backend port 5000
-      : `${protocol}//${hostname}/api/v1`        // Via Nginx (port 80 or 443) → same host, Nginx proxies to :5000
+  hostname === 'localhost' || hostname === '127.0.0.1'
+    ? 'http://localhost:5000/api/v1'
+    : 'https://vymecmonmluvhgtsfezw.supabase.co/api/v1'
 );
 
 
