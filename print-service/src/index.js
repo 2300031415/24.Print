@@ -177,8 +177,19 @@ async function processQueue() {
             }
 
             try {
-                await pdfPrinter.print(localPath, options);
-                console.log(`✅ Silent printing dispatched to spooler!`);
+                if (process.platform === 'linux') {
+                    const { execSync } = require('child_process');
+                    const printerFlag = resolvedPrinter && resolvedPrinter !== 'Kiosk_Printer_Default' ? `-d "${resolvedPrinter}"` : '';
+                    const copiesFlag = options.copies ? `-n ${options.copies}` : '-n 1';
+                    const duplexFlag = options.side === 'duplex' ? '-o sides=two-sided-long-edge' : '-o sides=one-sided';
+                    const lpCmd = `lp ${printerFlag} ${copiesFlag} ${duplexFlag} "${localPath}"`;
+                    console.log(`🐧 Executing Linux CUPS command: ${lpCmd}`);
+                    execSync(lpCmd, { stdio: 'ignore' });
+                    console.log(`✅ Dispatched to Linux CUPS spooler!`);
+                } else {
+                    await pdfPrinter.print(localPath, options);
+                    console.log(`✅ Silent printing dispatched to Windows spooler!`);
+                }
             } catch (printErr) {
                 try {
                     const defaultOptions = { ...options };
