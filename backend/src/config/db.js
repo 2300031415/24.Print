@@ -9,10 +9,11 @@ const pool = new Pool({
     port: parseInt(process.env.DB_PORT || '5432', 10),
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_NAME || 'print_kiosk_db',
+    database: process.env.DB_NAME || 'postgres',
+    ssl: (process.env.DB_HOST && process.env.DB_HOST.includes('supabase')) ? { rejectUnauthorized: false } : false,
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 3000,
+    connectionTimeoutMillis: 5000,
 });
 
 let isPostgresAvailable = false;

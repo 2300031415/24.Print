@@ -54,7 +54,33 @@ app.use('/api', (req, res, next) => {
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 
-// Health Check
+// Root & Health Check
+app.get('/', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>EasyXerox Backend API</title>
+            <style>
+                body { font-family: system-ui, sans-serif; background: #fff9ee; color: #0F172A; text-align: center; padding: 50px; }
+                .card { background: white; padding: 40px; border-radius: 20px; border: 2px solid #0066FF; max-width: 500px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,102,255,0.15); }
+                h1 { color: #0066FF; }
+                a { display: inline-block; margin-top: 15px; padding: 12px 24px; background: #0066FF; color: white; text-decoration: none; border-radius: 12px; font-weight: bold; }
+                a:hover { background: #0052CC; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>EasyXerox Backend API</h1>
+                <p>This is the backend API server running on <b>Port 5000</b>.</p>
+                <p>To view the <b>Kiosk Web App UI</b>, open:</p>
+                <a href="http://localhost:8501/kiosk/KIOSK-001">Go to Kiosk UI (Port 8501)</a>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
 app.get('/health', (req, res) => {
     res.json({ status: 'UP', timestamp: new Date().toISOString(), service: 'Xerox Kiosk API' });
 });

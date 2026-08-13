@@ -20,8 +20,8 @@ function createWindow() {
         }
     });
 
-    const targetUrl = process.env.ELECTRON_START_URL || 'https://lowcostfreedom.com/kiosk/KIOSK-001';
-    console.log(`🌐 Electron Kiosk loading Cloud Server URL: ${targetUrl}`);
+    const targetUrl = process.env.ELECTRON_START_URL || 'http://localhost:8501/kiosk/KIOSK-001';
+    console.log(`🌐 Electron Kiosk loading Target URL: ${targetUrl}`);
     
     // Load Cloud Server Kiosk Screen
     mainWindow.loadURL(targetUrl).catch((err) => {

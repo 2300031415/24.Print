@@ -9,11 +9,8 @@ require('dotenv').config();
 const { getPrinterStatus } = require('./printerMonitor');
 const { startUSBMonitoring, listDriveFiles, readDriveFile, getCurrentDrivesList } = require('./usbMonitor');
 
-// Force cloud backend URL unless an explicit production URL is provided
 const rawUrl = process.env.BACKEND_URL || '';
-const BACKEND_URL = (rawUrl.startsWith('https://') || rawUrl.includes('lowcostfreedom'))
-    ? rawUrl
-    : 'https://lowcostfreedom.com';
+const BACKEND_URL = rawUrl || 'http://localhost:8500';
 
 const MACHINE_CODE = process.env.MACHINE_CODE || 'KIOSK-001';
 const PRINTER_NAME = process.env.PRINTER_NAME || '';
