@@ -193,38 +193,36 @@ const KioskHome = () => {
             {/* Full Screen Media Display */}
             <div className="absolute inset-0 w-full h-full overflow-hidden">
               <AnimatePresence mode="wait">
-                {ads.length > 0 && (
-                  <motion.div
-                    key={ads[currentAdIndex]?.id || currentAdIndex}
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.8 }}
-                    className="relative w-full h-full"
-                  >
-                    {ads[currentAdIndex]?.media_type === 'video' ? (
-                      <video
-                        src={getMediaUrl(ads[currentAdIndex]?.media_url)}
-                        autoPlay
-                        muted
-                        loop
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <img
-                        src={getMediaUrl(ads[currentAdIndex]?.media_url)}
-                        alt={ads[currentAdIndex]?.title || 'Advertisement'}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80';
-                        }}
-                        className="w-full h-full object-cover brightness-95"
-                      />
-                    )}
-                    {/* Gradient Overlay for Readable Text */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0040A8]/90 via-black/40 to-[#0066FF]/50" />
-                  </motion.div>
-                )}
+                <motion.div
+                  key={ads[currentAdIndex]?.id || currentAdIndex || 'default_ad'}
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative w-full h-full"
+                >
+                  {ads[currentAdIndex]?.media_type === 'video' ? (
+                    <video
+                      src={getMediaUrl(ads[currentAdIndex]?.media_url)}
+                      autoPlay
+                      muted
+                      loop
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={ads[currentAdIndex]?.media_url ? getMediaUrl(ads[currentAdIndex]?.media_url) : 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80'}
+                      alt={ads[currentAdIndex]?.title || 'Instant Self-Service Xerox Printing'}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80';
+                      }}
+                      className="w-full h-full object-cover brightness-95"
+                    />
+                  )}
+                  {/* Gradient Overlay for Readable Text */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0040A8]/90 via-black/40 to-[#0066FF]/50" />
+                </motion.div>
               </AnimatePresence>
             </div>
 
@@ -261,7 +259,7 @@ const KioskHome = () => {
                 Promotional Offer
               </span>
               <h2 className="text-4xl font-extrabold text-white leading-tight font-heading drop-shadow-2xl">
-                {ads[currentAdIndex]?.title}
+                {ads[currentAdIndex]?.title || 'Instant 24/7 Self-Service Xerox & Cloud Printing'}
               </h2>
             </div>
 
