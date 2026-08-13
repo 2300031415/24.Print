@@ -135,7 +135,7 @@ const KioskHome = () => {
     };
   }, [socket, machineId, navigate, fetchMachineAds]);
 
-  const publicDomain = 'https://lowcostfreedom.com';
+  const publicDomain = import.meta.env.VITE_PUBLIC_DOMAIN || 'https://dazzling-maamoul-fd985e.netlify.app';
   const uploadUrl = `${publicDomain}/upload/${machineId}`;
 
 
