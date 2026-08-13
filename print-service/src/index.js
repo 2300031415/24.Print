@@ -10,7 +10,7 @@ const { getPrinterStatus } = require('./printerMonitor');
 const { startUSBMonitoring, listDriveFiles, readDriveFile, getCurrentDrivesList } = require('./usbMonitor');
 
 const rawUrl = process.env.BACKEND_URL || '';
-const BACKEND_URL = rawUrl || 'http://localhost:8500';
+const BACKEND_URL = rawUrl || 'https://lowcostfreedom.com';
 
 const MACHINE_CODE = process.env.MACHINE_CODE || 'KIOSK-001';
 const PRINTER_NAME = process.env.PRINTER_NAME || '';
@@ -177,19 +177,8 @@ async function processQueue() {
             }
 
             try {
-                if (process.platform === 'linux') {
-                    const { execSync } = require('child_process');
-                    const printerFlag = resolvedPrinter && resolvedPrinter !== 'Kiosk_Printer_Default' ? `-d "${resolvedPrinter}"` : '';
-                    const copiesFlag = options.copies ? `-n ${options.copies}` : '-n 1';
-                    const duplexFlag = options.side === 'duplex' ? '-o sides=two-sided-long-edge' : '-o sides=one-sided';
-                    const lpCmd = `lp ${printerFlag} ${copiesFlag} ${duplexFlag} "${localPath}"`;
-                    console.log(`🐧 Executing Linux CUPS command: ${lpCmd}`);
-                    execSync(lpCmd, { stdio: 'ignore' });
-                    console.log(`✅ Dispatched to Linux CUPS spooler!`);
-                } else {
-                    await pdfPrinter.print(localPath, options);
-                    console.log(`✅ Silent printing dispatched to Windows spooler!`);
-                }
+                await pdfPrinter.print(localPath, options);
+                console.log(`✅ Silent printing dispatched to spooler!`);
             } catch (printErr) {
                 try {
                     const defaultOptions = { ...options };
