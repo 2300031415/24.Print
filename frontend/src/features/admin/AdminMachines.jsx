@@ -58,7 +58,8 @@ const AdminMachines = () => {
 
   const handlePrintQr = () => {
     const printWindow = window.open('', '_blank');
-    const qrUrl = `https://lowcostfreedom.com/upload/${selectedQrMachine.machine_code}`;
+    const publicDomain = import.meta.env.VITE_PUBLIC_DOMAIN || 'https://dazzling-maamoul-fd985e.netlify.app';
+    const qrUrl = `${publicDomain}/upload/${selectedQrMachine.machine_code}`;
     printWindow.document.write(`
       <html>
         <head>
@@ -162,7 +163,7 @@ const AdminMachines = () => {
 
             <div className="p-4 bg-white rounded-2xl inline-block shadow-2xl mb-4">
               <QRCodeSVG
-                value={`https://lowcostfreedom.com/upload/${selectedQrMachine.machine_code}`}
+                value={`${import.meta.env.VITE_PUBLIC_DOMAIN || 'https://dazzling-maamoul-fd985e.netlify.app'}/upload/${selectedQrMachine.machine_code}`}
                 size={200}
                 level="H"
                 includeMargin={true}
@@ -171,7 +172,7 @@ const AdminMachines = () => {
 
             <p className="text-xs text-slate-400 mb-4">
               Scan URL: <br />
-              <span className="text-cyan-300 font-mono text-[11px]">https://lowcostfreedom.com/upload/{selectedQrMachine.machine_code}</span>
+              <span className="text-cyan-300 font-mono text-[11px]">{import.meta.env.VITE_PUBLIC_DOMAIN || 'https://dazzling-maamoul-fd985e.netlify.app'}/upload/{selectedQrMachine.machine_code}</span>
             </p>
 
             <button

@@ -18,8 +18,8 @@ const AdminAds = () => {
   const getMediaUrl = (url) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
-    if (window.location.hostname === 'localhost') return `http://localhost:5000${url}`;
-    return `https://lowcostfreedom.com${url}`;
+    const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:5000';
+    return `${backendUrl}${url}`;
   };
 
 
