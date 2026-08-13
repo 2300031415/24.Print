@@ -26,7 +26,9 @@ const KioskHome = () => {
   const getMediaUrl = (url) => {
     if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:5000';
+    const backendUrl = import.meta.env.VITE_API_URL 
+      ? import.meta.env.VITE_API_URL.replace('/api/v1', '') 
+      : 'https://vymecmonmluvhgtsfezw.supabase.co';
     return `${backendUrl}${url}`;
   };
 
@@ -211,7 +213,11 @@ const KioskHome = () => {
                     ) : (
                       <img
                         src={getMediaUrl(ads[currentAdIndex]?.media_url)}
-                        alt={ads[currentAdIndex]?.title}
+                        alt={ads[currentAdIndex]?.title || 'Advertisement'}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80';
+                        }}
                         className="w-full h-full object-cover brightness-95"
                       />
                     )}
