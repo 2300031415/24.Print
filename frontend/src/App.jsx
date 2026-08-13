@@ -42,15 +42,19 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
-// Check if running directly on physical kiosk board (localhost)
+// Check if running directly on physical kiosk board (localhost or hardware flag)
 const isLocalhost = typeof window !== 'undefined' && (
   window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1'
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname === '::1'
 );
 
 // Guard to block external web browsers from viewing the physical kiosk screen
 const LocalKioskGuard = ({ children }) => {
-  if (!isLocalhost) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isHardwareBoard = isLocalhost || urlParams.get('hardware') === 'true' || urlParams.get('device') === 'kiosk';
+
+  if (!isHardwareBoard) {
     return (
       <div className="min-h-screen bg-[#fff9ee] flex items-center justify-center p-6 text-center select-none font-sans">
         <div className="max-w-md bg-white border-2 border-[#0066FF] rounded-3xl p-8 shadow-2xl">
