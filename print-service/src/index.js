@@ -10,7 +10,7 @@ const { getPrinterStatus } = require('./printerMonitor');
 const { startUSBMonitoring, listDriveFiles, readDriveFile, getCurrentDrivesList } = require('./usbMonitor');
 
 const rawUrl = process.env.BACKEND_URL || '';
-const BACKEND_URL = rawUrl || 'https://lowcostfreedom.com';
+const BACKEND_URL = rawUrl || 'https://vymecmonmluvhgtsfezw.supabase.co';
 
 const MACHINE_CODE = process.env.MACHINE_CODE || 'KIOSK-001';
 const PRINTER_NAME = process.env.PRINTER_NAME || '';
