@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Printer, Wifi, WifiOff, Sparkles, Clock, ShieldCheck, Hand, ArrowLeft, Wrench } from 'lucide-react';
+import { Printer, Wifi, WifiOff, Sparkles, Clock, ShieldCheck, Hand, ArrowLeft, Wrench, Monitor, AlertTriangle, AlertCircle } from 'lucide-react';
 
 import api from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
