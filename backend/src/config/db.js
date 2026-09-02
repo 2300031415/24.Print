@@ -234,17 +234,20 @@ function handleMockQuery(text, params) {
 
     // 4. SELECT Machine by Code
     if (cleanText.includes('from machines') && (cleanText.includes('machine_code = $1') || cleanText.includes('m.id::text = $1') || cleanText.includes('id::text = $1'))) {
-        const mCode = params[0];
-        const machine = mockDb.machines.find(m => m.machine_code === mCode || m.id === mCode || (mCode === 'KIOSK-001' && m.machine_code === 'FFPVT_EasyXerox-001')) || mockDb.machines[0];
-        const client = machine ? (mockDb.clients.find(c => String(c.id) === String(machine.client_id)) || mockDb.clients[0]) : mockDb.clients[0];
+        const mCode = String(params[0] || '').trim();
+        const machine = mockDb.machines.find(m => m.machine_code === mCode || m.id === mCode);
+        if (!machine) {
+            return { rows: [], rowCount: 0 };
+        }
+        const client = mockDb.clients.find(c => String(c.id) === String(machine.client_id) || String(c.user_id) === String(machine.client_id));
         const isClientSuspended = client && (client.status === 'suspended' || client.status === 'inactive' || client.status === 'disabled');
-        const rows = machine ? [{
+        const rows = [{
             ...machine,
             status: isClientSuspended ? 'maintenance' : machine.status,
-            business_name: client ? client.business_name : 'Metro Xerox & Print Zone',
+            business_name: client ? client.business_name : 'Unassigned Partner',
             client_status: client ? client.status : 'active'
-        }] : [];
-        return { rows, rowCount: rows.length };
+        }];
+        return { rows, rowCount: 1 };
     }
 
     // 5. SELECT Machines List
