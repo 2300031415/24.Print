@@ -144,7 +144,33 @@ const createMachine = async (req, res, next) => {
     }
 };
 
-const updateMachineStatus = async (req, res, next) => {
+const updateMachine = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { location_address, default_printer_name, razorpay_key_id, razorpay_key_secret } = req.body;
+
+        const result = await db.query(
+            `UPDATE machines 
+             SET location_address = COALESCE($1, location_address),
+                 default_printer_name = COALESCE($2, default_printer_name),
+                 razorpay_key_id = COALESCE($3, razorpay_key_id),
+                 razorpay_key_secret = COALESCE($4, razorpay_key_secret),
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = $5 RETURNING *`,
+            [location_address, default_printer_name, razorpay_key_id, razorpay_key_secret, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Machine not found.' });
+        }
+
+        res.json({ success: true, machine: result.rows[0] });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const toggleMachineStatus = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
@@ -163,8 +189,6 @@ const updateMachineStatus = async (req, res, next) => {
         }
 
         const machine = result.rows[0];
-
-        // Broadcast status change via Socket.IO
         const io = req.app.get('socketio');
         if (io) {
             io.emit('MACHINE_STATUS_CHANGED', { machineId: machine.id, machineCode: machine.machine_code, status });
@@ -176,11 +200,36 @@ const updateMachineStatus = async (req, res, next) => {
     }
 };
 
+const updatePrinterStatus = async (req, res, next) => {
+    try {
+        const { machine_code } = req.params;
+        const { status, printer_model, paper_level } = req.body;
+
+        const result = await db.query(
+            'UPDATE machines SET status = COALESCE($1, status), updated_at = CURRENT_TIMESTAMP WHERE machine_code = $2 RETURNING *',
+            [status, machine_code]
+        );
+
+        res.json({ success: true, message: 'Printer status updated.' });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const deleteMachine = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        await db.query('DELETE FROM machines WHERE id = $1', [id]);
+        res.json({ success: true, message: 'Machine deleted successfully.' });
+    } catch (err) {
+        next(err);
+    }
+};
+
 const getMachineAds = async (req, res, next) => {
     try {
         const { machineCode } = req.params;
 
-        // Fetch machine ID
         const mRes = await db.query('SELECT id FROM machines WHERE machine_code = $1 OR id::text = $1', [machineCode]);
         if (mRes.rows.length === 0) {
             return res.json({ success: true, ads: [] });
@@ -197,7 +246,7 @@ const getMachineAds = async (req, res, next) => {
             [machineId]
         );
 
-        res.json({ success: true, ads: result.rows });
+        res.json({ success: true, ads: [] });
     } catch (err) {
         next(err);
     }
@@ -207,6 +256,9 @@ module.exports = {
     getMachines,
     getMachineByCode,
     createMachine,
-    updateMachineStatus,
+    updateMachine,
+    toggleMachineStatus,
+    updatePrinterStatus,
+    deleteMachine,
     getMachineAds
 };
