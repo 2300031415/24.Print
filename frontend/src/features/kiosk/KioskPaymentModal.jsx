@@ -60,6 +60,23 @@ const KioskPaymentModal = ({ machineId, uploadId, printOptions, onClose }) => {
 
   const [countdown, setCountdown] = useState(10);
 
+  // Auto Countdown to Home on Completion
+  useEffect(() => {
+    if (paymentStatus === 'completed') {
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            navigate(`/kiosk/${machineId}`);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [paymentStatus, machineId, navigate]);
+
   // Listen to Socket.IO for PAYMENT_SUCCESS & PRINT_STATUS_UPDATE
   useEffect(() => {
     if (!socket) return;
@@ -98,60 +115,41 @@ const KioskPaymentModal = ({ machineId, uploadId, printOptions, onClose }) => {
     }
   }, [paymentStatus]);
 
-  // 10-Second Countdown to Auto-Reset to Kiosk Home Screen
-  useEffect(() => {
-    if (paymentStatus === 'completed') {
-      setCountdown(10);
-      const interval = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            navigate(`/kiosk/${machineId}`);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [paymentStatus, machineId, navigate]);
-
-
-  // Opens the Razorpay checkout modal
-  const openRazorpay = (order, keyId) => {
+  // Handle Razorpay Popup Trigger
+  const openRazorpay = (order, keyToUse) => {
     const options = {
-      key: keyId || razorpayKey,
+      key: keyToUse,
       amount: order.amount,
       currency: order.currency || 'INR',
-      name: 'EasyXerox Kiosk System',
-      description: `Print Order (${printOptions.copies} copy, ${printOptions.totalPages} pages)`,
-      order_id: order.id,
-      handler: async (response) => {
+      name: 'EasyXerox Kiosk Printing',
+      description: `Silent Print Order (${printOptions.copies} copies • ${printOptions.paperSize})`,
+      order_id: order.id.startsWith('order_mock_') ? undefined : order.id,
+      handler: async function (response) {
         setPaymentStatus('verifying');
         try {
-          const verifyRes = await api.post('/payments/verify', {
-            razorpayOrderId: response.razorpay_order_id,
+          const res = await api.post('/payments/verify', {
+            razorpayOrderId: order.id,
             razorpayPaymentId: response.razorpay_payment_id,
             razorpaySignature: response.razorpay_signature,
             uploadId,
             printOptions
           });
-          if (verifyRes.data.success) {
+
+          if (res.data.success) {
             setPaymentStatus('printing');
           } else {
             setPaymentStatus('failed');
-            setErrorMsg(verifyRes.data.message);
+            setErrorMsg(res.data.message || 'Payment verification failed.');
           }
         } catch (err) {
           setPaymentStatus('failed');
-          setErrorMsg('Payment verification failed.');
+          setErrorMsg('Error completing payment verification.');
         }
       },
       prefill: { name: 'Kiosk Customer', contact: '9876543210' },
-      theme: { color: '#06b6d4' },
+      theme: { color: '#0066FF' },
       modal: {
         ondismiss: () => {
-          // User closed Razorpay — go back to the pending screen
           setPaymentStatus('pending');
           setLoading(false);
         }
@@ -199,48 +197,46 @@ const KioskPaymentModal = ({ machineId, uploadId, printOptions, onClose }) => {
     }
   };
 
-  const paymentUpiUrl = razorpayOrder
-    ? `upi://pay?pa=mockmerchant@razorpay&pn=XeroxKiosk&am=${printOptions.totalAmount}&cu=INR&tn=Order_${razorpayOrder.id}`
-    : '';
-
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-2xl flex items-center justify-center p-6 select-none font-sans">
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 select-none font-sans">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative flex flex-col items-center text-center"
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="w-full max-w-lg bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-2xl relative flex flex-col items-center text-center text-slate-950"
       >
         {paymentStatus === 'pending' && (
           <>
             <button
               onClick={onClose}
-              className="absolute top-6 right-6 p-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl active:scale-95 transition-all"
+              className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-950 transition-all rounded-xl"
             >
               <X className="w-6 h-6" />
             </button>
 
-            <h3 className="text-2xl font-bold text-white font-heading mt-2">
+            <h3 className="text-2xl font-black text-slate-950 font-heading mt-2">
               {loading ? 'Preparing Payment...' : 'Ready to Pay'}
             </h3>
 
-            <div className="my-8 flex flex-col items-center justify-center gap-4">
+            <div className="my-6 flex flex-col items-center justify-center gap-3">
               {loading ? (
                 <>
-                  <Loader2 className="w-16 h-16 text-cyan-500 animate-spin" />
-                  <p className="text-slate-400 text-sm">Creating secure payment order...</p>
+                  <Loader2 className="w-14 h-14 text-blue-600 animate-spin" />
+                  <p className="text-slate-600 font-bold text-xs">Creating secure payment order...</p>
                 </>
               ) : (
                 <>
-                  <CreditCard className="w-16 h-16 text-cyan-400" />
-                  <p className="text-slate-400 text-sm">Tap the button below to open Razorpay</p>
+                  <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl border-2 border-blue-200 flex items-center justify-center shadow-md">
+                    <CreditCard className="w-8 h-8" />
+                  </div>
+                  <p className="text-slate-600 font-bold text-xs">Tap the button below to open Razorpay Gateway</p>
                 </>
               )}
             </div>
 
-            <div className="w-full bg-slate-950/90 p-4 rounded-2xl border border-slate-800 mb-5 flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-400">Total Amount</span>
-              <span className="text-3xl font-extrabold text-emerald-400 font-mono">
+            <div className="w-full bg-slate-50 p-4 rounded-2xl border-2 border-blue-100 mb-5 flex items-center justify-between shadow-sm">
+              <span className="text-sm font-black text-slate-700 uppercase tracking-wider">Total Payable</span>
+              <span className="text-3xl font-black text-emerald-600 font-mono">
                 ₹{printOptions.totalAmount.toFixed(2)}
               </span>
             </div>
@@ -249,36 +245,34 @@ const KioskPaymentModal = ({ machineId, uploadId, printOptions, onClose }) => {
               <button
                 onClick={handleOpenRazorpayCheckout}
                 disabled={loading}
-                className="w-full py-4 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-extrabold rounded-2xl transition-all shadow-cyan-glow btn-touch text-base flex items-center justify-center gap-2"
+                className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black rounded-2xl transition-all shadow-md btn-touch text-base flex items-center justify-center gap-2"
               >
                 <CreditCard className="w-5 h-5" />
-                <span>{loading ? 'Preparing...' : 'Pay via Razorpay (UPI / Card / NetBanking)'}</span>
+                <span>{loading ? 'Preparing Gateway...' : 'Pay via Razorpay (UPI / Card / NetBanking)'}</span>
               </button>
 
               <button
                 onClick={handleSimulatePayment}
                 disabled={loading}
-                className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl transition-all text-sm flex items-center justify-center gap-2 btn-touch"
+                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl transition-all text-sm flex items-center justify-center gap-2 btn-touch shadow-sm"
               >
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <ShieldCheck className="w-4 h-4" />
                 <span>⚡ Test Payment (Simulate & Print Instantly)</span>
               </button>
             </div>
-
-
           </>
         )}
 
         {(paymentStatus === 'verifying' || paymentStatus === 'printing') && (
           <div className="py-12 flex flex-col items-center justify-center">
             <div className="relative mb-6">
-              <div className="w-24 h-24 rounded-full border-4 border-cyan-500/20 border-t-cyan-400 animate-spin" />
-              <Printer className="w-10 h-10 text-cyan-400 absolute inset-0 m-auto animate-pulse" />
+              <div className="w-24 h-24 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
+              <Printer className="w-10 h-10 text-blue-600 absolute inset-0 m-auto animate-pulse" />
             </div>
-            <h3 className="text-2xl font-bold text-white font-heading">
-              {paymentStatus === 'verifying' ? 'Verifying Razorpay Signature...' : 'Printing Document Silently...'}
+            <h3 className="text-2xl font-black text-slate-950 font-heading">
+              {paymentStatus === 'verifying' ? 'Verifying Payment Signature...' : 'Printing Document Silently...'}
             </h3>
-            <p className="text-sm text-slate-400 mt-2 max-w-xs">
+            <p className="text-sm font-bold text-slate-600 mt-2 max-w-xs leading-relaxed">
               Sending silent print job directly to local Windows printer spooler queue.
             </p>
           </div>
@@ -286,27 +280,27 @@ const KioskPaymentModal = ({ machineId, uploadId, printOptions, onClose }) => {
 
         {paymentStatus === 'completed' && (
           <div className="py-8 flex flex-col items-center justify-center">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 mb-4 animate-bounce">
+            <div className="w-20 h-20 rounded-full bg-emerald-100 border-2 border-emerald-500 flex items-center justify-center text-emerald-600 mb-4 animate-bounce">
               <CheckCircle2 className="w-12 h-12" />
             </div>
-            <h3 className="text-3xl font-extrabold text-white font-heading">
+            <h3 className="text-3xl font-black text-slate-950 font-heading">
               Print Job Completed!
             </h3>
-            <p className="text-base text-slate-300 mt-2 font-medium">
+            <p className="text-base font-bold text-slate-700 mt-2">
               Please collect your printed pages from the output tray.
             </p>
-            <p className="text-xs text-emerald-400 mt-4 bg-emerald-950/60 px-4 py-2 rounded-xl border border-emerald-800 font-mono">
+            <p className="text-xs text-emerald-800 mt-4 bg-emerald-50 px-4 py-2.5 rounded-xl border border-emerald-300 font-mono font-bold shadow-sm">
               Uploaded document automatically deleted from kiosk memory.
             </p>
             
             <div className="mt-6 flex flex-col items-center gap-3">
-              <div className="px-6 py-2 bg-slate-800 rounded-full text-slate-300 text-sm font-semibold border border-slate-700 flex items-center gap-2">
+              <div className="px-6 py-2.5 bg-blue-50 rounded-full text-blue-900 text-sm font-black border border-blue-200 flex items-center gap-2 shadow-sm">
                 <span>Returning to Home Screen in</span>
-                <span className="text-cyan-400 font-extrabold text-lg font-mono">{countdown}s</span>
+                <span className="text-blue-600 font-black text-lg font-mono">{countdown}s</span>
               </div>
               <button
                 onClick={() => navigate(`/kiosk/${machineId}`)}
-                className="text-xs text-slate-400 hover:text-white underline transition-colors"
+                className="text-xs font-black text-slate-500 hover:text-slate-950 underline transition-colors"
               >
                 Return to Home Screen Now
               </button>
@@ -314,29 +308,27 @@ const KioskPaymentModal = ({ machineId, uploadId, printOptions, onClose }) => {
           </div>
         )}
 
-
         {paymentStatus === 'failed' && (
           <div className="py-8 flex flex-col items-center justify-center">
-            <div className="w-20 h-20 rounded-full bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center text-rose-400 mb-4">
+            <div className="w-20 h-20 rounded-full bg-rose-100 border-2 border-rose-500 flex items-center justify-center text-rose-600 mb-4">
               <AlertCircle className="w-12 h-12" />
             </div>
-            <h3 className="text-2xl font-bold text-white font-heading">
+            <h3 className="text-2xl font-black text-slate-950 font-heading">
               {errorMsg?.toLowerCase().includes('printer') || errorMsg?.toLowerCase().includes('paper') || errorMsg?.toLowerCase().includes('spooler')
                 ? '⚠️ Printer Hardware Issue'
                 : 'Payment Error'}
             </h3>
-            <p className="text-sm text-rose-300 mt-2 max-w-sm font-medium leading-relaxed bg-rose-950/40 p-4 rounded-xl border border-rose-900/60">
+            <p className="text-sm text-rose-800 mt-2 max-w-sm font-bold leading-relaxed bg-rose-50 p-4 rounded-2xl border border-rose-200">
               {errorMsg || 'Unable to complete print operation. Please check printer paper tray and connections.'}
             </p>
             <button
               onClick={onClose}
-              className="mt-6 px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl btn-touch shadow-lg"
+              className="mt-6 px-8 py-3.5 bg-slate-950 hover:bg-slate-900 text-white font-black rounded-2xl btn-touch shadow-md"
             >
               Close & Try Again
             </button>
           </div>
         )}
-
       </motion.div>
     </div>
   );

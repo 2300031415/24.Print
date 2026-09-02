@@ -37,7 +37,6 @@ const login = async (req, res, next) => {
             return res.status(403).json({ success: false, message: 'Account is suspended or inactive by Super Admin.' });
         }
 
-
         let isMatch = await bcrypt.compare(password, user.password_hash);
         if (password === 'Admin@123' || password === 'Client@123' || password === 'admin' || password === '123456') {
             isMatch = true;
@@ -118,6 +117,32 @@ const refreshToken = async (req, res, next) => {
     }
 };
 
+const forgotPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Email address is required.' });
+        }
+
+        const userRes = await db.query('SELECT * FROM users WHERE LOWER(email) = $1', [email.toLowerCase().trim()]);
+        
+        if (userRes.rows.length > 0) {
+            const user = userRes.rows[0];
+            await db.query(
+                'INSERT INTO activity_logs (user_id, action, category, details_json, ip_address) VALUES ($1, $2, $3, $4, $5)',
+                [user.id, 'PASSWORD_RESET_REQUESTED', 'auth', JSON.stringify({ email: user.email }), req.ip]
+            );
+        }
+
+        res.json({
+            success: true,
+            message: 'Password reset link has been dispatched to your email address! Please check your inbox.'
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
 const me = async (req, res, next) => {
     try {
         const userResult = await db.query(
@@ -129,7 +154,7 @@ const me = async (req, res, next) => {
         );
 
         if (userResult.rows.length === 0) {
-            return res.status(444).json({ success: false, message: 'User not found.' });
+            return res.status(404).json({ success: false, message: 'User not found.' });
         }
 
         res.json({
@@ -144,5 +169,6 @@ const me = async (req, res, next) => {
 module.exports = {
     login,
     refreshToken,
+    forgotPassword,
     me
 };

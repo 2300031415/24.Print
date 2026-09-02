@@ -5,13 +5,33 @@ import { FileText, ArrowRight, X, Eye, Maximize2, Loader2, Sparkles, AlertCircle
 
 import api from '../../services/api';
 import PDFCanvasViewer from '../../components/PDFCanvasViewer';
+import { useSocket } from '../../context/SocketContext';
 
 const KioskPdfPreview = () => {
   const { machineId, uploadToken } = useParams();
   const navigate = useNavigate();
+  const { socket } = useSocket();
 
   const [upload, setUpload] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Listen for new uploaded document (e.g. Upload Another Document)
+  useEffect(() => {
+    if (!socket) return;
+    socket.emit('JOIN_MACHINE', machineId);
+
+    const handleFileUploaded = (payload) => {
+      console.log('⚡ Realtime PDF Upload Event Received on Kiosk Preview:', payload);
+      if (payload.uploadToken && payload.uploadToken !== uploadToken) {
+        navigate(`/kiosk/${machineId}/preview/${payload.uploadToken}`);
+      }
+    };
+
+    socket.on('FILE_UPLOADED', handleFileUploaded);
+    return () => {
+      socket.off('FILE_UPLOADED', handleFileUploaded);
+    };
+  }, [socket, machineId, uploadToken, navigate]);
 
   useEffect(() => {
     const fetchUploadDetails = async () => {

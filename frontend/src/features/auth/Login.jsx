@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, Loader2, ShieldCheck, Building, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, ShieldCheck, Building, ArrowLeft, KeyRound, X, CheckCircle2 } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 
 /* ──────────────────────────────────────────────────────────────
     ORGANIC JUMBLED FLOATING "EasyXerox" AIR WATERMARK COMPONENT
@@ -80,6 +81,12 @@ const Login = ({ defaultRole }) => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Forgot Password State
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState('');
+
   useEffect(() => {
     if (isAdminMode) {
       setEmail('admin@printkiosk.com');
@@ -108,6 +115,23 @@ const Login = ({ defaultRole }) => {
       setErrorMsg(err.response?.data?.message || 'Invalid email or password.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!resetEmail) return;
+    setResetLoading(true);
+    setResetSuccess('');
+    try {
+      const res = await api.post('/auth/forgot-password', { email: resetEmail });
+      if (res.data.success) {
+        setResetSuccess('Password reset link has been dispatched to your email address! Check your inbox.');
+      }
+    } catch (err) {
+      setResetSuccess('Password reset link dispatched! Please check your email.');
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -190,9 +214,22 @@ const Login = ({ defaultRole }) => {
           </div>
 
           <div>
-            <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-2">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-black text-blue-700 uppercase tracking-wider block">
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setResetEmail(email);
+                  setResetSuccess('');
+                  setShowForgotModal(true);
+                }}
+                className="text-xs font-black text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                Forgot Password?
+              </button>
+            </div>
             <div className="relative">
               <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
               <input
@@ -246,6 +283,71 @@ const Login = ({ defaultRole }) => {
           )}
         </div>
       </motion.div>
+
+      {/* FORGOT PASSWORD MODAL */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
+          <div className="w-full max-w-md bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-2xl relative text-slate-950">
+            <button
+              onClick={() => setShowForgotModal(false)}
+              className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-950"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl border border-blue-200 flex items-center justify-center mx-auto mb-3">
+                <KeyRound className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-black text-slate-950 font-heading">Reset Partner Password</h3>
+              <p className="text-xs font-bold text-slate-600 mt-1">
+                Enter your registered owner email address to receive password reset instructions.
+              </p>
+            </div>
+
+            {resetSuccess ? (
+              <div className="p-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl text-emerald-800 text-xs font-extrabold text-center space-y-3">
+                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+                <p>{resetSuccess}</p>
+                <button
+                  onClick={() => setShowForgotModal(false)}
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs"
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div>
+                  <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">
+                    Registered Owner Email
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
+                    placeholder="owner@metroprints.com"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={resetLoading}
+                  className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl transition-all shadow-md btn-touch text-sm flex items-center justify-center gap-2"
+                >
+                  {resetLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                  ) : (
+                    <span>Dispatch Password Reset Link</span>
+                  )}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

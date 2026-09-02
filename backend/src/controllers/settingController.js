@@ -16,10 +16,24 @@ const getPricing = async (req, res, next) => {
 
 const updatePricing = async (req, res, next) => {
     try {
-        const { id, machine_id, bw_single_page_price, color_single_page_price, bw_duplex_page_price, color_duplex_page_price, paper_size, is_default } = req.body;
+        let { id, machine_id, bw_single_page_price, color_single_page_price, bw_duplex_page_price, color_duplex_page_price, paper_size, is_default } = req.body;
+
+        const targetMachineId = (machine_id && machine_id !== 'all' && machine_id !== 'ALL') ? machine_id : null;
+        const isDefault = !targetMachineId;
+
+        // Find existing pricing row to update if available
+        let existing;
+        if (id) {
+            existing = await db.query('SELECT * FROM pricing WHERE id = $1', [id]);
+        } else if (targetMachineId) {
+            existing = await db.query('SELECT * FROM pricing WHERE machine_id::text = $1', [targetMachineId]);
+        } else {
+            existing = await db.query('SELECT * FROM pricing WHERE is_default = true OR machine_id IS NULL LIMIT 1');
+        }
 
         let result;
-        if (id) {
+        if (existing && existing.rows && existing.rows.length > 0) {
+            const targetId = existing.rows[0].id;
             result = await db.query(
                 `UPDATE pricing 
                  SET bw_single_page_price = $1,
@@ -29,17 +43,17 @@ const updatePricing = async (req, res, next) => {
                      paper_size = $5,
                      updated_at = CURRENT_TIMESTAMP
                  WHERE id = $6 RETURNING *`,
-                [bw_single_page_price, color_single_page_price, bw_duplex_page_price, color_duplex_page_price, paper_size || 'A4', id]
+                [bw_single_page_price, color_single_page_price, bw_duplex_page_price, color_duplex_page_price, paper_size || 'A4', targetId]
             );
         } else {
             result = await db.query(
                 `INSERT INTO pricing (machine_id, bw_single_page_price, color_single_page_price, bw_duplex_page_price, color_duplex_page_price, paper_size, is_default)
                  VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-                [machine_id || null, bw_single_page_price, color_single_page_price, bw_duplex_page_price, color_duplex_page_price, paper_size || 'A4', is_default || false]
+                [targetMachineId, bw_single_page_price, color_single_page_price, bw_duplex_page_price, color_duplex_page_price, paper_size || 'A4', isDefault]
             );
         }
 
-        res.json({ success: true, pricing: result.rows[0] });
+        res.json({ success: true, pricing: result.rows ? result.rows[0] : result });
     } catch (err) {
         next(err);
     }

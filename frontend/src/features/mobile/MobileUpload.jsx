@@ -92,7 +92,7 @@ const MobileUpload = () => {
         </div>
 
         <div className="px-3 py-1.5 bg-white text-blue-700 rounded-xl text-xs font-mono font-black border border-blue-200 shadow-sm">
-          {machineId}
+          {machine?.machine_code || machineId || 'FFPVT_EasyXerox-001'}
         </div>
       </header>
 

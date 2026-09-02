@@ -5,10 +5,12 @@ import { Settings2, Minus, Plus, Palette, Layers, FileSpreadsheet, RotateCcw, Ar
 
 import api from '../../services/api';
 import KioskPaymentModal from './KioskPaymentModal';
+import { useSocket } from '../../context/SocketContext';
 
 const KioskPrintOptions = () => {
   const { machineId, uploadToken } = useParams();
   const navigate = useNavigate();
+  const { socket } = useSocket();
 
   const [upload, setUpload] = useState(null);
   const [pricing, setPricing] = useState({
@@ -49,6 +51,24 @@ const KioskPrintOptions = () => {
 
     fetchUploadAndPricing();
   }, [uploadToken, machineId]);
+
+  // Listen for new uploaded document (e.g. Upload Another Document)
+  useEffect(() => {
+    if (!socket) return;
+    socket.emit('JOIN_MACHINE', machineId);
+
+    const handleFileUploaded = (payload) => {
+      console.log('⚡ Realtime PDF Upload Event Received on Print Options:', payload);
+      if (payload.uploadToken && payload.uploadToken !== uploadToken) {
+        navigate(`/kiosk/${machineId}/preview/${payload.uploadToken}`);
+      }
+    };
+
+    socket.on('FILE_UPLOADED', handleFileUploaded);
+    return () => {
+      socket.off('FILE_UPLOADED', handleFileUploaded);
+    };
+  }, [socket, machineId, uploadToken, navigate]);
 
   // 60-Second Inactivity Auto-Reset to Standby Ads Home Screen (unless payment modal is open)
   useEffect(() => {
