@@ -19,8 +19,8 @@ const KioskHome = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [printerStatus, setPrinterStatus] = useState('ready');
 
-  // Kiosk Mode State: 'standby_ad' (Full-screen ad) vs 'qr_interactive' (QR Scan screen)
-  const [kioskState, setKioskState] = useState('standby_ad');
+  // Default to 'qr_interactive' if no ads exist
+  const [kioskState, setKioskState] = useState('qr_interactive');
 
   // Helper to construct full media URL for ad images/videos
   const getMediaUrl = (url) => {
@@ -28,21 +28,20 @@ const KioskHome = () => {
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     const backendUrl = import.meta.env.VITE_API_URL 
       ? import.meta.env.VITE_API_URL.replace('/api/v1', '') 
-      : 'https://vymecmonmluvhgtsfezw.supabase.co';
+      : `${window.location.protocol}//${window.location.hostname}:5000`;
     return `${backendUrl}${url}`;
   };
 
-
-  // Hoisted so it can be called from both useEffect and the socket ADS_UPDATED handler
+  // Fetch machine ads from backend
   const fetchMachineAds = async () => {
     try {
       const res = await api.get(`/machines/code/${machineId}/ads`);
       if (res.data.success && res.data.ads && res.data.ads.length > 0) {
         setAds(res.data.ads);
         setCurrentAdIndex(0);
-        setKioskState('standby_ad'); // Ads exist → show ad slideshow
+        setKioskState('standby_ad'); // Ads exist -> show ad slideshow
       } else {
-        // No ads at all → show QR code screen directly
+        // No active ads -> stay on QR code screen directly
         setAds([]);
         setKioskState('qr_interactive');
       }
@@ -86,15 +85,14 @@ const KioskHome = () => {
     return () => clearInterval(adInterval);
   }, [ads]);
 
-  // 60-Second Inactivity Auto-Return to Standby Ads Screen
+  // 60-Second Inactivity Auto-Return to Standby Ads Screen ONLY if ads exist
   useEffect(() => {
-    if (kioskState !== 'qr_interactive') return;
+    if (kioskState !== 'qr_interactive' || ads.length === 0) return;
     const idleTimer = setTimeout(() => {
       setKioskState('standby_ad');
-    }, 60000); // Exactly 60 seconds (1 minute)
+    }, 60000);
     return () => clearTimeout(idleTimer);
-  }, [kioskState]);
-
+  }, [kioskState, ads]);
 
   // Listen to Socket.IO for Machine Events & Direct Upload Notification
   useEffect(() => {
@@ -134,10 +132,9 @@ const KioskHome = () => {
       socket.off('PRINTER_STATUS_CHANGE', handlePrinterStatusChange);
       socket.off('ADS_UPDATED', handleAdsUpdated);
     };
-  }, [socket, machineId, navigate, fetchMachineAds]);
+  }, [socket, machineId, navigate]);
 
   const uploadUrl = `${window.location.origin}/upload/${machineId}`;
-
 
   // Handle Touch Screen Anywhere on Ad to reveal QR Screen
   const handleAdTouchScreen = () => {
@@ -174,12 +171,13 @@ const KioskHome = () => {
     );
   }
 
+  const showStandbyAds = kioskState === 'standby_ad' && ads.length > 0;
 
   return (
     <div className="relative w-screen h-screen bg-slate-50 text-slate-800 overflow-hidden select-none font-sans">
-      {/* 1. FULL-PAGE STANDBY ADVERTISEMENT MODE */}
+      {/* 1. FULL-PAGE STANDBY ADVERTISEMENT MODE (ONLY WHEN ADS > 0) */}
       <AnimatePresence mode="wait">
-        {kioskState === 'standby_ad' && (
+        {showStandbyAds && (
           <motion.div
             key="standby_ad_view"
             initial={{ opacity: 0 }}
@@ -210,12 +208,8 @@ const KioskHome = () => {
                     />
                   ) : (
                     <img
-                      src={ads[currentAdIndex]?.media_url ? getMediaUrl(ads[currentAdIndex]?.media_url) : 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80'}
-                      alt={ads[currentAdIndex]?.title || 'Instant Self-Service Xerox Printing'}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80';
-                      }}
+                      src={getMediaUrl(ads[currentAdIndex]?.media_url)}
+                      alt={ads[currentAdIndex]?.title || 'Promotional Ad'}
                       className="w-full h-full object-cover brightness-95"
                     />
                   )}
@@ -258,7 +252,7 @@ const KioskHome = () => {
                 Promotional Offer
               </span>
               <h2 className="text-4xl font-extrabold text-white leading-tight font-heading drop-shadow-2xl">
-                {ads[currentAdIndex]?.title || 'Instant 24/7 Self-Service Xerox & Cloud Printing'}
+                {ads[currentAdIndex]?.title || 'Promotional Advertisement'}
               </h2>
             </div>
 
@@ -286,9 +280,9 @@ const KioskHome = () => {
         )}
       </AnimatePresence>
 
-      {/* 2. INTERACTIVE QR CODE SCREEN MODE */}
+      {/* 2. INTERACTIVE QR CODE SCREEN MODE (ALWAYS SHOWN IF ADS === 0) */}
       <AnimatePresence mode="wait">
-        {kioskState === 'qr_interactive' && (
+        {!showStandbyAds && (
           <motion.div
             key="qr_interactive_view"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -300,7 +294,6 @@ const KioskHome = () => {
             {/* HEADER BAR */}
             <header className="relative z-10 flex items-center justify-between bg-[#0066FF] backdrop-blur-xl border-2 border-white/40 rounded-2xl px-6 py-4 shadow-blue-glow text-white">
               <div className="flex items-center gap-3">
-                {/* Only show Back to Ads button if there are active ads */}
                 {ads.length > 0 && (
                   <button
                     onClick={() => setKioskState('standby_ad')}
@@ -426,6 +419,5 @@ const KioskHome = () => {
     </div>
   );
 };
-
 
 export default KioskHome;
