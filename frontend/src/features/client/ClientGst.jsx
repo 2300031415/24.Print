@@ -48,64 +48,68 @@ const ClientGst = () => {
 
   return (
     <PortalLayout title="GST Tax Configuration" role="client">
-      <div className="max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
-        <h3 className="text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
-          <Percent className="w-6 h-6 text-cyan-400" />
-          <span>Active GST Rate Setup</span>
-        </h3>
+      <div className="w-full max-w-7xl mx-auto space-y-8 select-none font-sans">
+        <div className="bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-xl space-y-6">
+          <h3 className="text-2xl font-black text-slate-950 font-heading flex items-center gap-3 border-b border-blue-100 pb-4">
+            <Percent className="w-7 h-7 text-blue-600" />
+            <span>Active GST Rate Setup</span>
+          </h3>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-xs font-bold text-slate-400 block mb-1">Tax Display Label</label>
-            <input
-              type="text"
-              required
-              value={formData.tax_name}
-              onChange={(e) => setFormData({ ...formData, tax_name: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-bold text-slate-400 block mb-1">Total GST Percentage (%)</label>
-            <input
-              type="number"
-              step="0.1"
-              required
-              value={formData.percentage}
-              onChange={(e) => {
-                const val = parseFloat(e.target.value);
-                setFormData({
-                  ...formData,
-                  percentage: val,
-                  cgst_percentage: val / 2,
-                  sgst_percentage: val / 2,
-                  igst_percentage: val
-                });
-              }}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-lg font-bold text-emerald-400 font-mono"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 pt-2">
-            <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span className="text-xs text-slate-400 block">CGST Share</span>
-              <span className="text-sm font-bold text-white">{formData.cgst_percentage}%</span>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-2">Tax Display Label</label>
+              <input
+                type="text"
+                required
+                value={formData.tax_name}
+                onChange={(e) => setFormData({ ...formData, tax_name: e.target.value })}
+                className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-base font-black text-slate-950 focus:outline-none focus:border-blue-600 focus:bg-white transition-all"
+              />
             </div>
-            <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span className="text-xs text-slate-400 block">SGST Share</span>
-              <span className="text-sm font-bold text-white">{formData.sgst_percentage}%</span>
-            </div>
-          </div>
 
-          <button
-            type="submit"
-            className="w-full py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-cyan-glow btn-touch text-base flex items-center justify-center gap-2 mt-4"
-          >
-            <Save className="w-5 h-5" />
-            <span>Update GST Rate</span>
-          </button>
-        </form>
+            <div>
+              <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-2">Total GST Percentage (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                required
+                value={formData.percentage}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  setFormData({
+                    ...formData,
+                    percentage: val,
+                    cgst_percentage: val / 2,
+                    sgst_percentage: val / 2,
+                    igst_percentage: val
+                  });
+                }}
+                className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-xl font-black text-emerald-600 font-mono focus:outline-none focus:border-blue-600 focus:bg-white transition-all"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              <div className="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
+                <span className="text-xs font-black text-blue-700 uppercase tracking-wider block">CGST Share</span>
+                <span className="text-lg font-black text-slate-950">{formData.cgst_percentage}%</span>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
+                <span className="text-xs font-black text-blue-700 uppercase tracking-wider block">SGST Share</span>
+                <span className="text-lg font-black text-slate-950">{formData.sgst_percentage}%</span>
+              </div>
+            </div>
+
+            <div className="pt-4 flex justify-end">
+              <button
+                type="submit"
+                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-base rounded-xl transition-all shadow-blue-glow btn-touch flex items-center justify-center gap-2"
+              >
+                <Save className="w-5 h-5 text-white" />
+                <span>Update GST Rate</span>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </PortalLayout>
   );

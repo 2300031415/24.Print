@@ -37,20 +37,19 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
     { name: 'Transactions', path: '/client/transactions', icon: FileText }
   ];
 
-
   const navItems = role === 'admin' ? adminNav : clientNav;
 
   return (
-    <div className="min-h-screen bg-[#fff9ee] text-slate-900 flex overflow-hidden font-sans">
-      {/* SIDEBAR NAVIGATION */}
-      <aside className="w-72 bg-[#0066FF] border-r-2 border-[#0052CC] flex flex-col justify-between p-6 shrink-0 shadow-2xl">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex overflow-hidden font-sans">
+      {/* SIDEBAR NAVIGATION (Royal Blue Theme) */}
+      <aside className="w-72 bg-blue-600 border-r-2 border-blue-700 flex flex-col justify-between p-6 shrink-0 shadow-2xl">
         <div>
-          {/* Logo */}
+          {/* Logo Badge */}
           <div className="flex flex-col mb-8 px-2 gap-2">
-            <div className="logo-badge self-start py-2 px-4 shadow-xl border-2 border-white/40">
-              <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
+            <div className="bg-white p-1.5 px-4 rounded-2xl border-2 border-blue-700 shadow-xl self-start overflow-hidden">
+              <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain scale-140 transform" />
             </div>
-            <span className="text-[10px] uppercase font-black tracking-widest text-blue-100 block pl-1">
+            <span className="text-[11px] uppercase font-black tracking-widest text-blue-100 block pl-1">
               {role === 'admin' ? 'Super Admin Portal' : 'Client Owner Portal'}
             </span>
           </div>
@@ -64,17 +63,17 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-extrabold transition-all ${
                     isActive
-                      ? 'bg-white text-[#0066FF] shadow-lg border border-blue-100'
-                      : 'text-white/85 hover:text-white hover:bg-[#0052CC]'
+                      ? 'bg-white text-blue-600 shadow-lg border-2 border-blue-200'
+                      : 'text-white/90 hover:text-white hover:bg-blue-700/80'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-[#0066FF]' : 'text-blue-100'}`} />
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-blue-100'}`} />
                     <span>{item.name}</span>
                   </div>
-                  {isActive && <ChevronRight className="w-4 h-4 text-[#0066FF]" />}
+                  {isActive && <ChevronRight className="w-4 h-4 text-blue-600" />}
                 </Link>
               );
             })}
@@ -82,20 +81,20 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
         </div>
 
         {/* User Footer Profile & Logout */}
-        <div className="pt-6 border-t border-white/20">
+        <div className="pt-6 border-t border-blue-500/60">
           <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-9 h-9 rounded-full bg-white border border-blue-200 flex items-center justify-center font-black text-[#0066FF]">
+            <div className="w-9 h-9 rounded-full bg-white border-2 border-blue-200 flex items-center justify-center font-black text-blue-600 shadow-md">
               {user?.full_name?.charAt(0) || 'U'}
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-bold text-white truncate">{user?.full_name || 'System User'}</p>
-              <p className="text-[11px] text-blue-100 truncate">{user?.email}</p>
+              <p className="text-xs font-black text-white truncate">{user?.full_name || 'System User'}</p>
+              <p className="text-[11px] text-blue-100 font-bold truncate">{user?.email}</p>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="w-full py-2.5 px-4 bg-slate-800/80 hover:bg-rose-950/60 hover:text-rose-400 hover:border-rose-800/80 text-slate-300 font-semibold rounded-xl text-xs border border-slate-700 transition-all flex items-center justify-center gap-2 btn-touch"
+            className="w-full py-2.5 px-4 bg-blue-900/60 hover:bg-rose-600 hover:text-white text-white font-extrabold rounded-xl text-xs border border-blue-400/30 transition-all flex items-center justify-center gap-2 btn-touch shadow-md"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -103,20 +102,20 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
         </div>
       </aside>
 
-      {/* MAIN VIEW CONTENT AREA */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        {/* Top Navbar */}
-        <header className="h-20 bg-slate-900/60 border-b border-slate-800/80 px-8 flex items-center justify-between sticky top-0 z-20 backdrop-blur-md">
-          <h2 className="text-2xl font-bold text-white font-heading">{title}</h2>
+      {/* MAIN VIEW CONTENT AREA (Light Ice White Background) */}
+      <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50">
+        {/* Top Navbar Header */}
+        <header className="h-20 bg-white/95 border-b border-blue-100 px-8 flex items-center justify-between sticky top-0 z-20 backdrop-blur-md shadow-sm">
+          <h2 className="text-2xl font-black font-heading text-slate-950">{title}</h2>
           
           <div className="flex items-center gap-4">
-            <span className="px-3 py-1 bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700">
-              System Time: {new Date().toLocaleDateString()}
+            <span className="px-3.5 py-1.5 bg-blue-50 text-blue-800 text-xs font-extrabold rounded-xl border border-blue-200 shadow-sm">
+              System Date: {new Date().toLocaleDateString()}
             </span>
           </div>
         </header>
 
-        {/* Main Body */}
+        {/* Main Content Body */}
         <main className="p-8 flex-1">{children}</main>
       </div>
     </div>

@@ -6,8 +6,8 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    background-color: #020617;
-    color: #f8fafc;
+    background-color: #f8fafc;
+    color: #0f172a;
   }
 
   h1, h2, h3, h4, .font-heading {
@@ -17,12 +17,11 @@
 
 /* Color Tokens */
 :root {
-  --color-[#fff9ee]: #020617;
   --color-brand-blue: #0066FF;
   --color-brand-blue-hover: #0052CC;
-  --color-brand-blue-light: #0f172a;
-  --color-pure-white: #0f172a;
-  --color-slate-dark: #f8fafc;
+  --color-brand-blue-light: #eff6ff;
+  --color-pure-white: #ffffff;
+  --color-slate-dark: #0f172a;
 }
 
 /* EasyXerox White Logo Badge */
@@ -47,23 +46,23 @@
 
 /* Custom Cards */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.96);
+  background: #ffffff;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(0, 102, 255, 0.18);
+  border: 2px solid #dbeafe;
   box-shadow: 0 10px 30px rgba(0, 102, 255, 0.08);
 }
 
 .glass-panel-dark {
   background: #0066FF;
   color: #ffffff;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 12px 40px rgba(0, 102, 255, 0.35);
 }
 
 .glass-card {
-  background: #0f172a;
-  border: 1.5px solid rgba(0, 102, 255, 0.15);
+  background: #ffffff;
+  border: 2px solid #dbeafe;
   box-shadow: 0 10px 35px 0 rgba(0, 102, 255, 0.1);
 }
 
@@ -96,7 +95,7 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
   background: #0066FF;

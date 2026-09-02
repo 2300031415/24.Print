@@ -40,108 +40,111 @@ const ClientMachines = () => {
 
   return (
     <PortalLayout title="My Registered Kiosks & Printers" role="client">
-      <div className="space-y-4 mb-6">
-        <p className="text-slate-400 text-sm">
-          Manage your kiosk locations and toggle maintenance mode to temporarily pause paper loading or routine maintenance.
-        </p>
-      </div>
+      <div className="w-full max-w-7xl mx-auto space-y-6 select-none font-sans">
+        <div className="bg-white p-6 rounded-3xl border-2 border-blue-100 shadow-md">
+          <p className="text-slate-700 font-bold text-sm">
+            Manage your kiosk locations and toggle maintenance mode to temporarily pause paper loading or routine maintenance.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {machines.map((machine) => {
-          const isMaintenance = machine.status === 'maintenance';
-          return (
-            <div
-              key={machine.id}
-              className={`glass-panel p-6 rounded-3xl border transition-all space-y-5 ${
-                isMaintenance ? 'border-amber-500/40 bg-amber-950/10' : 'border-slate-800'
-              }`}
-            >
-              {/* HEADER BADGE & TOGGLE */}
-              <div className="flex items-center justify-between">
-                <span className="px-3 py-1 bg-cyan-950 text-cyan-300 border border-cyan-800 rounded-lg text-xs font-mono font-bold">
-                  {machine.machine_code}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 ${
-                      isMaintenance
-                        ? 'bg-amber-950 text-amber-400 border border-amber-800'
-                        : 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                    }`}
-                  >
-                    {isMaintenance ? (
-                      <>
-                        <Wrench className="w-3.5 h-3.5 animate-spin" />
-                        Under Maintenance
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Operational
-                      </>
-                    )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {machines.map((machine) => {
+            const isMaintenance = machine.status === 'maintenance';
+            return (
+              <div
+                key={machine.id}
+                className={`p-6 rounded-3xl border-2 transition-all space-y-5 shadow-xl ${
+                  isMaintenance
+                    ? 'border-amber-300 bg-amber-50/80'
+                    : 'border-blue-100 bg-white hover:border-blue-500'
+                }`}
+              >
+                {/* HEADER BADGE & TOGGLE */}
+                <div className="flex items-center justify-between">
+                  <span className="px-3.5 py-1 bg-blue-50 text-blue-800 border border-blue-200 rounded-lg text-xs font-mono font-black shadow-sm">
+                    {machine.machine_code}
                   </span>
+
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-black flex items-center gap-1.5 shadow-sm ${
+                        isMaintenance
+                          ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                          : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                      }`}
+                    >
+                      {isMaintenance ? (
+                        <>
+                          <Wrench className="w-3.5 h-3.5 animate-spin text-amber-700" />
+                          Under Maintenance
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                          Operational
+                        </>
+                      )}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              {/* MACHINE NAME & LOCATION */}
-              <div>
-                <h3 className="text-xl font-bold text-white font-heading">{machine.name}</h3>
-                <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
-                  <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>{machine.location_address || 'Registered Location'}</span>
-                </p>
-              </div>
-
-              {/* MAINTENANCE TOGGLE CONTROL CARD */}
-              <div className="p-4 bg-slate-950/90 rounded-2xl border border-slate-800 flex items-center justify-between">
+                {/* MACHINE NAME & LOCATION */}
                 <div>
-                  <p className="text-xs font-bold text-white">Board Operational Control</p>
-                  <p className="text-[11px] text-slate-400">
-                    {isMaintenance ? 'Kiosk display is currently stopped' : 'Kiosk is active & taking prints'}
+                  <h3 className="text-xl font-black text-slate-950 font-heading">{machine.name}</h3>
+                  <p className="text-xs text-slate-700 font-bold flex items-center gap-1 mt-1">
+                    <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <span>{machine.location_address || 'Registered Location'}</span>
                   </p>
                 </div>
 
-                <button
-                  onClick={() => handleToggleMaintenance(machine)}
-                  disabled={loadingId === machine.id}
-                  className={`relative w-14 h-8 rounded-full transition-colors p-1 flex items-center ${
-                    isMaintenance ? 'bg-amber-600' : 'bg-emerald-500'
-                  }`}
-                >
-                  <div
-                    className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform flex items-center justify-center ${
-                      isMaintenance ? 'translate-x-6' : 'translate-x-0'
+                {/* MAINTENANCE TOGGLE CONTROL CARD */}
+                <div className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-200 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-black text-slate-950">Board Operational Control</p>
+                    <p className="text-[11px] text-slate-600 font-bold">
+                      {isMaintenance ? 'Kiosk display is currently stopped' : 'Kiosk is active & taking prints'}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => handleToggleMaintenance(machine)}
+                    disabled={loadingId === machine.id}
+                    className={`relative w-14 h-8 rounded-full transition-colors p-1 flex items-center shadow-inner ${
+                      isMaintenance ? 'bg-amber-500' : 'bg-emerald-500'
                     }`}
                   >
-                    {isMaintenance ? (
-                      <Wrench className="w-3.5 h-3.5 text-amber-600" />
-                    ) : (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    )}
-                  </div>
-                </button>
-              </div>
+                    <div
+                      className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform flex items-center justify-center ${
+                        isMaintenance ? 'translate-x-6' : 'translate-x-0'
+                      }`}
+                    >
+                      {isMaintenance ? (
+                        <Wrench className="w-3.5 h-3.5 text-amber-600" />
+                      ) : (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      )}
+                    </div>
+                  </button>
+                </div>
 
-              {/* PRINTER DETAILS */}
-              <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 text-xs space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Printer Hardware Status</span>
-                  <span className="text-emerald-400 font-bold capitalize">{machine.printer_status || 'ready'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Printer Model</span>
-                  <span className="text-white font-mono">{machine.default_printer_name || 'Brother DCP-T820DW Printer'}</span>
+                {/* PRINTER DETAILS */}
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 font-bold">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Printer Hardware Status</span>
+                    <span className="text-emerald-700 font-black capitalize">{machine.printer_status || 'ready'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Printer Model</span>
+                    <span className="text-slate-950 font-mono font-black">{machine.default_printer_name || 'Brother DCP-T820DW Printer'}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </PortalLayout>
   );
 };
 
 export default ClientMachines;
-

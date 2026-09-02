@@ -6,7 +6,7 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    background-color: #fff9ee;
+    background-color: #F8FAFC;
     color: #0F172A;
   }
 
@@ -15,12 +15,11 @@
   }
 }
 
-/* Color Tokens */
+/* Color Tokens matching Royal Blue, Pure White & Slate Black */
 :root {
-  --color-cream: #fff9ee;
   --color-brand-blue: #0066FF;
   --color-brand-blue-hover: #0052CC;
-  --color-brand-blue-light: #E6F0FF;
+  --color-brand-blue-light: #EFF6FF;
   --color-pure-white: #ffffff;
   --color-slate-dark: #0F172A;
 }
@@ -32,7 +31,7 @@
   -webkit-backdrop-filter: blur(12px);
   border: 2px solid #0066FF;
   box-shadow: 0 8px 24px -2px rgba(0, 102, 255, 0.22);
-  padding: 6px 18px;
+  padding: 4px 14px;
   border-radius: 16px;
   display: inline-flex;
   align-items: center;
@@ -47,11 +46,11 @@
 
 /* Custom Cards */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(0, 102, 255, 0.18);
-  box-shadow: 0 10px 30px rgba(0, 102, 255, 0.08);
+  border: 1.5px solid rgba(0, 102, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 102, 255, 0.08);
 }
 
 .glass-panel-dark {
@@ -63,21 +62,17 @@
 
 .glass-card {
   background: #ffffff;
-  border: 1.5px solid rgba(0, 102, 255, 0.15);
-  box-shadow: 0 10px 35px 0 rgba(0, 102, 255, 0.1);
+  border: 1.5px solid rgba(0, 102, 255, 0.12);
+  box-shadow: 0 10px 30px 0 rgba(0, 102, 255, 0.06);
 }
 
 /* Glowing Accent Shadows */
 .shadow-blue-glow {
-  box-shadow: 0 6px 25px -2px rgba(0, 102, 255, 0.35);
-}
-
-.shadow-gold-glow {
-  box-shadow: 0 6px 25px -2px rgba(0, 102, 255, 0.3);
+  box-shadow: 0 8px 30px -2px rgba(0, 102, 255, 0.35);
 }
 
 .shadow-cyan-glow {
-  box-shadow: 0 6px 25px -2px rgba(0, 102, 255, 0.3);
+  box-shadow: 0 8px 30px -2px rgba(0, 102, 255, 0.25);
 }
 
 /* Touch Friendly Button Active Scale */
@@ -96,7 +91,7 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #fff9ee;
+  background: #F8FAFC;
 }
 ::-webkit-scrollbar-thumb {
   background: #0066FF;
@@ -116,4 +111,3 @@
   width: max-content;
   animation: marquee 22s linear infinite;
 }
-

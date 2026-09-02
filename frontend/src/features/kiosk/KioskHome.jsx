@@ -177,7 +177,7 @@ const KioskHome = () => {
 
 
   return (
-    <div className="relative w-screen h-screen bg-[#fff9ee] text-slate-800 overflow-hidden select-none font-sans">
+    <div className="relative w-screen h-screen bg-slate-50 text-slate-800 overflow-hidden select-none font-sans">
       {/* 1. FULL-PAGE STANDBY ADVERTISEMENT MODE */}
       <AnimatePresence mode="wait">
         {kioskState === 'standby_ad' && (
@@ -188,7 +188,7 @@ const KioskHome = () => {
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.5 }}
             onClick={handleAdTouchScreen}
-            className="absolute inset-0 z-30 cursor-pointer flex flex-col justify-between p-8 bg-[#fff9ee]"
+            className="absolute inset-0 z-30 cursor-pointer flex flex-col justify-between p-8 bg-slate-50"
           >
             {/* Full Screen Media Display */}
             <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -296,7 +296,7 @@ const KioskHome = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.4 }}
-            className="relative z-10 w-full h-full flex flex-col justify-between p-6 bg-[#fff9ee]"
+            className="relative z-10 w-full h-full flex flex-col justify-between p-6 bg-slate-50"
           >
             {/* HEADER BAR */}
             <header className="relative z-10 flex items-center justify-between bg-[#0066FF] backdrop-blur-xl border-2 border-white/40 rounded-2xl px-6 py-4 shadow-blue-glow text-white">

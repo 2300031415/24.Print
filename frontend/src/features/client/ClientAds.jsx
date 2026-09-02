@@ -37,7 +37,6 @@ const ClientAds = () => {
     return `${backendUrl}${url}`;
   };
 
-
   const fetchAds = async () => {
     try {
       const res = await api.get('/ads');
@@ -102,53 +101,53 @@ const ClientAds = () => {
 
   return (
     <PortalLayout title="Promotional Advertisement Management" role="client">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 select-none font-sans">
         {/* UPLOAD & BOARD SELECTION FORM */}
-        <div className="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl h-fit">
-          <h3 className="text-xl font-bold text-white font-heading mb-2 flex items-center gap-2">
-            <Upload className="w-5 h-5 text-cyan-400" />
+        <div className="lg:col-span-5 bg-white border-2 border-blue-100 rounded-3xl p-6 shadow-xl h-fit">
+          <h3 className="text-xl font-black text-slate-950 font-heading mb-2 flex items-center gap-2">
+            <Upload className="w-5 h-5 text-blue-600" />
             <span>Publish Promotional Ad</span>
           </h3>
-          <p className="text-xs text-slate-400 mb-4">Upload promotional media and select target kiosk boards to broadcast instantly.</p>
+          <p className="text-xs font-bold text-slate-600 mb-6">Upload promotional media and select target kiosk boards to broadcast instantly.</p>
 
-          <form onSubmit={handleUploadAd} className="space-y-4">
+          <form onSubmit={handleUploadAd} className="space-y-5">
             <div>
-              <label className="text-xs font-bold text-slate-400 block mb-1">Ad Title / Campaign Name</label>
+              <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-2">Ad Title / Campaign Name</label>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-cyan-500 transition-all outline-none"
+                className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white transition-all outline-none"
                 placeholder="e.g. 20% Discount for Students"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-400 block mb-1">Media File (JPG, PNG, GIF, MP4)</label>
+              <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-2">Media File (JPG, PNG, GIF, MP4)</label>
               <input
                 type="file"
                 required
                 accept="image/*,video/mp4"
                 onChange={(e) => setFile(e.target.files[0])}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-300"
+                className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 text-xs text-slate-950 font-bold"
               />
             </div>
 
             {/* TARGET KIOSK BOARDS SELECTION */}
             {machines.length > 0 && (
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-2">Target Kiosk Board(s)</label>
-                <div className="space-y-2 bg-slate-950 border border-slate-800 rounded-2xl p-3">
+                <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-2">Target Kiosk Board(s)</label>
+                <div className="space-y-2 bg-slate-50 border-2 border-slate-200 rounded-2xl p-4">
                   {machines.map((m) => (
-                    <label key={m.id} className="flex items-center gap-2 text-xs text-white cursor-pointer select-none">
+                    <label key={m.id} className="flex items-center gap-2.5 text-xs text-slate-950 font-extrabold cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={selectedMachineIds.includes(m.id)}
                         onChange={() => handleMachineToggle(m.id)}
-                        className="rounded accent-cyan-500 w-4 h-4"
+                        className="rounded accent-blue-600 w-4 h-4 cursor-pointer"
                       />
-                      <MonitorCheck className="w-4 h-4 text-cyan-400" />
+                      <MonitorCheck className="w-4 h-4 text-blue-600" />
                       <span>{m.name} ({m.machine_code})</span>
                     </label>
                   ))}
@@ -159,7 +158,7 @@ const ClientAds = () => {
             <button
               type="submit"
               disabled={uploading}
-              className="w-full py-3.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-cyan-glow btn-touch text-sm"
+              className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl transition-all shadow-blue-glow btn-touch text-sm"
             >
               {uploading ? 'Publishing...' : 'Publish to Selected Board(s)'}
             </button>
@@ -167,21 +166,21 @@ const ClientAds = () => {
         </div>
 
         {/* ADS LIST */}
-        <div className="lg:col-span-8 space-y-4">
-          <h3 className="text-xl font-bold text-white font-heading">Active Advertisements ({ads.length})</h3>
+        <div className="lg:col-span-7 space-y-6">
+          <h3 className="text-2xl font-black text-slate-950 font-heading">Active Advertisements ({ads.length})</h3>
 
           {ads.length === 0 ? (
-            <div className="text-center py-16 bg-slate-900/40 border border-slate-800 rounded-3xl">
-              <Tv className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <h4 className="text-base font-bold text-slate-300">No active advertisements.</h4>
-              <p className="text-xs text-slate-500 mt-1">Upload your first ad on the left to broadcast to your kiosk boards.</p>
+            <div className="text-center py-16 bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-md">
+              <Tv className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+              <h4 className="text-base font-black text-slate-950">No active advertisements.</h4>
+              <p className="text-xs font-bold text-slate-600 mt-1">Upload your first ad on the left to broadcast to your kiosk boards.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {ads.map((ad) => (
-                <div key={ad.id} className="glass-panel p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-4">
+                <div key={ad.id} className="bg-white p-5 rounded-3xl border-2 border-blue-100 flex items-center justify-between gap-4 shadow-xl hover:border-blue-500 transition-all">
                   <div className="flex items-center gap-4 overflow-hidden">
-                    <div className="w-24 h-24 rounded-xl overflow-hidden bg-slate-950 shrink-0 border border-slate-800">
+                    <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-100 shrink-0 border-2 border-slate-200">
                       {ad.media_type === 'video' ? (
                         <video src={getMediaUrl(ad.media_url)} className="w-full h-full object-cover" />
                       ) : (
@@ -190,9 +189,9 @@ const ClientAds = () => {
                     </div>
 
                     <div className="overflow-hidden">
-                      <h4 className="font-bold text-white text-sm truncate">{ad.title}</h4>
-                      <p className="text-xs text-slate-400 mt-1">Rotation Duration: {ad.duration_seconds || 10}s</p>
-                      <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                      <h4 className="font-black text-slate-950 text-base truncate">{ad.title}</h4>
+                      <p className="text-xs text-slate-600 font-bold mt-1">Rotation Duration: {ad.duration_seconds || 10}s</p>
+                      <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm">
                         Live Broadcasting
                       </span>
                     </div>
@@ -201,7 +200,7 @@ const ClientAds = () => {
                   <button
                     onClick={() => handleDeleteAd(ad.id)}
                     title="Delete Advertisement"
-                    className="p-3 bg-rose-950/60 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-800 rounded-xl transition-all shrink-0 btn-touch flex items-center gap-1.5 text-xs font-bold"
+                    className="p-3 bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 rounded-xl transition-all shrink-0 btn-touch flex items-center gap-1.5 text-xs font-black"
                   >
                     <Trash2 className="w-4 h-4" />
                     <span className="hidden sm:inline">Delete</span>
