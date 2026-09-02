@@ -9,7 +9,7 @@ import { useSocket } from '../../context/SocketContext';
 import USBDriveModal from './USBDriveModal';
 
 const KioskHome = () => {
-  const { machineId = 'KIOSK-001' } = useParams();
+  const { machineId = 'FFPVT_EasyXerox-001' } = useParams();
   const navigate = useNavigate();
   const { socket, isConnected } = useSocket();
 
@@ -26,11 +26,17 @@ const KioskHome = () => {
   const getMediaUrl = (url) => {
     if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    const backendUrl = import.meta.env.VITE_API_URL 
-      ? import.meta.env.VITE_API_URL.replace('/api/v1', '') 
-      : `${window.location.protocol}//${window.location.hostname}:5000`;
-    return `${backendUrl}${url}`;
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    const port = window.location.port;
+
+    const backendBase = (hostname === 'localhost' || hostname === '127.0.0.1')
+      ? 'http://localhost:5000'
+      : (port === '5173' || port === '8501' ? `http://${hostname}:5000` : `${protocol}//${hostname}`);
+
+    return `${backendBase}${url}`;
   };
+
 
   // Fetch machine ads from backend
   const fetchMachineAds = async () => {

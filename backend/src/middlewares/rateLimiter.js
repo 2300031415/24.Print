@@ -1,24 +1,31 @@
-const rateLimit = require('express-rate-limit');
+let rateLimit;
+try {
+    rateLimit = require('express-rate-limit');
+} catch (e) {
+    rateLimit = null;
+}
 
-const apiLimiter = rateLimit({
+const passThrough = (req, res, next) => next();
+
+const apiLimiter = rateLimit ? rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 500, // Limit each IP to 500 requests per window
+    max: 1000, // High limit to allow continuous user interaction
     standardHeaders: true,
     legacyHeaders: false,
     message: {
         success: false,
         message: 'Too many requests from this IP, please try again after 15 minutes.'
     }
-});
+}) : passThrough;
 
-const uploadLimiter = rateLimit({
+const uploadLimiter = rateLimit ? rateLimit({
     windowMs: 60 * 1000, // 1 minute
-    max: 10, // Limit to 10 uploads per minute per IP
+    max: 200, // High limit to prevent false-positive upload blocks on mobile
     message: {
         success: false,
         message: 'Upload frequency limit reached. Please wait a minute before uploading another document.'
     }
-});
+}) : passThrough;
 
 module.exports = {
     apiLimiter,

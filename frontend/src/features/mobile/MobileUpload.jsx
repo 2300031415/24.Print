@@ -6,7 +6,7 @@ import { UploadCloud, FileText, CheckCircle2, AlertCircle, Printer, Sparkles, Sh
 import api from '../../services/api';
 
 const MobileUpload = () => {
-  const { machineId = 'KIOSK-001' } = useParams();
+  const { machineId = 'FFPVT_EasyXerox-001' } = useParams();
 
   const [machine, setMachine] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);

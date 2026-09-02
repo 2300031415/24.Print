@@ -67,7 +67,7 @@ const mockDb = {
     machines: [
         {
             id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
-            machine_code: 'KIOSK-001',
+            machine_code: 'FFPVT_EasyXerox-001',
             name: 'Connaught Place Kiosk #1',
             client_id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
             location_address: 'Metro Station Gate 2, Connaught Place',
@@ -262,7 +262,7 @@ function handleMockQuery(text, params) {
     // 4. SELECT Machine by Code
     if (cleanText.includes('from machines') && (cleanText.includes('machine_code = $1') || cleanText.includes('m.id::text = $1') || cleanText.includes('id::text = $1'))) {
         const mCode = params[0];
-        const machine = mockDb.machines.find(m => m.machine_code === mCode || m.id === mCode) || mockDb.machines[0];
+        const machine = mockDb.machines.find(m => m.machine_code === mCode || m.id === mCode || (mCode === 'KIOSK-001' && m.machine_code === 'FFPVT_EasyXerox-001')) || mockDb.machines[0];
         const client = machine ? (mockDb.clients.find(c => String(c.id) === String(machine.client_id)) || mockDb.clients[0]) : mockDb.clients[0];
         const isClientSuspended = client && (client.status === 'suspended' || client.status === 'inactive' || client.status === 'disabled');
         const rows = machine ? [{

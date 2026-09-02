@@ -70,9 +70,14 @@ const uploadPdfHandler = async (req, res, next) => {
             upload: uploadRecord
         });
     } catch (err) {
-        next(err);
+        logger.error(`Upload Pdf Error: ${err.message}`);
+        res.status(500).json({
+            success: false,
+            message: err.message || 'Error uploading document. Please try again.'
+        });
     }
 };
+
 
 const getUploadByToken = async (req, res, next) => {
     try {

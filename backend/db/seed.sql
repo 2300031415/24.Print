@@ -44,14 +44,14 @@ VALUES (
 INSERT INTO machines (id, machine_code, name, client_id, location_address, city, state, pincode, qr_code_url, status, default_printer_name, printer_status, ip_address)
 VALUES (
     'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
-    'KIOSK-001',
+    'FFPVT_EasyXerox-001',
     'Connaught Place Kiosk #1',
     'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
     'Metro Station Gate 2, Connaught Place',
     'New Delhi',
     'Delhi',
     '110001',
-    'https://domain.com/upload/KIOSK-001',
+    'https://domain.com/upload/FFPVT_EasyXerox-001',
     'online',
     'HP_LaserJet_Pro_M404dn',
     'ready',
