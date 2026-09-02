@@ -224,7 +224,7 @@ const ClientSettings = () => {
                   onChange={(e) => handleBoardChange(e.target.value)}
                   className="w-full px-5 py-4 bg-slate-50 border-2 border-blue-200 rounded-2xl text-slate-950 font-black text-base focus:outline-none focus:border-blue-600 focus:bg-white appearance-none cursor-pointer shadow-sm transition-all"
                 >
-                  <option value="all">All Kiosk Boards (Default Client Razorpay Gateway)</option>
+                  <option value="all">All Kiosk Boards</option>
                   {machines.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.machine_code || m.name || 'FFPVT_EasyXerox-001'}

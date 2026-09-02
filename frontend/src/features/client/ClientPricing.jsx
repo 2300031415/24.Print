@@ -85,7 +85,7 @@ const ClientPricing = () => {
               onChange={(e) => setSelectedMachineId(e.target.value)}
               className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-base font-black text-slate-950 cursor-pointer focus:border-blue-600 focus:outline-none shadow-sm transition-all"
             >
-              <option value="all">All Kiosks (Default Rate)</option>
+              <option value="all">All Kiosk Boards</option>
               {machines.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.machine_code || m.name || 'FFPVT_EasyXerox-001'}

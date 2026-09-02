@@ -152,7 +152,7 @@ const ClientDashboard = () => {
               onChange={(e) => setSelectedBoardId(e.target.value)}
               className="bg-slate-50 border-2 border-blue-200 text-blue-900 text-sm font-black rounded-xl px-4 py-3 outline-none focus:border-blue-600 cursor-pointer shadow-sm transition-all"
             >
-              <option value="ALL">All Kiosk Boards (Combined Overview)</option>
+              <option value="ALL">All Kiosk Boards</option>
               {machines.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.machine_code || m.name || 'FFPVT_EasyXerox-001'}

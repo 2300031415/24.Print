@@ -223,19 +223,29 @@ const KioskPrintOptions = () => {
             <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-5">
               <label className="text-xs font-black text-slate-500 uppercase block mb-3">Paper Size</label>
               <div className="flex gap-2">
-                {['A4', 'Legal', 'A3'].map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setPaperSize(size)}
-                    className={`flex-1 py-3 font-black rounded-xl border text-sm transition-all btn-touch ${
-                      paperSize === size
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-md'
-                        : 'bg-white text-slate-700 border-blue-100 hover:border-blue-300'
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
+                {['A4', 'Legal', 'A3'].map((size) => {
+                  const isAvailable = size === 'A4';
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      disabled={!isAvailable}
+                      onClick={() => isAvailable && setPaperSize(size)}
+                      className={`flex-1 py-3 font-black rounded-xl border text-sm transition-all flex flex-col items-center justify-center relative ${
+                        paperSize === size
+                          ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                          : !isAvailable
+                          ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60'
+                          : 'bg-white text-slate-700 border-blue-100 hover:border-blue-300 btn-touch'
+                      }`}
+                    >
+                      <span>{size}</span>
+                      {!isAvailable && (
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 -mt-0.5">N/A</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
