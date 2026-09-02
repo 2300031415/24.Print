@@ -57,9 +57,10 @@ const uploadPdfHandler = async (req, res, next) => {
                 uploadedAt: uploadRecord.created_at
             };
 
-            // Broadcast to machine socket room
+            // Broadcast to machine socket room & globally
             io.to(`machine:${machine.machine_code}`).emit('FILE_UPLOADED', payload);
             io.to(`machine:${machine.id}`).emit('FILE_UPLOADED', payload);
+            io.emit('FILE_UPLOADED', payload);
             logger.info(`Notified Kiosk Room machine:${machine.machine_code} for upload token ${uploadToken}`);
         }
 

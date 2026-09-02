@@ -63,9 +63,6 @@ const MobileUpload = () => {
 
     try {
       const res = await api.post('/uploads', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
         onUploadProgress: (progressEvent) => {
           const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           setUploadProgress(percent);
