@@ -58,17 +58,23 @@ const KioskHome = () => {
     }
   };
 
+  const [machineNotFound, setMachineNotFound] = useState(false);
+
   // Load Machine Details & Advertisements
   useEffect(() => {
     const fetchMachineDetails = async () => {
       try {
         const res = await api.get(`/machines/code/${machineId}`);
-        if (res.data.success) {
+        if (res.data.success && res.data.machine) {
           setMachine(res.data.machine);
           setPrinterStatus(res.data.machine.printer_status || 'ready');
+          setMachineNotFound(false);
+        } else {
+          setMachineNotFound(true);
         }
       } catch (err) {
         console.error('Error fetching machine details:', err);
+        setMachineNotFound(true);
       }
     };
 
@@ -150,6 +156,30 @@ const KioskHome = () => {
   const handleAdTouchScreen = () => {
     setKioskState('qr_interactive');
   };
+
+  if (machineNotFound) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col items-center justify-center p-8 select-none font-sans">
+        <div className="relative mb-6">
+          <div className="w-24 h-24 rounded-3xl bg-rose-500/10 border-2 border-rose-500/30 flex items-center justify-center">
+            <Monitor className="w-12 h-12 text-rose-500" />
+          </div>
+        </div>
+        <span className="px-4 py-1.5 bg-rose-950/80 text-rose-300 border border-rose-800/80 rounded-full text-xs font-mono font-bold uppercase tracking-widest mb-4">
+          Fleet Registry Notice • {machineId}
+        </span>
+        <h1 className="text-3xl font-black text-white font-heading text-center mb-3">
+          Unregistered Kiosk Board
+        </h1>
+        <p className="text-slate-400 font-bold max-w-md text-sm text-center mb-8 leading-relaxed">
+          Kiosk Machine Code <code className="text-blue-400 font-mono font-black">{machineId}</code> is not registered in the EasyXerox fleet database.
+        </p>
+        <div className="px-6 py-3 bg-slate-900 text-slate-400 font-mono font-bold text-xs rounded-2xl border border-slate-800">
+          Status: Hardware Unassigned / No Board Active
+        </div>
+      </div>
+    );
+  }
 
   // FULL-SCREEN KIOSK MAINTENANCE OVERLAY
   if (machine?.status === 'maintenance') {

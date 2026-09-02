@@ -667,7 +667,7 @@ function handleMockQuery(text, params) {
         const rows = mockDb.print_jobs.map(pj => ({
             ...pj,
             machine_code: pj.machine_code || 'KIOSK-001',
-            machine_name: 'Connaught Place Kiosk #1',
+            machine_name: 'Kiosk Board',
             original_filename: pj.original_filename || 'document.pdf'
         }));
         return { rows, rowCount: rows.length };
@@ -693,7 +693,20 @@ function handleMockQuery(text, params) {
 
     // 20. Admin / Client Dashboard Summaries
     if (cleanText.includes('count(*) from clients') || cleanText.includes('sum(amount)')) {
-        return { rows: [{ count: String(mockDb.clients.length), online_count: '1', total: '2450.00', today: '450.00', pages: '120', month: '2450.00' }], rowCount: 1 };
+        const totalRev = mockDb.payments.filter(p => p.status === 'captured').reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+        const totalPages = mockDb.print_jobs.filter(pj => pj.status === 'completed').reduce((sum, pj) => sum + ((pj.total_pages || 1) * (pj.copies || 1)), 0);
+        const onlineMachines = mockDb.machines.filter(m => m.status === 'online').length;
+        return {
+            rows: [{
+                count: String(mockDb.clients.length),
+                online_count: String(onlineMachines),
+                total: String(totalRev),
+                today: '0',
+                pages: String(totalPages),
+                month: String(totalRev)
+            }],
+            rowCount: 1
+        };
     }
 
     // Default Fallback Empty Result
