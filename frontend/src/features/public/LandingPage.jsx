@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import InteractivePrintSimulator from './InteractivePrintSimulator';
-import KioskLocatorAndInquiry from './KioskLocatorAndInquiry';
 import {
   Printer,
   QrCode,
@@ -133,7 +131,6 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('customers');
   const [selectedModel, setSelectedModel] = useState('comb4');
-  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
@@ -158,17 +155,9 @@ const LandingPage = () => {
             <a href="#plug-and-play" className="hover:text-blue-600 transition-colors">Plug & Play</a>
             <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-blue-600 transition-colors">How It Works</a>
-            <a href="#network" className="hover:text-blue-600 transition-colors">Network</a>
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsSimulatorOpen(true)}
-              className="hidden lg:flex px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all items-center gap-2"
-            >
-              <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
-              <span>Live Print Demo</span>
-            </button>
             <button
               onClick={() => navigate('/client/login')}
               className="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-blue-glow transition-all btn-touch"
@@ -223,13 +212,6 @@ const LandingPage = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-wrap items-center justify-center gap-4 pt-4"
           >
-            <button
-              onClick={() => setIsSimulatorOpen(true)}
-              className="px-8 py-4 bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-slate-950 font-black text-base rounded-2xl shadow-2xl transition-all flex items-center gap-3 btn-touch"
-            >
-              <Sparkles className="w-5 h-5 text-yellow-200 animate-pulse" />
-              <span>Try Live Interactive Print Demo</span>
-            </button>
             <button
               onClick={() => navigate('/client/login')}
               className="px-8 py-4 bg-white text-blue-950 hover:bg-blue-50 font-black text-base rounded-2xl shadow-2xl transition-all flex items-center gap-3 btn-touch"
@@ -1155,17 +1137,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ──────────────────────────────────────────────────────────────
-          LIVE KIOSK DEPLOYMENT NETWORK & PARTNER INQUIRY
-      ────────────────────────────────────────────────────────────── */}
-      <section id="network" className="py-20 px-6 bg-white z-10 relative overflow-hidden">
-        {/* Organic Jumbled Floating Air Watermark */}
-        <OrganicJumbledWatermark />
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <KioskLocatorAndInquiry />
-        </div>
-      </section>
 
       {/* ──────────────────────────────────────────────────────────────
           PARTNER CTA BANNER (Royal Blue Gradient Banner)
@@ -1260,12 +1232,6 @@ const LandingPage = () => {
                 <a href="#how-it-works" className="hover:text-blue-400 transition-colors flex items-center gap-2.5">
                   <ChevronRight className="w-4 h-4 text-blue-400" />
                   <span>How It Works</span>
-                </a>
-              </li>
-              <li>
-                <a href="#network" className="hover:text-blue-400 transition-colors flex items-center gap-2.5">
-                  <ChevronRight className="w-4 h-4 text-blue-400" />
-                  <span>Network</span>
                 </a>
               </li>
             </ul>
