@@ -93,6 +93,82 @@ const uploadPdfHandler = async (req, res, next) => {
     }
 };
 
+/**
+ * USB Upload Handler — called by the Windows print daemon when user selects a
+ * file from a pendrive.
+ */
+const uploadUsbHandler = async (req, res, next) => {
+    try {
+        const { machineCode } = req.body;
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded.' });
+        }
+
+        if (!machineCode) {
+            return res.status(400).json({ success: false, message: 'machineCode is required.' });
+        }
+
+        const machineRes = await db.query(
+            'SELECT id, machine_code, name FROM machines WHERE machine_code = $1 OR id::text = $1',
+            [machineCode]
+        );
+
+        if (machineRes.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Machine not found.' });
+        }
+
+        const machine = machineRes.rows[0];
+        let totalPages = 1;
+        if (file.mimetype === 'application/pdf') {
+            try {
+                totalPages = await getPdfPageCount(file.path);
+            } catch (_) {
+                totalPages = 1;
+            }
+        }
+
+        const uploadToken = `UPL-${Date.now()}`;
+        const uploadResult = await db.query(
+            `INSERT INTO uploads (upload_token, machine_id, original_filename, file_path, file_size_bytes, total_pages, mime_type, status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending') RETURNING *`,
+            [
+                uploadToken,
+                machine.id,
+                file.originalname,
+                `/uploads/${path.basename(file.path)}`,
+                file.size,
+                totalPages,
+                file.mimetype
+            ]
+        );
+
+        const uploadRecord = uploadResult.rows[0];
+        const io = req.app.get('socketio');
+        if (io) {
+            const payload = {
+                uploadToken: uploadRecord.upload_token,
+                uploadId: uploadRecord.id,
+                machineId: machine.id,
+                machineCode: machine.machine_code,
+                filename: uploadRecord.original_filename,
+                filePath: uploadRecord.file_path,
+                fileSize: uploadRecord.file_size_bytes,
+                totalPages: uploadRecord.total_pages,
+                uploadedAt: uploadRecord.created_at
+            };
+
+            io.to(`machine:${machine.machine_code}`).emit('FILE_UPLOADED', payload);
+            io.to(`machine:${machine.id}`).emit('FILE_UPLOADED', payload);
+        }
+
+        res.status(201).json({ success: true, upload: uploadRecord });
+    } catch (err) {
+        next(err);
+    }
+};
+
 const getUploadByToken = async (req, res, next) => {
     try {
         const { token } = req.params;
@@ -126,6 +202,7 @@ const deleteUpload = async (req, res, next) => {
 
 module.exports = {
     uploadPdfHandler,
+    uploadUsbHandler,
     getUploadByToken,
     deleteUpload
 };
