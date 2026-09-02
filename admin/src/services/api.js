@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-const hostname = window.location.hostname;
+const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+const protocol = typeof window !== 'undefined' ? window.location.protocol : 'http:';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (
   hostname === 'localhost' || hostname === '127.0.0.1'
-    ? 'http://localhost:5000/api/v1'
-    : 'https://vymecmonmluvhgtsfezw.supabase.co/api/v1'
+    ? `${protocol}//${hostname}:5000/api/v1`
+    : `${protocol}//${hostname}/api/v1`
 );
 
 const api = axios.create({
