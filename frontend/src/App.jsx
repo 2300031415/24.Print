@@ -43,44 +43,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
-// Check if running directly on physical kiosk board (localhost or hardware flag)
-const isLocalhost = typeof window !== 'undefined' && (
-  window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1' ||
-  window.location.hostname === '::1'
-);
-
-// Guard to block external web browsers from viewing the physical kiosk screen
-const LocalKioskGuard = ({ children }) => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const isHardwareBoard = isLocalhost || urlParams.get('hardware') === 'true' || urlParams.get('device') === 'kiosk';
-
-  if (!isHardwareBoard) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-center select-none font-sans">
-        <div className="max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
-          <div className="logo-badge mb-4 py-2 px-6 shadow-cyan-glow">
-            <img src="/logo.png" alt="EasyXerox" className="h-10 w-auto object-contain" />
-          </div>
-          <h2 className="text-2xl font-black text-cyan-400 mb-2 font-heading">
-            Hardware Kiosk Screen Only
-          </h2>
-          <p className="text-xs text-slate-400 font-medium mb-6 leading-relaxed">
-            This kiosk display screen is restricted and can only be operated directly on the physical kiosk machine hardware.
-          </p>
-          <a
-            href="/"
-            className="px-6 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-cyan-glow inline-block transition-all"
-          >
-            Go to Product Landing Page
-          </a>
-        </div>
-      </div>
-    );
-  }
-  return children;
-};
-
 function App() {
   return (
     <AuthProvider>
@@ -89,10 +51,10 @@ function App() {
           {/* 1. PUBLIC PRODUCT LANDING PAGE (easyxerox.com) */}
           <Route path="/" element={<LandingPage />} />
 
-          {/* 2. KIOSK APPLICATION ROUTES (Restricted to Physical Kiosk Hardware Board) */}
-          <Route path="/kiosk/:machineId" element={<LocalKioskGuard><KioskHome /></LocalKioskGuard>} />
-          <Route path="/kiosk/:machineId/preview/:uploadToken" element={<LocalKioskGuard><KioskPdfPreview /></LocalKioskGuard>} />
-          <Route path="/kiosk/:machineId/options/:uploadToken" element={<LocalKioskGuard><KioskPrintOptions /></LocalKioskGuard>} />
+          {/* 2. KIOSK APPLICATION ROUTES (Live Interactive Kiosk Hardware Board Display) */}
+          <Route path="/kiosk/:machineId" element={<KioskHome />} />
+          <Route path="/kiosk/:machineId/preview/:uploadToken" element={<KioskPdfPreview />} />
+          <Route path="/kiosk/:machineId/options/:uploadToken" element={<KioskPrintOptions />} />
 
           {/* 3. MOBILE UPLOAD WEBSITE (easyxerox.com/upload/:machineCode) */}
           <Route path="/upload/:machineId" element={<MobileUpload />} />
