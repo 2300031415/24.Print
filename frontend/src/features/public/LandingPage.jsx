@@ -132,6 +132,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('customers');
   const [selectedModel, setSelectedModel] = useState('comb4');
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
