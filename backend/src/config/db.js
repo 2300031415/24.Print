@@ -575,10 +575,23 @@ function handleMockQuery(text, params) {
         return { rows: [jobObj], rowCount: 1 };
     }
 
-    // 15. SELECT Users by Email
-    if (cleanText.includes('from users') && cleanText.includes('email = $1')) {
-        const user = mockDb.users.find(u => u.email.toLowerCase() === String(params[0] || '').toLowerCase());
-        return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
+    // 15. SELECT Users by Email or ID
+    if (cleanText.includes('from users')) {
+        const targetSearch = String(params[0] || '').toLowerCase().trim();
+        const user = mockDb.users.find(u => u.email.toLowerCase().trim() === targetSearch || String(u.id) === targetSearch);
+        if (user) {
+            const client = mockDb.clients.find(c => String(c.user_id) === String(user.id) || String(c.id) === String(user.id));
+            return {
+                rows: [{
+                    ...user,
+                    client_id: client ? client.id : null,
+                    business_name: client ? client.business_name : null,
+                    client_status: client ? client.status : 'active'
+                }],
+                rowCount: 1
+            };
+        }
+        return { rows: [], rowCount: 0 };
     }
 
     // 16. INSERT User
