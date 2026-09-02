@@ -1278,22 +1278,25 @@ const LandingPage = () => {
             </h4>
             <ul className="space-y-4 text-sm font-medium">
               <li className="flex items-start gap-3.5 text-slate-200">
-                <div className="p-2 bg-slate-900 border border-slate-800 rounded-xl text-blue-400 shrink-0">
+                <div className="p-2 bg-slate-900 border border-slate-800 rounded-xl text-blue-400 shrink-0 mt-0.5">
                   <MapPin className="w-5 h-5" />
                 </div>
-                <span className="leading-snug pt-1">EasyXerox Systems Pvt Ltd, Connaught Place, New Delhi, India</span>
+                <span className="leading-snug">Flat 202, Gandham Nest, Police Battalion Colony, Kondapur, Hyderabad, Telangana 500084</span>
               </li>
-              <li className="flex items-center gap-3.5 text-slate-200">
-                <div className="p-2 bg-slate-900 border border-slate-800 rounded-xl text-emerald-400 shrink-0">
+              <li className="flex items-start gap-3.5 text-slate-200">
+                <div className="p-2 bg-slate-900 border border-slate-800 rounded-xl text-emerald-400 shrink-0 mt-0.5">
                   <Phone className="w-5 h-5" />
                 </div>
-                <span>+91 98765 43210 (Toll Free / Support)</span>
+                <div className="leading-snug">
+                  <a href="tel:+918885600899" className="hover:text-emerald-400 transition-colors block">+91 88856 00899</a>
+                  <a href="tel:+919908849889" className="hover:text-emerald-400 transition-colors block">+91 99088 49889</a>
+                </div>
               </li>
               <li className="flex items-center gap-3.5 text-slate-200">
                 <div className="p-2 bg-slate-900 border border-slate-800 rounded-xl text-cyan-400 shrink-0">
                   <Mail className="w-5 h-5" />
                 </div>
-                <span>support@easyxerox.com</span>
+                <a href="mailto:support@easyxerox.com" className="hover:text-cyan-400 transition-colors">support@easyxerox.com</a>
               </li>
               <li className="flex items-center gap-3.5 text-slate-400 text-xs">
                 <div className="p-2 bg-slate-900 border border-slate-800 rounded-xl text-purple-400 shrink-0">
