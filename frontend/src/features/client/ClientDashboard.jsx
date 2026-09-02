@@ -67,50 +67,57 @@ const ClientDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // 12-Month Data for Revenue Overview & Total Customers based on Board Selection
+  // 12-Month Data for Revenue Overview & Total Customers based on Board Selection & Year Filter
   useEffect(() => {
     const isSingleMachineOrAll = selectedBoardId === 'ALL' || machines.length <= 1;
 
     // 12 Months Data (Jan - Dec)
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    // Revenue Overview Data (₹) - Consistent across single board selection
+    // If selectedYear is not 2026 (e.g. 2025), set all values to 0 (null data)
+    if (selectedYear !== '2026') {
+      setMonthlyRevenueData(months.map(m => ({ month: m, value: 0 })));
+      setMonthlyCustomerData(months.map(m => ({ month: m, value: 0 })));
+      return;
+    }
+
+    // Revenue Overview Data (₹) - 2026 Data
     const revenueValues = isSingleMachineOrAll
       ? [4800, 7400, 7800, 9800, 6600, 6400, 4900, 7300, 650, 0, 0, 0]
       : [2400, 3700, 3900, 4900, 3300, 3200, 2450, 3650, 325, 0, 0, 0];
 
-    // Total Customers Data - Consistent across single board selection
+    // Total Customers Data - 2026 Data
     const customerValues = isSingleMachineOrAll
       ? [270, 310, 680, 840, 620, 590, 820, 1250, 85, 0, 0, 0]
       : [135, 155, 340, 420, 310, 295, 410, 625, 42, 0, 0, 0];
 
     setMonthlyRevenueData(months.map((m, idx) => ({ month: m, value: revenueValues[idx] })));
     setMonthlyCustomerData(months.map((m, idx) => ({ month: m, value: customerValues[idx] })));
-  }, [selectedBoardId, machines]);
+  }, [selectedBoardId, machines, selectedYear]);
 
   // Filter transactions by selected board
   const filteredTxns = (selectedBoardId === 'ALL' || machines.length <= 1)
     ? recentTxns
     : recentTxns.filter(tx => String(tx.machine_id) === String(selectedBoardId) || tx.machine_name?.includes(selectedBoardId));
 
-  // Compute metrics (Exact match when 1 machine exists)
+  // Compute metrics (Exact match when 1 machine exists & year is active)
   const isSingleMachineOrAll = selectedBoardId === 'ALL' || machines.length <= 1;
 
-  const displayTodayRevenue = isSingleMachineOrAll
+  const displayTodayRevenue = selectedYear !== '2026' ? 0 : (isSingleMachineOrAll
     ? (stats?.todayRevenue || 450)
-    : (stats?.todayRevenue || 450) * 0.6;
+    : (stats?.todayRevenue || 450) * 0.6);
 
-  const displayMonthlyRevenue = isSingleMachineOrAll
+  const displayMonthlyRevenue = selectedYear !== '2026' ? 0 : (isSingleMachineOrAll
     ? (stats?.monthlyRevenue || 1250)
-    : (stats?.monthlyRevenue || 1250) * 0.55;
+    : (stats?.monthlyRevenue || 1250) * 0.55);
 
-  const displayTotalCustomers = isSingleMachineOrAll
+  const displayTotalCustomers = selectedYear !== '2026' ? 0 : (isSingleMachineOrAll
     ? 17690
-    : 8845;
+    : 8845);
 
-  const displayPagesPrinted = isSingleMachineOrAll
+  const displayPagesPrinted = selectedYear !== '2026' ? 0 : (isSingleMachineOrAll
     ? (stats?.totalPagesPrinted || 120)
-    : Math.round((stats?.totalPagesPrinted || 120) * 0.5);
+    : Math.round((stats?.totalPagesPrinted || 120) * 0.5));
 
   // Y-Axis Max Scale calculations
   const maxRevenueVal = 10000;
@@ -402,7 +409,7 @@ const ClientDashboard = () => {
                 GROWTH IN {selectedYear}
               </span>
               <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                <div className="h-full bg-blue-600 rounded-full w-[65%]" />
+                <div className="h-full bg-blue-600 rounded-full transition-all duration-500" style={{ width: selectedYear === '2026' ? '65%' : '0%' }} />
               </div>
             </div>
           </div>
