@@ -391,7 +391,15 @@ function handleMockQuery(text, params) {
                 .filter(a => assignedAdIds.includes(String(a.id)) && a.status === 'approved');
             return { rows, rowCount: rows.length };
         }
-        // Default: return all ads
+        // Filter by client if client_id = $1 is present in query
+        if (cleanText.includes('a.client_id') && params.length > 0) {
+            const targetClientId = String(params[0]).trim();
+            const rows = mockDb.advertisements
+                .filter(a => String(a.client_id) === targetClientId)
+                .map(a => ({ ...a, client_name: 'Metro Xerox Zone' }));
+            return { rows, rowCount: rows.length };
+        }
+        // Default: return all ads (for superadmin)
         const rows = mockDb.advertisements.map(a => ({ ...a, client_name: 'Metro Xerox Zone' }));
         return { rows, rowCount: rows.length };
     }
@@ -677,12 +685,15 @@ function handleMockQuery(text, params) {
     if (cleanText.includes('from clients')) {
         const rows = mockDb.clients.map(c => {
             const user = mockDb.users.find(u => u.id === c.user_id);
+            const clientMachines = mockDb.machines.filter(m => String(m.client_id) === String(c.id) || String(m.client_id) === String(c.user_id));
+            const clientTxns = mockDb.transactions.filter(t => String(t.client_id) === String(c.id) || String(t.client_id) === String(c.user_id));
+            const totalEarned = clientTxns.reduce((acc, t) => acc + (parseFloat(t.client_share) || 0), 0);
             return {
                 ...c,
                 email: user ? user.email : (c.email || 'client@shop.com'),
                 full_name: user ? user.full_name : c.business_name,
-                total_machines: 1,
-                total_earnings: 1250.00
+                total_machines: clientMachines.length,
+                total_earnings: totalEarned
             };
         });
         return { rows, rowCount: rows.length };

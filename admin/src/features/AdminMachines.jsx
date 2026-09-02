@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Monitor, Plus, QrCode, MapPin, Printer, Wifi, ShieldCheck, X } from 'lucide-react';
+import { Monitor, Plus, QrCode, MapPin, Printer, Wifi, ShieldCheck, X, ExternalLink } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
 import PortalLayout from '../components/PortalLayout';
@@ -106,49 +106,68 @@ const AdminMachines = () => {
         {/* MACHINES GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {machines.map((machine) => (
-            <div key={machine.id} className="bg-white p-6 rounded-3xl border-2 border-blue-100 flex flex-col justify-between space-y-5 shadow-xl hover:border-blue-500 transition-all">
+            <div
+              key={machine.id}
+              className="bg-white border-2 border-blue-100 rounded-3xl p-6 shadow-xl flex flex-col justify-between space-y-4 hover:border-blue-300 transition-all"
+            >
               <div>
-                <div className="flex items-center justify-between">
-                  <span className="px-3.5 py-1 bg-blue-50 text-blue-800 border border-blue-200 rounded-lg text-xs font-mono font-black shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-mono font-black">
                     {machine.machine_code}
                   </span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-black capitalize shadow-sm ${
-                    machine.status === 'online' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'
-                  }`}>
-                    {machine.status}
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
+                      machine.status === 'online'
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                        : 'bg-rose-100 text-rose-800 border border-rose-300'
+                    }`}
+                  >
+                    {machine.status || 'Online'}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-black text-slate-950 font-heading mt-4">{machine.machine_code}</h3>
-                <p className="text-xs text-slate-700 font-bold flex items-center gap-1 mt-1">
+                <h4 className="text-xl font-black text-slate-950 font-heading mb-1">{machine.machine_code}</h4>
+                <p className="text-xs text-slate-500 font-bold flex items-center gap-1 mb-4">
                   <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span>{machine.location_address || 'Registered Location'}, {machine.city || 'Delhi'}</span>
+                  <span>{machine.location_address || 'Metro Station Entrance #2'}</span>
                 </p>
 
-                <div className="mt-4 p-4 bg-slate-50 rounded-2xl border-2 border-slate-200 text-xs space-y-2 font-bold">
-                  <div className="flex justify-between text-slate-600">
-                    <span>Partner Owner</span>
-                    <span className="text-slate-950 font-black">{machine.client_name}</span>
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs font-bold">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Partner Owner</span>
+                    <span className="text-slate-950 font-black">{machine.client_name || 'Metro Xerox & Print Zone'}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Default Printer</span>
-                    <span className="text-blue-700 font-mono font-bold">{machine.default_printer_name || 'Brother DCP-T820DW Printer'}</span>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Default Printer</span>
+                    <span className="text-blue-700 font-mono">{machine.default_printer_name || 'Brother DCP-T820DW Printer'}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Printed Jobs</span>
-                    <span className="text-emerald-600 font-black">{machine.total_jobs_printed || 0}</span>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Printed Jobs</span>
+                    <span className="text-emerald-600 font-mono font-black">{machine.total_jobs_printed || 0}</span>
                   </div>
                 </div>
               </div>
 
-              {/* View QR Code Button */}
-              <button
-                onClick={() => setSelectedQrMachine(machine)}
-                className="w-full py-3.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-black rounded-2xl text-xs border border-blue-200 flex items-center justify-center gap-2 btn-touch shadow-sm"
-              >
-                <QrCode className="w-4 h-4 text-blue-600" />
-                <span>View & Print QR Code</span>
-              </button>
+              {/* Action Buttons */}
+              <div className="space-y-2 pt-2">
+                <a
+                  href={`/kiosk/${machine.machine_code}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black rounded-2xl text-xs border border-emerald-200 flex items-center justify-center gap-2 transition-all"
+                >
+                  <ExternalLink className="w-4 h-4 text-emerald-600" />
+                  <span>Open Kiosk Touch Display Screen ↗️</span>
+                </a>
+
+                <button
+                  onClick={() => setSelectedQrMachine(machine)}
+                  className="w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 font-black rounded-2xl text-xs border border-blue-200 flex items-center justify-center gap-2 btn-touch shadow-sm"
+                >
+                  <QrCode className="w-4 h-4 text-blue-600" />
+                  <span>View & Print QR Code</span>
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -173,18 +192,50 @@ const AdminMachines = () => {
               />
             </div>
 
-            <p className="text-xs text-slate-600 font-bold mb-4">
-              Scan Mobile Upload URL: <br />
-              <span className="text-blue-700 font-mono text-[11px] font-black">https://easyxerox.com/upload/{selectedQrMachine.machine_code}</span>
-            </p>
+            <div className="bg-slate-50 p-4 rounded-2xl border border-blue-100 text-left space-y-3 mb-5 text-xs">
+              <div>
+                <p className="text-slate-500 font-bold">📱 Scan Mobile Upload URL (For Customers):</p>
+                <a
+                  href={`https://easyxerox.com/upload/${selectedQrMachine.machine_code}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-600 font-mono text-[11px] font-black hover:underline block truncate"
+                >
+                  https://easyxerox.com/upload/{selectedQrMachine.machine_code}
+                </a>
+              </div>
+              <div className="border-t border-slate-200 pt-2">
+                <p className="text-slate-500 font-bold">🖥️ Touch Kiosk Board Screen URL (For Kiosk Hardware):</p>
+                <a
+                  href={`https://easyxerox.com/kiosk/${selectedQrMachine.machine_code}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-emerald-700 font-mono text-[11px] font-black hover:underline block truncate"
+                >
+                  https://easyxerox.com/kiosk/{selectedQrMachine.machine_code}
+                </a>
+              </div>
+            </div>
 
-            <button
-              onClick={handlePrintQr}
-              className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-md btn-touch"
-            >
-              <Printer className="w-4 h-4" />
-              <span>Print QR Code Sticker</span>
-            </button>
+            <div className="space-y-2">
+              <a
+                href={`/kiosk/${selectedQrMachine.machine_code}`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-md btn-touch"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>Open Kiosk Board Display Screen ↗️</span>
+              </a>
+
+              <button
+                onClick={handlePrintQr}
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-md btn-touch"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Print QR Code Sticker</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
