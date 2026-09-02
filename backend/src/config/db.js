@@ -605,7 +605,38 @@ function handleMockQuery(text, params) {
             created_at: new Date().toISOString()
         };
         mockDb.clients.push(cObj);
+        persistDb();
         return { rows: [cObj], rowCount: 1 };
+    }
+
+    // 17b. UPDATE Client
+    if (cleanText.includes('update clients')) {
+        const clientId = String(params[10] || params[8] || params[0] || '').trim();
+        let client = mockDb.clients.find(c => String(c.id) === clientId || String(c.user_id) === clientId) || mockDb.clients[0];
+        if (client) {
+            if (params[0]) client.business_name = params[0];
+            if (params[1]) client.contact_phone = params[1];
+            if (params[2]) client.address = params[2];
+            if (params[3]) client.city = params[3];
+            if (params[4]) client.state = params[4];
+            if (params[5]) client.pincode = params[5];
+            if (params[7]) client.status = params[7];
+            persistDb();
+        }
+        return { rows: client ? [client] : [], rowCount: client ? 1 : 0 };
+    }
+
+    // 17c. UPDATE User (email, password_hash, status)
+    if (cleanText.includes('update users')) {
+        const userId = String(params[1] || params[0] || '').trim();
+        let user = mockDb.users.find(u => String(u.id) === userId || String(u.email).toLowerCase() === userId.toLowerCase()) || mockDb.users[0];
+        if (user) {
+            if (cleanText.includes('email = $1')) user.email = params[0];
+            if (cleanText.includes('password_hash = $1')) user.password_hash = params[0];
+            if (cleanText.includes('status = $1')) user.status = params[0];
+            persistDb();
+        }
+        return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
     }
 
     // 18. SELECT Print Jobs History

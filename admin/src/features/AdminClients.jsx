@@ -26,6 +26,7 @@ const AdminClients = () => {
 
   const [editData, setEditData] = useState({
     business_name: '',
+    email: '',
     phone: '',
     password: ''
   });
@@ -108,6 +109,7 @@ const AdminClients = () => {
     setSelectedClient(client);
     setEditData({
       business_name: client.business_name || '',
+      email: client.email || '',
       phone: client.contact_phone || client.phone || '',
       password: ''
     });
@@ -331,14 +333,27 @@ const AdminClients = () => {
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Phone Number</label>
-                <input
-                  type="text"
-                  value={editData.phone}
-                  onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Contact Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={editData.email}
+                    onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
+                    placeholder="owner@shop.com"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={editData.phone}
+                    onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
+                  />
+                </div>
               </div>
 
               <div>

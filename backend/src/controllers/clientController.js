@@ -157,7 +157,8 @@ const createClient = async (req, res, next) => {
 const updateClient = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { business_name, contact_phone, address, city, state, pincode, commission_rate, status, email, password, razorpay_key_id, razorpay_key_secret } = req.body;
+        const { business_name, contact_phone, phone, address, city, state, pincode, commission_rate, status, email, password, razorpay_key_id, razorpay_key_secret } = req.body;
+        const phoneToUse = contact_phone || phone;
 
         const result = await db.query(
             `UPDATE clients 
@@ -175,7 +176,7 @@ const updateClient = async (req, res, next) => {
              WHERE id::text = $11::text OR user_id::text = $11::text RETURNING *`,
             [
                 business_name || null,
-                contact_phone || null,
+                phoneToUse || null,
                 address || null,
                 city || null,
                 state || null,
@@ -190,33 +191,38 @@ const updateClient = async (req, res, next) => {
 
         const clientObj = (result && result.rows && result.rows.length > 0) ? result.rows[0] : { id, status, user_id: id };
 
-        // Also update associated User account status
-        if (status) {
+        // Also update associated User email, password & status
+        if (email || password || status) {
             try {
-                const userStatus = status === 'suspended' ? 'suspended' : 'active';
-                await db.query('UPDATE users SET status = $1 WHERE id::text = $2::text', [
-                    userStatus,
-                    clientObj.user_id || id
-                ]);
-                const machineStatus = status === 'suspended' ? 'maintenance' : 'online';
-                await db.query('UPDATE machines SET status = $1 WHERE client_id::text = $2::text', [machineStatus, clientObj.id || id]);
+                if (email && email.trim().length > 0) {
+                    await db.query('UPDATE users SET email = $1 WHERE id::text = $2::text', [
+                        email.toLowerCase().trim(),
+                        clientObj.user_id || id
+                    ]);
+                }
+                if (password && password.trim().length > 0) {
+                    const password_hash = await bcrypt.hash(password.trim(), 10);
+                    await db.query('UPDATE users SET password_hash = $1 WHERE id::text = $2::text', [
+                        password_hash,
+                        clientObj.user_id || id
+                    ]);
+                }
+                if (status) {
+                    const userStatus = status === 'suspended' ? 'suspended' : 'active';
+                    await db.query('UPDATE users SET status = $1 WHERE id::text = $2::text', [
+                        userStatus,
+                        clientObj.user_id || id
+                    ]);
+                    const machineStatus = status === 'suspended' ? 'maintenance' : 'online';
+                    await db.query('UPDATE machines SET status = $1 WHERE client_id::text = $2::text', [machineStatus, clientObj.id || id]);
 
-                const io = req.app.get('socketio');
-                if (io) {
-                    io.emit('MACHINE_STATUS_CHANGE', { status: machineStatus });
+                    const io = req.app.get('socketio');
+                    if (io) {
+                        io.emit('MACHINE_STATUS_CHANGE', { status: machineStatus });
+                    }
                 }
             } catch (e) {
-                console.error('Non-critical status sync error:', e.message);
-            }
-        }
-
-        // Optional Password Reset by Admin
-        if (password && password.trim().length > 0) {
-            try {
-                const password_hash = await bcrypt.hash(password.trim(), 10);
-                await db.query('UPDATE users SET password_hash = $1 WHERE id::text = $2::text', [password_hash, clientObj.user_id || id]);
-            } catch (e) {
-                console.error('Password hash error:', e.message);
+                console.error('User update sync error:', e.message);
             }
         }
 

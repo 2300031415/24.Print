@@ -36,10 +36,10 @@ const AdminPricing = () => {
         const def = res.data.pricingList[0];
         setFormData({
           id: def.id,
-          bw_single_page_price: def.bw_single_page_price,
-          color_single_page_price: def.color_single_page_price,
-          bw_duplex_page_price: def.bw_duplex_page_price,
-          color_duplex_page_price: def.color_duplex_page_price,
+          bw_single_page_price: parseFloat(def.bw_single_page_price || 2.00),
+          color_single_page_price: parseFloat(def.color_single_page_price || 10.00),
+          bw_duplex_page_price: parseFloat(def.bw_duplex_page_price || 3.50),
+          color_duplex_page_price: parseFloat(def.color_duplex_page_price || 18.00),
           paper_size: def.paper_size || 'A4'
         });
       }
@@ -55,13 +55,21 @@ const AdminPricing = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/settings/pricing', { ...formData, machine_id: selectedMachineId });
+      const payload = {
+        ...formData,
+        bw_single_page_price: Number(formData.bw_single_page_price) || 0,
+        color_single_page_price: Number(formData.color_single_page_price) || 0,
+        bw_duplex_page_price: Number(formData.bw_duplex_page_price) || 0,
+        color_duplex_page_price: Number(formData.color_duplex_page_price) || 0,
+        machine_id: selectedMachineId
+      };
+      const res = await api.post('/settings/pricing', payload);
       if (res.data.success) {
-        alert(`Pricing rates updated successfully for ${selectedMachineId === 'all' ? 'All Kiosks' : 'Selected Kiosk Product'}!`);
+        alert(`Pricing rates updated successfully for ${selectedMachineId === 'all' ? 'All Kiosk Boards' : 'Selected Kiosk Board'}!`);
         fetchPricing();
       }
     } catch (err) {
-      alert('Error updating pricing rules.');
+      alert(err.response?.data?.message || 'Error updating pricing rules.');
     }
   };
 
@@ -92,9 +100,6 @@ const AdminPricing = () => {
                 </option>
               ))}
             </select>
-            <p className="text-xs text-slate-600 font-bold mt-2">
-              Selecting a specific kiosk allows you to set custom per-page rates for that product only.
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,8 +110,8 @@ const AdminPricing = () => {
                   type="number"
                   step="0.5"
                   required
-                  value={formData.bw_single_page_price}
-                  onChange={(e) => setFormData({ ...formData, bw_single_page_price: parseFloat(e.target.value) })}
+                  value={isNaN(formData.bw_single_page_price) ? '' : formData.bw_single_page_price}
+                  onChange={(e) => setFormData({ ...formData, bw_single_page_price: e.target.value === '' ? '' : parseFloat(e.target.value) })}
                   className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-xl font-mono font-black text-slate-950 focus:border-blue-600 focus:outline-none"
                 />
               </div>
@@ -117,8 +122,8 @@ const AdminPricing = () => {
                   type="number"
                   step="0.5"
                   required
-                  value={formData.color_single_page_price}
-                  onChange={(e) => setFormData({ ...formData, color_single_page_price: parseFloat(e.target.value) })}
+                  value={isNaN(formData.color_single_page_price) ? '' : formData.color_single_page_price}
+                  onChange={(e) => setFormData({ ...formData, color_single_page_price: e.target.value === '' ? '' : parseFloat(e.target.value) })}
                   className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-xl font-mono font-black text-blue-600 focus:border-blue-600 focus:outline-none"
                 />
               </div>
@@ -131,8 +136,8 @@ const AdminPricing = () => {
                   type="number"
                   step="0.5"
                   required
-                  value={formData.bw_duplex_page_price}
-                  onChange={(e) => setFormData({ ...formData, bw_duplex_page_price: parseFloat(e.target.value) })}
+                  value={isNaN(formData.bw_duplex_page_price) ? '' : formData.bw_duplex_page_price}
+                  onChange={(e) => setFormData({ ...formData, bw_duplex_page_price: e.target.value === '' ? '' : parseFloat(e.target.value) })}
                   className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-xl font-mono font-black text-slate-950 focus:border-blue-600 focus:outline-none"
                 />
               </div>
@@ -143,8 +148,8 @@ const AdminPricing = () => {
                   type="number"
                   step="0.5"
                   required
-                  value={formData.color_duplex_page_price}
-                  onChange={(e) => setFormData({ ...formData, color_duplex_page_price: parseFloat(e.target.value) })}
+                  value={isNaN(formData.color_duplex_page_price) ? '' : formData.color_duplex_page_price}
+                  onChange={(e) => setFormData({ ...formData, color_duplex_page_price: e.target.value === '' ? '' : parseFloat(e.target.value) })}
                   className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-xl font-mono font-black text-blue-600 focus:border-blue-600 focus:outline-none"
                 />
               </div>
