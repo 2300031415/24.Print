@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import InteractivePrintSimulator from './InteractivePrintSimulator';
+import KioskLocatorAndInquiry from './KioskLocatorAndInquiry';
 import {
   Printer,
   QrCode,
@@ -131,6 +133,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('customers');
   const [selectedModel, setSelectedModel] = useState('comb4');
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
@@ -159,6 +162,13 @@ const LandingPage = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsSimulatorOpen(true)}
+              className="hidden lg:flex px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
+              <span>Live Print Demo</span>
+            </button>
             <button
               onClick={() => navigate('/client/login')}
               className="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-blue-glow transition-all btn-touch"
@@ -214,6 +224,13 @@ const LandingPage = () => {
             className="flex flex-wrap items-center justify-center gap-4 pt-4"
           >
             <button
+              onClick={() => setIsSimulatorOpen(true)}
+              className="px-8 py-4 bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-slate-950 font-black text-base rounded-2xl shadow-2xl transition-all flex items-center gap-3 btn-touch"
+            >
+              <Sparkles className="w-5 h-5 text-yellow-200 animate-pulse" />
+              <span>Try Live Interactive Print Demo</span>
+            </button>
+            <button
               onClick={() => navigate('/client/login')}
               className="px-8 py-4 bg-white text-blue-950 hover:bg-blue-50 font-black text-base rounded-2xl shadow-2xl transition-all flex items-center gap-3 btn-touch"
             >
@@ -221,13 +238,6 @@ const LandingPage = () => {
               <span>Host a Kiosk / Partner Login</span>
               <ArrowRight className="w-5 h-5" />
             </button>
-            <a
-              href="#showcase"
-              className="px-8 py-4 bg-blue-950/60 hover:bg-blue-950/80 text-white font-bold text-base rounded-2xl border border-white/20 transition-all flex items-center gap-2 btn-touch"
-            >
-              <span>View Kiosk Showcase</span>
-              <ChevronRight className="w-5 h-5 text-cyan-300" />
-            </a>
           </motion.div>
         </div>
       </header>
@@ -1146,140 +1156,14 @@ const LandingPage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-          LIVE KIOSK DEPLOYMENT NETWORK
+          LIVE KIOSK DEPLOYMENT NETWORK & PARTNER INQUIRY
       ────────────────────────────────────────────────────────────── */}
       <section id="network" className="py-20 px-6 bg-white z-10 relative overflow-hidden">
-        
         {/* Organic Jumbled Floating Air Watermark */}
         <OrganicJumbledWatermark />
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full text-blue-700 text-xs font-black uppercase tracking-wider mb-4">
-              <MapPin className="w-4 h-4" />
-              <span>Live Kiosk Deployment Network</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black font-heading text-slate-950">
-              Self-Service Xerox Kiosks Across High-Footfall Hubs
-            </h2>
-            <p className="mt-3 text-slate-700 text-sm font-bold leading-relaxed">
-              Find EasyXerox automated print stations operating 24/7 at transit hubs, university campuses, tech parks, and commercial markets.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Location 1 */}
-            <motion.div
-              whileHover={{ scale: 1.04, y: -6 }}
-              transition={{ duration: 0.3 }}
-              className="bg-slate-50/90 backdrop-blur-sm border border-slate-200 rounded-3xl p-6 hover:border-blue-500 hover:bg-white transition-all flex flex-col justify-between shadow-sm hover:shadow-xl cursor-pointer"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-mono font-bold">
-                    KIOSK-001
-                  </span>
-                  <span className="px-3 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-bold flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Online 24/7
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-950 font-heading">Metro Gate #2 Kiosk</h3>
-                <p className="text-xs text-slate-700 font-bold mt-1 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span>Connaught Place Metro Complex, New Delhi</span>
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-700 font-bold flex justify-between">
-                <span>Features</span>
-                <span className="text-blue-700 font-black">B&W + Color Xerox</span>
-              </div>
-            </motion.div>
-
-            {/* Location 2 */}
-            <motion.div
-              whileHover={{ scale: 1.04, y: -6 }}
-              transition={{ duration: 0.3 }}
-              className="bg-slate-50/90 backdrop-blur-sm border border-slate-200 rounded-3xl p-6 hover:border-blue-500 hover:bg-white transition-all flex flex-col justify-between shadow-sm hover:shadow-xl cursor-pointer"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-mono font-bold">
-                    KIOSK-002
-                  </span>
-                  <span className="px-3 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-bold flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Online 24/7
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-950 font-heading">IIT Campus Library Kiosk</h3>
-                <p className="text-xs text-slate-700 font-bold mt-1 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span>Central Library Lobby, IIT Delhi Campus</span>
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-700 font-bold flex justify-between">
-                <span>Features</span>
-                <span className="text-blue-700 font-black">High-Speed Duplex</span>
-              </div>
-            </motion.div>
-
-            {/* Location 3 */}
-            <motion.div
-              whileHover={{ scale: 1.04, y: -6 }}
-              transition={{ duration: 0.3 }}
-              className="bg-slate-50/90 backdrop-blur-sm border border-slate-200 rounded-3xl p-6 hover:border-blue-500 hover:bg-white transition-all flex flex-col justify-between shadow-sm hover:shadow-xl cursor-pointer"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-mono font-bold">
-                    KIOSK-003
-                  </span>
-                  <span className="px-3 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-bold flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Online 24/7
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-950 font-heading">Cyber City Tech Hub</h3>
-                <p className="text-xs text-slate-700 font-bold mt-1 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span>Building 10 Tower B, DLF Cyber City</span>
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-700 font-bold flex justify-between">
-                <span>Features</span>
-                <span className="text-blue-700 font-black">UPI + Mobile Scan</span>
-              </div>
-            </motion.div>
-
-            {/* Location 4 */}
-            <motion.div
-              whileHover={{ scale: 1.04, y: -6 }}
-              transition={{ duration: 0.3 }}
-              className="bg-slate-50/90 backdrop-blur-sm border border-slate-200 rounded-3xl p-6 hover:border-blue-500 hover:bg-white transition-all flex flex-col justify-between shadow-sm hover:shadow-xl cursor-pointer"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-mono font-bold">
-                    KIOSK-004
-                  </span>
-                  <span className="px-3 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-bold flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Online 24/7
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-950 font-heading">North Campus Market</h3>
-                <p className="text-xs text-slate-700 font-bold mt-1 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span>Kamla Nagar Main Market, Delhi University</span>
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-700 font-bold flex justify-between">
-                <span>Features</span>
-                <span className="text-blue-700 font-black">A4 Fast Thermal Print</span>
-              </div>
-            </motion.div>
-          </div>
+          <KioskLocatorAndInquiry />
         </div>
       </section>
 
@@ -1434,6 +1318,12 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
+
+      {/* Interactive Kiosk Print Simulator Modal */}
+      <InteractivePrintSimulator
+        isOpen={isSimulatorOpen}
+        onClose={() => setIsSimulatorOpen(false)}
+      />
     </div>
   );
 };
