@@ -276,8 +276,8 @@ function handleMockQuery(text, params) {
 
     // 5. SELECT Machines List
     if (cleanText.includes('from machines')) {
-        const rows = mockDb.machines.map(m => {
-            const client = mockDb.clients.find(c => String(c.id) === String(m.client_id)) || mockDb.clients[0];
+        let rows = mockDb.machines.map(m => {
+            const client = mockDb.clients.find(c => String(c.id) === String(m.client_id) || String(c.user_id) === String(m.client_id)) || mockDb.clients[0];
             const isClientSuspended = client && (client.status === 'suspended' || client.status === 'inactive' || client.status === 'disabled');
             return {
                 ...m,
@@ -287,6 +287,13 @@ function handleMockQuery(text, params) {
                 total_jobs_printed: mockDb.print_jobs.length
             };
         });
+
+        // Restrict to client's machines when client filter is present in query
+        if (cleanText.includes('m.client_id') && params.length > 0) {
+            const targetClientId = String(params[0]).trim();
+            rows = rows.filter(m => String(m.client_id) === targetClientId || String(m.client_name).toLowerCase().includes(targetClientId.toLowerCase()));
+        }
+
         return { rows, rowCount: rows.length };
     }
 

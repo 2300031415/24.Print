@@ -13,8 +13,17 @@ const getMachines = async (req, res, next) => {
 
         // If client, restrict to client's machines only
         if (req.user && req.user.role === 'client') {
-            queryStr += ` WHERE m.client_id = $1 OR c.user_id::text = $1`;
-            params.push(req.user.client_id || req.user.id);
+            let clientId = req.user.client_id;
+            if (!clientId && req.user.id) {
+                const clientRes = await db.query('SELECT id FROM clients WHERE user_id::text = $1::text OR id::text = $1::text', [req.user.id]);
+                if (clientRes.rows.length > 0) {
+                    clientId = clientRes.rows[0].id;
+                } else {
+                    clientId = req.user.id;
+                }
+            }
+            queryStr += ` WHERE m.client_id::text = $1::text OR c.user_id::text = $1::text`;
+            params.push(clientId);
         }
 
         queryStr += ` ORDER BY m.created_at DESC`;
@@ -38,39 +47,52 @@ const getMachines = async (req, res, next) => {
 const getMachineByCode = async (req, res, next) => {
     try {
         const { machineCode } = req.params;
-        const result = await db.query(
-            `SELECT m.*, c.business_name, c.status as client_status
-             FROM machines m 
-             JOIN clients c ON m.client_id = c.id 
+
+        const machineRes = await db.query(
+            `SELECT m.*, c.business_name as client_name, c.status as client_status 
+             FROM machines m
+             JOIN clients c ON m.client_id = c.id
              WHERE m.machine_code = $1 OR m.id::text = $1`,
             [machineCode]
         );
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Machine not found.' });
+        if (machineRes.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Kiosk machine not found.' });
         }
 
-        const machine = result.rows[0];
+        const machine = machineRes.rows[0];
 
-        // If client partner is disabled/suspended, force machine operational status to maintenance
+        // Override status if client account is suspended/disabled
         if (machine.client_status === 'suspended' || machine.client_status === 'inactive' || machine.client_status === 'disabled') {
             machine.status = 'maintenance';
         }
 
-        // Fetch machine pricing or default pricing fallback
+        // Fetch pricing for this machine (or default fallback)
         const pricingRes = await db.query(
-            `SELECT * FROM pricing WHERE machine_id = $1 OR is_default = true ORDER BY machine_id NULLS LAST LIMIT 1`,
+            `SELECT * FROM pricing 
+             WHERE machine_id = $1 OR is_default = true 
+             ORDER BY machine_id IS NOT NULL DESC, is_default DESC 
+             LIMIT 1`,
             [machine.id]
         );
 
-        // Fetch active GST
-        const gstRes = await db.query(`SELECT * FROM gst WHERE is_active = true LIMIT 1`);
+        const pricing = pricingRes.rows[0] || {
+            bw_single_page_price: '2.00',
+            color_single_page_price: '10.00',
+            bw_duplex_page_price: '3.50',
+            color_duplex_page_price: '18.00',
+            paper_size: 'A4'
+        };
+
+        // Fetch active GST rates
+        const gstRes = await db.query('SELECT * FROM gst WHERE is_active = true LIMIT 1');
+        const gst = gstRes.rows[0] || { percentage: '18.00' };
 
         res.json({
             success: true,
             machine,
-            pricing: pricingRes.rows[0] || { bw_single_page_price: 2, color_single_page_price: 10, bw_duplex_page_price: 3.5, color_duplex_page_price: 18 },
-            gst: gstRes.rows[0] || { percentage: 18 }
+            pricing,
+            gst
         });
     } catch (err) {
         next(err);
@@ -82,108 +104,73 @@ const createMachine = async (req, res, next) => {
         const { machine_code, name, client_id, location_address, city, state, pincode, default_printer_name, razorpay_key_id, razorpay_key_secret } = req.body;
 
         if (!machine_code || !client_id) {
-            return res.status(400).json({ success: false, message: 'Machine code and client owner are required.' });
+            return res.status(400).json({ success: false, message: 'Machine Code and Client Owner are required.' });
         }
 
-        const machineName = name || machine_code;
-        const domain = process.env.PUBLIC_DOMAIN || 'https://easyxerox.com';
-        const uploadUrl = `${domain}/upload/${machine_code.toUpperCase()}`;
-        const qrDataUrl = await QRCode.toDataURL(uploadUrl);
+        // Check duplicate code
+        const existing = await db.query('SELECT id FROM machines WHERE machine_code = $1', [machine_code.toUpperCase().trim()]);
+        if (existing.rows.length > 0) {
+            return res.status(400).json({ success: false, message: 'Machine Code already exists.' });
+        }
+
+        const publicDomain = process.env.PUBLIC_DOMAIN || 'https://easyxerox.com';
+        const qrUrl = `${publicDomain}/upload/${machine_code.toUpperCase().trim()}`;
+        const qrCodeBase64 = await QRCode.toDataURL(qrUrl);
 
         const result = await db.query(
             `INSERT INTO machines (machine_code, name, client_id, location_address, city, state, pincode, qr_code_url, default_printer_name, razorpay_key_id, razorpay_key_secret, status)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'online') RETURNING *`,
             [
-                machine_code.toUpperCase(),
-                machineName,
+                machine_code.toUpperCase().trim(),
+                name || machine_code.toUpperCase().trim(),
                 client_id,
                 location_address || '',
                 city || '',
                 state || '',
                 pincode || '',
-                qrDataUrl,
+                qrCodeBase64,
                 default_printer_name || 'Brother DCP-T820DW Printer',
                 razorpay_key_id || null,
                 razorpay_key_secret || null
             ]
         );
 
-        const newMachine = (result && result.rows && result.rows.length > 0) ? result.rows[0] : {
-            id: 'm_' + Date.now(),
-            machine_code: machine_code.toUpperCase(),
-            name: machineName,
-            client_id,
-            location_address: location_address || '',
-            qr_code_url: qrDataUrl,
-            default_printer_name: default_printer_name || 'Brother DCP-T820DW Printer',
-            status: 'online'
-        };
-
-        res.status(201).json({ success: true, machine: newMachine });
+        res.status(201).json({
+            success: true,
+            machine: result.rows[0]
+        });
     } catch (err) {
         next(err);
     }
 };
 
-const updateMachine = async (req, res, next) => {
+const updateMachineStatus = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { name, location_address, city, state, pincode, default_printer_name, razorpay_key_id, razorpay_key_secret, status } = req.body;
+        const { status } = req.body;
+
+        if (!['online', 'offline', 'maintenance'].includes(status)) {
+            return res.status(400).json({ success: false, message: 'Invalid status value.' });
+        }
 
         const result = await db.query(
-            `UPDATE machines 
-             SET name = COALESCE($1, name),
-                 location_address = COALESCE($2, location_address),
-                 city = COALESCE($3, city),
-                 state = COALESCE($4, state),
-                 pincode = COALESCE($5, pincode),
-                 default_printer_name = COALESCE($6, default_printer_name),
-                 razorpay_key_id = COALESCE($7, razorpay_key_id),
-                 razorpay_key_secret = COALESCE($8, razorpay_key_secret),
-                 status = COALESCE($9, status),
-                 updated_at = CURRENT_TIMESTAMP
-             WHERE id::text = $10::text OR machine_code = $10 RETURNING *`,
-            [
-                name || null,
-                location_address || null,
-                city || null,
-                state || null,
-                pincode || null,
-                default_printer_name || null,
-                razorpay_key_id !== undefined ? razorpay_key_id : null,
-                razorpay_key_secret !== undefined ? razorpay_key_secret : null,
-                status || null,
-                id
-            ]
-        );
-
-        const updatedMachine = (result && result.rows && result.rows.length > 0) ? result.rows[0] : { id, name, razorpay_key_id, razorpay_key_secret };
-
-        res.json({ success: true, machine: updatedMachine });
-    } catch (err) {
-        next(err);
-    }
-};
-
-const updatePrinterStatus = async (req, res, next) => {
-    try {
-        const { machine_code } = req.params;
-        const { printer_status, ip_address } = req.body;
-
-        const result = await db.query(
-            `UPDATE machines 
-             SET printer_status = COALESCE($1, printer_status),
-                 ip_address = COALESCE($2, ip_address),
-                 last_ping_at = CURRENT_TIMESTAMP
-             WHERE machine_code = $3 OR id::text = $3 RETURNING *`,
-            [printer_status, ip_address, machine_code]
+            'UPDATE machines SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+            [status, id]
         );
 
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Machine not found.' });
         }
 
-        res.json({ success: true, machine: result.rows[0] });
+        const machine = result.rows[0];
+
+        // Broadcast status change via Socket.IO
+        const io = req.app.get('socketio');
+        if (io) {
+            io.emit('MACHINE_STATUS_CHANGED', { machineId: machine.id, machineCode: machine.machine_code, status });
+        }
+
+        res.json({ success: true, machine });
     } catch (err) {
         next(err);
     }
@@ -193,59 +180,24 @@ const getMachineAds = async (req, res, next) => {
     try {
         const { machineCode } = req.params;
 
-        const machineRes = await db.query('SELECT id, client_id FROM machines WHERE machine_code = $1 OR id::text = $1', [machineCode]);
-        if (machineRes.rows.length === 0) {
+        // Fetch machine ID
+        const mRes = await db.query('SELECT id FROM machines WHERE machine_code = $1 OR id::text = $1', [machineCode]);
+        if (mRes.rows.length === 0) {
             return res.json({ success: true, ads: [] });
         }
 
-        const machine = machineRes.rows[0];
+        const machineId = mRes.rows[0].id;
 
         const result = await db.query(
             `SELECT a.* 
              FROM advertisements a
-             INNER JOIN machine_ads ma ON a.id = ma.advertisement_id
-             WHERE ma.machine_id = $1
-               AND a.status = 'approved'
+             JOIN machine_ads ma ON a.id = ma.advertisement_id
+             WHERE ma.machine_id = $1 AND a.status = 'approved'
              ORDER BY a.created_at DESC`,
-            [machine.id]
+            [machineId]
         );
 
         res.json({ success: true, ads: result.rows });
-    } catch (err) {
-        next(err);
-    }
-};
-
-const toggleMachineStatus = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { status } = req.body;
-
-        const result = await db.query(
-            `UPDATE machines SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 OR machine_code = $2 RETURNING *`,
-            [status, id]
-        );
-
-        const updatedMachine = result.rows[0] || { id, status };
-
-        const io = req.app.get('socketio');
-        if (io) {
-            io.to(`machine:${updatedMachine.id}`).emit('MACHINE_STATUS_CHANGE', { status: updatedMachine.status });
-            io.to(`machine:${updatedMachine.machine_code || 'KIOSK-001'}`).emit('MACHINE_STATUS_CHANGE', { status: updatedMachine.status });
-            io.to('machine:KIOSK-001').emit('MACHINE_STATUS_CHANGE', { status: updatedMachine.status });
-        }
-
-        res.json({ success: true, machine: updatedMachine });
-    } catch (err) {
-        next(err);
-    }
-};
-
-const deleteMachine = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        await db.query('DELETE FROM machines WHERE id = $1 OR machine_code = $1', [id]);
-        res.json({ success: true, message: 'Machine deleted successfully.' });
     } catch (err) {
         next(err);
     }
@@ -255,9 +207,6 @@ module.exports = {
     getMachines,
     getMachineByCode,
     createMachine,
-    updateMachine,
-    updatePrinterStatus,
-    getMachineAds,
-    toggleMachineStatus,
-    deleteMachine
+    updateMachineStatus,
+    getMachineAds
 };
