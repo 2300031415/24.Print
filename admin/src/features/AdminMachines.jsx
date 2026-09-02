@@ -12,15 +12,31 @@ const AdminMachines = () => {
   const [selectedQrMachine, setSelectedQrMachine] = useState(null);
 
   const [formData, setFormData] = useState({
-    machine_code: 'FFPVT_EasyXerox-002',
-    name: 'FFPVT_EasyXerox-002',
+    machine_code: 'FFPVT_EasyXerox-001',
+    name: 'FFPVT_EasyXerox-001',
     client_id: '',
-    location_address: 'Metro Station Entrance #2',
+    location_address: '',
     city: 'New Delhi',
     state: 'Delhi',
     pincode: '110001',
     default_printer_name: 'Brother DCP-T820DW Printer'
   });
+
+  const openRegisterModal = () => {
+    const nextNum = String(machines.length + 1).padStart(3, '0');
+    const defaultCode = `FFPVT_EasyXerox-${nextNum}`;
+    setFormData({
+      machine_code: defaultCode,
+      name: defaultCode,
+      client_id: clients.length > 0 ? clients[0].id : '',
+      location_address: '',
+      city: 'New Delhi',
+      state: 'Delhi',
+      pincode: '110001',
+      default_printer_name: 'Brother DCP-T820DW Printer'
+    });
+    setShowModal(true);
+  };
 
   const fetchData = async () => {
     try {
@@ -95,7 +111,7 @@ const AdminMachines = () => {
             <p className="text-slate-600 font-bold text-xs mt-1">Register new Windows 11 Touch Kiosks and generate unique machine QR codes.</p>
           </div>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={openRegisterModal}
             className="px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-md flex items-center gap-2 btn-touch text-sm shrink-0"
           >
             <Plus className="w-5 h-5" />
