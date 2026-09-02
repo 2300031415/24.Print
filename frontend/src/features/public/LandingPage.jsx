@@ -17,14 +17,14 @@ import {
   Building2,
   Clock,
   Lock,
-  Layers,
   BarChart3,
   Users,
   Instagram,
   Mail,
   Phone,
   MapPin,
-  Globe,
+  Plug,
+  Wifi,
   ExternalLink
 } from 'lucide-react';
 
@@ -37,11 +37,11 @@ const LandingPage = () => {
       {/* ──────────────────────────────────────────────────────────────
           TOP NAVIGATION BAR
       ────────────────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 px-6 py-4">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/85 backdrop-blur-xl border-b border-slate-800/80 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="logo-badge py-2 px-4 shadow-cyan-glow">
-              <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
+            <div className="bg-white p-1 px-3 rounded-xl border-2 border-cyan-400 shadow-cyan-glow flex items-center justify-center overflow-hidden">
+              <img src="/logo.png" alt="EasyXerox" className="h-10 w-auto object-contain scale-125 transform" />
             </div>
             <span className="text-xl font-extrabold font-heading text-white tracking-tight group-hover:text-cyan-400 transition-colors">
               EasyXerox
@@ -49,9 +49,10 @@ const LandingPage = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
+            <a href="#showcase" className="hover:text-cyan-400 transition-colors">Product Showcase</a>
             <a href="#features" className="hover:text-cyan-400 transition-colors">Features</a>
+            <a href="#plug-and-play" className="hover:text-cyan-400 transition-colors">Plug & Play</a>
             <a href="#how-it-works" className="hover:text-cyan-400 transition-colors">How It Works</a>
-            <a href="#benefits" className="hover:text-cyan-400 transition-colors">Partner Benefits</a>
             <a href="#network" className="hover:text-cyan-400 transition-colors">Network</a>
           </div>
 
@@ -69,48 +70,45 @@ const LandingPage = () => {
       {/* ──────────────────────────────────────────────────────────────
           HERO SECTION
       ────────────────────────────────────────────────────────────── */}
-      <header className="relative pt-36 pb-20 px-6 overflow-hidden">
+      <header className="relative pt-36 pb-16 px-6 overflow-hidden text-center">
         {/* Background glow effects */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-tr from-cyan-500/20 to-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/3 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[950px] h-[550px] bg-gradient-to-tr from-cyan-500/20 via-blue-600/15 to-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto text-center relative z-10">
+        <div className="max-w-5xl mx-auto relative z-10 space-y-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/90 border border-cyan-500/30 rounded-full text-xs font-bold text-cyan-400 mb-6 shadow-lg backdrop-blur-md"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/90 border border-cyan-500/30 rounded-full text-xs font-bold text-cyan-400 shadow-lg backdrop-blur-md"
           >
             <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
-            <span>Next-Gen Commercial Self-Service Xerox Kiosks</span>
+            <span>★ Commercial Self-Service Xerox & Print Kiosk Network</span>
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-extrabold font-heading text-white tracking-tight leading-tight max-w-5xl mx-auto"
+            className="text-4xl md:text-6xl lg:text-7xl font-extrabold font-heading text-white tracking-tight leading-tight"
           >
-            Touchless, Automated <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500 bg-clip-text text-transparent">
-              24/7 Document Printing & Xerox
-            </span>
+            Meet <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500 bg-clip-text text-transparent">EasyXerox</span> Kiosk. <br />
+            Instant Printing & Xerox Anytime.
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 text-lg md:text-xl text-slate-400 max-w-3xl mx-auto font-normal leading-relaxed"
+            className="text-base md:text-xl text-slate-300 font-normal leading-relaxed max-w-3xl mx-auto"
           >
-            Transform any retail space into a smart, revenue-generating printing hub. Customers scan a QR code, upload documents from their phones, pay via UPI, and receive instant silent prints.
+            Transform any retail shop, college campus, or metro station into an automated revenue-generating print hub. Scan QR, upload files, pay via UPI, and receive instant prints.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-10 flex flex-wrap items-center justify-center gap-4"
+            className="flex flex-wrap items-center justify-center gap-4 pt-4"
           >
             <button
               onClick={() => navigate('/client/login')}
@@ -121,40 +119,248 @@ const LandingPage = () => {
               <ArrowRight className="w-5 h-5" />
             </button>
             <a
-              href="#how-it-works"
+              href="#showcase"
               className="px-8 py-4 bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-bold text-base rounded-2xl border border-slate-700/80 transition-all flex items-center gap-2 btn-touch"
             >
-              <span>Explore Features</span>
+              <span>View Kiosk Showcase</span>
               <ChevronRight className="w-5 h-5 text-slate-400" />
             </a>
           </motion.div>
-
-          {/* Quick Metrics Badges */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="p-5 bg-slate-900/60 border border-slate-800/80 rounded-2xl text-left backdrop-blur-md">
-              <div className="text-2xl md:text-3xl font-extrabold text-cyan-400 font-heading">100%</div>
-              <div className="text-xs text-slate-400 font-medium mt-1">Self-Service Touch HMI</div>
-            </div>
-            <div className="p-5 bg-slate-900/60 border border-slate-800/80 rounded-2xl text-left backdrop-blur-md">
-              <div className="text-2xl md:text-3xl font-extrabold text-emerald-400 font-heading">&lt; 5 sec</div>
-              <div className="text-xs text-slate-400 font-medium mt-1">Silent Print Dispatch</div>
-            </div>
-            <div className="p-5 bg-slate-900/60 border border-slate-800/80 rounded-2xl text-left backdrop-blur-md">
-              <div className="text-2xl md:text-3xl font-extrabold text-blue-400 font-heading">Razorpay</div>
-              <div className="text-xs text-slate-400 font-medium mt-1">Instant UPI Payments</div>
-            </div>
-            <div className="p-5 bg-slate-900/60 border border-slate-800/80 rounded-2xl text-left backdrop-blur-md">
-              <div className="text-2xl md:text-3xl font-extrabold text-purple-400 font-heading">24/7</div>
-              <div className="text-xs text-slate-400 font-medium mt-1">Automated Operations</div>
-            </div>
-          </div>
         </div>
       </header>
 
       {/* ──────────────────────────────────────────────────────────────
+          PRODUCT SHOWCASE WITH FRONT VIEW ONLY & FLOATING BADGES
+      ────────────────────────────────────────────────────────────── */}
+      <section id="showcase" className="py-16 px-6 relative overflow-hidden bg-slate-950">
+        <div className="max-w-7xl mx-auto relative z-10">
+          
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest block mb-2">Automated Kiosk Showcase</span>
+            <h2 className="text-3xl md:text-5xl font-extrabold font-heading text-white">
+              The EasyXerox Printing Hardware
+            </h2>
+            <p className="text-slate-400 text-base mt-3">
+              Engineered with standing touch display, heavy-duty printer bay, and 24/7 cloud connectivity.
+            </p>
+          </div>
+
+          {/* Central Showcase Grid: FRONT VIEW ONLY */}
+          <div className="relative min-h-[580px] flex items-center justify-center">
+            
+            {/* Background Ambient Glowing Radial Aura */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-gradient-to-tr from-cyan-500/25 via-emerald-500/15 to-blue-600/25 rounded-full blur-[120px] pointer-events-none" />
+
+            {/* Left Column Floating Feature Badges */}
+            <div className="hidden lg:flex flex-col gap-8 absolute left-8 top-1/2 -translate-y-1/2 z-20 max-w-xs text-left">
+              
+              {/* Badge 1 */}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="p-4 bg-slate-900/90 border border-emerald-500/30 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-3.5 hover:border-emerald-400 transition-all group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/40 group-hover:scale-110 transition-transform">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white font-heading">24/7 Availability</h4>
+                  <p className="text-xs text-slate-400">Continuous automated operation without staff.</p>
+                </div>
+              </motion.div>
+
+              {/* Badge 2 (Time 5s removed) */}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="p-4 bg-slate-900/90 border border-cyan-500/30 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-3.5 hover:border-cyan-400 transition-all group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-500/40 group-hover:scale-110 transition-transform">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white font-heading">Instant Silent Print</h4>
+                  <p className="text-xs text-slate-400">Instant spooler dispatch to high-speed printer.</p>
+                </div>
+              </motion.div>
+
+              {/* Badge 3 */}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="p-4 bg-slate-900/90 border border-blue-500/30 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-3.5 hover:border-blue-400 transition-all group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/40 group-hover:scale-110 transition-transform">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white font-heading">Encrypted Files</h4>
+                  <p className="text-xs text-slate-400">Secure auto-purged document transmission.</p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Central Product Image: FRONT VIEW ONLY */}
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+              className="relative z-10 max-w-xs md:max-w-sm mx-auto py-6"
+            >
+              <img
+                src="/kiosk-front-only.png"
+                alt="EasyXerox Commercial Self-Service Xerox Kiosk Front View"
+                className="w-full h-auto object-contain max-h-[520px] filter drop-shadow-[0_25px_50px_rgba(0,240,255,0.4)] transition-transform duration-500"
+              />
+            </motion.div>
+
+            {/* Right Column Floating Feature Badges */}
+            <div className="hidden lg:flex flex-col gap-8 absolute right-8 top-1/2 -translate-y-1/2 z-20 max-w-xs text-left">
+              
+              {/* Badge 4 (230V removed) */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="p-4 bg-slate-900/90 border border-emerald-500/30 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-3.5 hover:border-emerald-400 transition-all group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/40 group-hover:scale-110 transition-transform">
+                  <Plug className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white font-heading">Plug & Play Setup</h4>
+                  <p className="text-xs text-slate-400">Just plug power & ethernet cable.</p>
+                </div>
+              </motion.div>
+
+              {/* Badge 5 */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="p-4 bg-slate-900/90 border border-purple-500/30 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-3.5 hover:border-purple-400 transition-all group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/40 group-hover:scale-110 transition-transform">
+                  <CreditCard className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white font-heading">Seamless UPI QR</h4>
+                  <p className="text-xs text-slate-400">Instant Razorpay UPI QR payment verification.</p>
+                </div>
+              </motion.div>
+
+              {/* Badge 6 */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="p-4 bg-slate-900/90 border border-amber-500/30 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-3.5 hover:border-amber-400 transition-all group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-110 transition-transform">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white font-heading">0 Staff Labor Cost</h4>
+                  <p className="text-xs text-slate-400">Shop partners earn automated split income.</p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+
+        {/* 5-Step Customer Print Workflow Scrolling Marquee Ribbon */}
+        <div className="mt-12 py-4 bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-400 -rotate-1 shadow-2xl overflow-hidden select-none">
+          <div className="flex whitespace-nowrap gap-12 text-slate-950 font-black text-sm uppercase tracking-wider animate-marquee">
+            <span className="flex items-center gap-2">✦ 1. SCAN QR</span>
+            <span className="flex items-center gap-2">✦ 2. UPLOAD FILE</span>
+            <span className="flex items-center gap-2">✦ 3. REVIEW PRINT SETTINGS</span>
+            <span className="flex items-center gap-2">✦ 4. PAY UPI</span>
+            <span className="flex items-center gap-2">✦ 5. INSTANT PRINT DISPATCH</span>
+            
+            <span className="flex items-center gap-2">✦ 1. SCAN QR</span>
+            <span className="flex items-center gap-2">✦ 2. UPLOAD FILE</span>
+            <span className="flex items-center gap-2">✦ 3. REVIEW PRINT SETTINGS</span>
+            <span className="flex items-center gap-2">✦ 4. PAY UPI</span>
+            <span className="flex items-center gap-2">✦ 5. INSTANT PRINT DISPATCH</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────
+          SHOP PARTNERS: ZERO EFFORT PLUG & PLAY SETUP
+      ────────────────────────────────────────────────────────────── */}
+      <section id="plug-and-play" className="py-20 px-6 bg-gradient-to-b from-slate-950 via-slate-900/80 to-slate-950 border-y border-slate-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-950/80 border border-emerald-500/30 rounded-full text-emerald-400 text-xs font-extrabold uppercase tracking-wider mb-4">
+              <Plug className="w-4 h-4" />
+              <span>Zero-Effort Partner Setup</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-extrabold font-heading text-white">
+              Just Plug Power & Ethernet Cable. <br />
+              <span className="text-cyan-400">That's All You Need To Start Earning.</span>
+            </h2>
+            <p className="mt-4 text-slate-300 text-base leading-relaxed">
+              No complex installation, no staff required, and zero operational hassle. Buying or hosting an EasyXerox kiosk requires only two standard connections in your shop!
+            </p>
+          </div>
+
+          {/* 2 Connections Card Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Connection 1: Power Socket */}
+            <div className="bg-slate-900 border-2 border-cyan-500/30 rounded-3xl p-8 hover:border-cyan-400 transition-all shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="w-16 h-16 bg-cyan-500/20 text-cyan-400 rounded-2xl flex items-center justify-center mb-6 border border-cyan-500/40 group-hover:scale-110 transition-transform">
+                <Plug className="w-8 h-8" />
+              </div>
+              <span className="px-3 py-1 bg-cyan-950 text-cyan-300 text-xs font-extrabold uppercase tracking-widest rounded-lg border border-cyan-800">
+                Requirement #1
+              </span>
+              <h3 className="text-2xl font-bold text-white font-heading mt-4 mb-2">Power Socket</h3>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Plug the kiosk power cord into any wall power socket. Built-in surge protection keeps it running safely 24/7.
+              </p>
+            </div>
+
+            {/* Connection 2: Ethernet Cable */}
+            <div className="bg-slate-900 border-2 border-emerald-500/30 rounded-3xl p-8 hover:border-emerald-400 transition-all shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 border border-emerald-500/40 group-hover:scale-110 transition-transform">
+                <Wifi className="w-8 h-8" />
+              </div>
+              <span className="px-3 py-1 bg-emerald-950 text-emerald-300 text-xs font-extrabold uppercase tracking-widest rounded-lg border border-emerald-800">
+                Requirement #2
+              </span>
+              <h3 className="text-2xl font-bold text-white font-heading mt-4 mb-2">Ethernet Cable or WiFi</h3>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Connect your router via an Ethernet cable or WiFi. The kiosk automatically syncs print orders and payments.
+              </p>
+            </div>
+          </div>
+
+          {/* Shop Partner Workflow Summary Banner */}
+          <div className="mt-12 max-w-5xl mx-auto bg-slate-900/90 border border-slate-800 rounded-3xl p-8 text-center flex flex-wrap items-center justify-between gap-6">
+            <div className="text-left max-w-xl">
+              <h4 className="text-lg font-bold text-white font-heading">Ready to Place a Kiosk in Your Shop?</h4>
+              <p className="text-xs text-slate-400 mt-1">Once plugged in, the machine self-boots, connects to EasyXerox servers, and starts generating automated daily split revenue.</p>
+            </div>
+            <button
+              onClick={() => navigate('/client/login')}
+              className="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-emerald-glow transition-all btn-touch flex items-center gap-2"
+            >
+              <span>Onboard Your Shop Location</span>
+              <ArrowRight className="w-4 h-4 text-slate-950" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────
           CORE FEATURES GRID
       ────────────────────────────────────────────────────────────── */}
-      <section id="features" className="py-20 px-6 bg-slate-900/40 relative">
+      <section id="features" className="py-20 px-6 bg-slate-900/40 border-t border-slate-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-3">
@@ -218,20 +424,20 @@ const LandingPage = () => {
               <div className="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-400 mb-6 group-hover:scale-110 transition-transform">
                 <TrendingUp className="w-7 h-7" />
               </div>
-              <h4 className="text-xl font-bold text-white font-heading mb-3">Live Revenue Split Engine</h4>
+              <h4 className="text-xl font-bold text-white font-heading mb-3">Partner Earning Analytics</h4>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Automated commission calculator splits transaction earnings in real time between machine hosts and platform admins with transparent daily logs.
+                Comprehensive Client Partner portal tracks total sales, machine pings, paper levels, and automated commission payouts.
               </p>
             </div>
 
             {/* Feature 6 */}
             <div className="p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-rose-500/50 transition-all duration-300 group">
               <div className="w-14 h-14 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center justify-center text-rose-400 mb-6 group-hover:scale-110 transition-transform">
-                <Lock className="w-7 h-7" />
+                <ShieldCheck className="w-7 h-7" />
               </div>
-              <h4 className="text-xl font-bold text-white font-heading mb-3">Automated File Privacy</h4>
+              <h4 className="text-xl font-bold text-white font-heading mb-3">Commercial Hardware Guard</h4>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Uploaded PDFs and documents are automatically shredded and deleted immediately following print completion, ensuring 100% user data confidentiality.
+                Physical kiosks enforce strict local hardware guards, blocking external browser access and maintaining uninterrupted kiosk display operation.
               </p>
             </div>
           </div>
@@ -239,38 +445,37 @@ const LandingPage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-          HOW IT WORKS (TABBED WALKTHROUGH)
+          INTERACTIVE WORKFLOW TAB SWITCHER (HOW IT WORKS)
       ────────────────────────────────────────────────────────────── */}
-      <section id="how-it-works" className="py-20 px-6 relative">
+      <section id="how-it-works" className="py-20 px-6 bg-slate-950 border-t border-slate-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-3">
-              Simple & Intuitive
-            </h2>
-            <h3 className="text-3xl md:text-5xl font-extrabold font-heading text-white">
+            <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest block mb-2">Simple & Intuitive</span>
+            <h2 className="text-3xl md:text-5xl font-extrabold font-heading text-white">
               How EasyXerox Works
-            </h3>
+            </h2>
           </div>
 
-          {/* Toggle Tabs */}
-          <div className="flex items-center justify-center mb-16">
-            <div className="p-1.5 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-2">
+          {/* Tab Switcher */}
+          <div className="flex justify-center mb-12">
+            <div className="bg-slate-900 p-1.5 rounded-2xl border border-slate-800 inline-flex gap-2">
               <button
                 onClick={() => setActiveTab('customers')}
-                className={`px-6 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+                className={`px-6 py-3 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 ${
                   activeTab === 'customers'
-                    ? 'bg-cyan-500 text-slate-950 shadow-md'
+                    ? 'bg-cyan-500 text-slate-950 shadow-cyan-glow'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <Users className="w-4 h-4" />
                 <span>For Printing Customers</span>
               </button>
+
               <button
                 onClick={() => setActiveTab('partners')}
-                className={`px-6 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+                className={`px-6 py-3 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 ${
                   activeTab === 'partners'
-                    ? 'bg-cyan-500 text-slate-950 shadow-md'
+                    ? 'bg-cyan-500 text-slate-950 shadow-cyan-glow'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -280,46 +485,48 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Steps Content */}
-          {activeTab === 'customers' ? (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl relative">
+          {/* Tab Content 1: Customers */}
+          {activeTab === 'customers' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="p-8 bg-slate-900/80 border border-slate-800 rounded-3xl relative">
                 <div className="text-4xl font-extrabold font-heading text-cyan-500/40 mb-4">01</div>
-                <h4 className="text-lg font-bold text-white mb-2">Scan QR Code</h4>
-                <p className="text-xs text-slate-400">Scan the QR code displayed on the touchscreen kiosk using any smartphone camera.</p>
+                <h4 className="text-xl font-bold text-white mb-2">Scan Machine QR</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">Scan the unique kiosk QR code using any smartphone camera or WhatsApp to open the instant upload webpage.</p>
               </div>
-              <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl relative">
+
+              <div className="p-8 bg-slate-900/80 border border-slate-800 rounded-3xl relative">
                 <div className="text-4xl font-extrabold font-heading text-cyan-500/40 mb-4">02</div>
-                <h4 className="text-lg font-bold text-white mb-2">Upload Document</h4>
-                <p className="text-xs text-slate-400">Select any PDF or image up to 100MB directly from your phone's browser.</p>
+                <h4 className="text-xl font-bold text-white mb-2">Upload & Select Copies</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">Choose PDF documents, select B&W or Color, set copies, single or duplex printing, and calculate total price.</p>
               </div>
-              <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl relative">
+
+              <div className="p-8 bg-slate-900/80 border border-slate-800 rounded-3xl relative">
                 <div className="text-4xl font-extrabold font-heading text-cyan-500/40 mb-4">03</div>
-                <h4 className="text-lg font-bold text-white mb-2">Customize & Pay</h4>
-                <p className="text-xs text-slate-400">Choose B&W/Color, single/duplex, page count, and scan the Razorpay UPI QR code.</p>
-              </div>
-              <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl relative">
-                <div className="text-4xl font-extrabold font-heading text-cyan-500/40 mb-4">04</div>
-                <h4 className="text-lg font-bold text-white mb-2">Collect Prints</h4>
-                <p className="text-xs text-slate-400">Your documents print silently and instantly. File is purged immediately after.</p>
+                <h4 className="text-xl font-bold text-white mb-2">Pay UPI & Collect Print</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">Scan the dynamic Razorpay UPI QR code on the touchscreen. Once payment verifies, silent printing starts instantly.</p>
               </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl">
+          )}
+
+          {/* Tab Content 2: Partners */}
+          {activeTab === 'partners' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="p-8 bg-slate-900/80 border border-slate-800 rounded-3xl relative">
                 <div className="text-4xl font-extrabold font-heading text-emerald-500/40 mb-4">01</div>
-                <h4 className="text-lg font-bold text-white mb-2">Host Machine Hardware</h4>
-                <p className="text-xs text-slate-400">Place our touch kiosk in your shop, metro station, college campus, or retail outlet.</p>
+                <h4 className="text-xl font-bold text-white mb-2">Host Machine Hardware</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">Place our kiosk in your retail shop, metro station, college campus, or venue. Plug in power & Ethernet cable.</p>
               </div>
-              <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl">
+
+              <div className="p-8 bg-slate-900/80 border border-slate-800 rounded-3xl relative">
                 <div className="text-4xl font-extrabold font-heading text-emerald-500/40 mb-4">02</div>
-                <h4 className="text-lg font-bold text-white mb-2">Earn Passive Revenue</h4>
-                <p className="text-xs text-slate-400">Receive automated split commissions on every single print job and ad impression.</p>
+                <h4 className="text-xl font-bold text-white mb-2">Earn Passive Revenue</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">Receive automated split commissions on every single print job and screen advertisement impression 24/7.</p>
               </div>
-              <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl">
+
+              <div className="p-8 bg-slate-900/80 border border-slate-800 rounded-3xl relative">
                 <div className="text-4xl font-extrabold font-heading text-emerald-500/40 mb-4">03</div>
-                <h4 className="text-lg font-bold text-white mb-2">Track on Dashboard</h4>
-                <p className="text-xs text-slate-400">Log into your Client Partner portal to view daily earnings, paper status, and transaction history.</p>
+                <h4 className="text-xl font-bold text-white mb-2">Track on Dashboard</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">Log into your Client Partner portal to view real-time daily earnings, paper status, and transaction history.</p>
               </div>
             </div>
           )}
@@ -327,7 +534,7 @@ const LandingPage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-          NETWORK KIOSK LOCATIONS SECTION
+          LIVE KIOSK DEPLOYMENT NETWORK
       ────────────────────────────────────────────────────────────── */}
       <section id="network" className="py-20 px-6 bg-slate-900/40 border-t border-slate-800">
         <div className="max-w-7xl mx-auto">
@@ -454,7 +661,7 @@ const LandingPage = () => {
             Ready to Monetize Your Space with Self-Service Printing?
           </h2>
           <p className="mt-4 text-slate-300 text-base md:text-lg max-w-2xl mx-auto">
-            Join hundreds of shop owners and venue partners earning passive daily income.
+            Join hundreds of shop owners and venue partners earning passive daily income. Just plug power & Ethernet to start.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <button
@@ -474,11 +681,11 @@ const LandingPage = () => {
       <footer className="border-t border-slate-800/80 bg-slate-950 pt-20 pb-12 px-8 text-sm text-slate-300">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 pb-16 border-b border-slate-800/80">
           
-          {/* Column 1: Brand & Instagram (5 cols) */}
+          {/* Column 1: Brand & Instagram */}
           <div className="md:col-span-5 space-y-6">
             <div className="flex items-center gap-3.5">
-              <div className="logo-badge py-2 px-4 shadow-cyan-glow border border-cyan-500/30">
-                <img src="/logo.png" alt="EasyXerox" className="h-10 w-auto object-contain" />
+              <div className="bg-white p-1.5 px-3.5 rounded-2xl border-2 border-cyan-400 shadow-cyan-glow flex items-center justify-center overflow-hidden">
+                <img src="/logo.png" alt="EasyXerox" className="h-12 w-auto object-contain scale-125 transform" />
               </div>
               <span className="text-2xl font-extrabold font-heading text-white tracking-tight">
                 EasyXerox
@@ -503,12 +710,18 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Column 2: Navigation Links (3 cols) */}
+          {/* Column 2: Navigation Links */}
           <div className="md:col-span-3">
             <h4 className="text-xs font-black text-cyan-400 uppercase tracking-widest mb-6 font-heading border-b border-slate-800/80 pb-3">
               Quick Links
             </h4>
             <ul className="space-y-4 text-sm font-bold text-slate-300">
+              <li>
+                <a href="#showcase" className="hover:text-cyan-400 transition-colors flex items-center gap-2.5">
+                  <ChevronRight className="w-4 h-4 text-cyan-400" />
+                  <span>Product Showcase</span>
+                </a>
+              </li>
               <li>
                 <a href="#features" className="hover:text-cyan-400 transition-colors flex items-center gap-2.5">
                   <ChevronRight className="w-4 h-4 text-cyan-400" />
@@ -516,15 +729,15 @@ const LandingPage = () => {
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" className="hover:text-cyan-400 transition-colors flex items-center gap-2.5">
+                <a href="#plug-and-play" className="hover:text-cyan-400 transition-colors flex items-center gap-2.5">
                   <ChevronRight className="w-4 h-4 text-cyan-400" />
-                  <span>How It Works</span>
+                  <span>Plug & Play Setup</span>
                 </a>
               </li>
               <li>
-                <a href="#benefits" className="hover:text-cyan-400 transition-colors flex items-center gap-2.5">
+                <a href="#how-it-works" className="hover:text-cyan-400 transition-colors flex items-center gap-2.5">
                   <ChevronRight className="w-4 h-4 text-cyan-400" />
-                  <span>Partner Benefits</span>
+                  <span>How It Works</span>
                 </a>
               </li>
               <li>
@@ -536,7 +749,7 @@ const LandingPage = () => {
             </ul>
           </div>
 
-          {/* Column 3: Contact & Support (4 cols) */}
+          {/* Column 3: Contact & Support */}
           <div className="md:col-span-4">
             <h4 className="text-xs font-black text-cyan-400 uppercase tracking-widest mb-6 font-heading border-b border-slate-800/80 pb-3">
               Contact & Support
