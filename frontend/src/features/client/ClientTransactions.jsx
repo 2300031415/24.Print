@@ -141,7 +141,7 @@ const ClientTransactions = () => {
                           <Monitor className="w-4 h-4 text-blue-600 shrink-0" />
                           <div>
                             <p className="text-sm font-black text-slate-950">{job.machine_name || 'Connaught Place Kiosk #1'}</p>
-                            <span className="text-[10px] font-mono text-blue-700 uppercase font-black">{job.machine_code || 'KIOSK-001'}</span>
+                            <span className="text-[10px] font-mono text-blue-700 uppercase font-black">{job.machine_code || 'FFPVT_EasyXerox-001'}</span>
                           </div>
                         </div>
                       </td>

@@ -145,7 +145,7 @@ const AdminReports = () => {
                         />
                       </td>
                       <td className="py-3.5 px-4 font-mono text-xs text-cyan-400 font-bold">{job.id.substring(0, 8)}</td>
-                      <td className="py-3.5 px-4 font-bold text-white">{job.machine_code || 'KIOSK-001'}</td>
+                      <td className="py-3.5 px-4 font-bold text-white">{job.machine_code || 'FFPVT_EasyXerox-001'}</td>
                       <td className="py-3.5 px-4 text-slate-200 font-medium truncate max-w-[200px]">{job.original_filename || 'PDF Print Job'}</td>
                       <td className="py-3.5 px-4 text-xs">
                         {job.copies}x • <span className="uppercase text-cyan-300 font-semibold">{job.color_mode}</span> • <span className="capitalize text-slate-400">{job.duplex_mode}</span>
