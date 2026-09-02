@@ -277,21 +277,22 @@ function handleMockQuery(text, params) {
     // 5. SELECT Machines List
     if (cleanText.includes('from machines')) {
         let rows = mockDb.machines.map(m => {
-            const client = mockDb.clients.find(c => String(c.id) === String(m.client_id) || String(c.user_id) === String(m.client_id)) || mockDb.clients[0];
+            const client = mockDb.clients.find(c => String(c.id) === String(m.client_id) || String(c.user_id) === String(m.client_id));
             const isClientSuspended = client && (client.status === 'suspended' || client.status === 'inactive' || client.status === 'disabled');
             return {
                 ...m,
                 status: isClientSuspended ? 'maintenance' : m.status,
-                client_name: client ? client.business_name : 'Metro Xerox & Print Zone',
+                client_name: client ? client.business_name : 'Unassigned Client',
+                client_user_id: client ? client.user_id : null,
                 client_status: client ? client.status : 'active',
-                total_jobs_printed: mockDb.print_jobs.length
+                total_jobs_printed: mockDb.print_jobs.filter(pj => String(pj.machine_id) === String(m.id)).length
             };
         });
 
         // Restrict to client's machines when client filter is present in query
-        if (cleanText.includes('m.client_id') && params.length > 0) {
-            const targetClientId = String(params[0]).trim();
-            rows = rows.filter(m => String(m.client_id) === targetClientId || String(m.client_name).toLowerCase().includes(targetClientId.toLowerCase()));
+        if ((cleanText.includes('m.client_id') || cleanText.includes('c.user_id')) && params.length > 0) {
+            const targetId = String(params[0]).trim();
+            rows = rows.filter(m => String(m.client_id) === targetId || String(m.client_user_id) === targetId);
         }
 
         return { rows, rowCount: rows.length };
