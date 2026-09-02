@@ -639,6 +639,29 @@ function handleMockQuery(text, params) {
         return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
     }
 
+    // 17d. INSERT Machine
+    if (cleanText.includes('insert into machines')) {
+        const mObj = {
+            id: 'm_' + Date.now(),
+            machine_code: String(params[0] || '').toUpperCase(),
+            name: params[1] || params[0],
+            client_id: params[2],
+            location_address: params[3] || '',
+            city: params[4] || '',
+            state: params[5] || '',
+            pincode: params[6] || '',
+            qr_code_url: params[7] || '',
+            default_printer_name: params[8] || 'Brother DCP-T820DW Printer',
+            razorpay_key_id: params[9] || null,
+            razorpay_key_secret: params[10] || null,
+            status: 'online',
+            created_at: new Date().toISOString()
+        };
+        mockDb.machines.unshift(mObj);
+        persistDb();
+        return { rows: [mObj], rowCount: 1 };
+    }
+
     // 18. SELECT Print Jobs History
     if (cleanText.includes('from print_jobs') || cleanText.includes('pj.*')) {
         const rows = mockDb.print_jobs.map(pj => ({

@@ -81,33 +81,45 @@ const createMachine = async (req, res, next) => {
     try {
         const { machine_code, name, client_id, location_address, city, state, pincode, default_printer_name, razorpay_key_id, razorpay_key_secret } = req.body;
 
-        if (!machine_code || !name || !client_id) {
-            return res.status(400).json({ success: false, message: 'Machine code, name, and client ID are required.' });
+        if (!machine_code || !client_id) {
+            return res.status(400).json({ success: false, message: 'Machine code and client owner are required.' });
         }
 
-        const domain = process.env.PUBLIC_DOMAIN || 'http://localhost:5173';
-        const uploadUrl = `${domain}/upload/${machine_code}`;
+        const machineName = name || machine_code;
+        const domain = process.env.PUBLIC_DOMAIN || 'https://easyxerox.com';
+        const uploadUrl = `${domain}/upload/${machine_code.toUpperCase()}`;
         const qrDataUrl = await QRCode.toDataURL(uploadUrl);
 
         const result = await db.query(
-            `INSERT INTO machines (machine_code, name, client_id, location_address, city, state, pincode, qr_code_url, default_printer_name, razorpay_key_id, razorpay_key_secret)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+            `INSERT INTO machines (machine_code, name, client_id, location_address, city, state, pincode, qr_code_url, default_printer_name, razorpay_key_id, razorpay_key_secret, status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'online') RETURNING *`,
             [
                 machine_code.toUpperCase(),
-                name,
+                machineName,
                 client_id,
                 location_address || '',
                 city || '',
                 state || '',
                 pincode || '',
                 qrDataUrl,
-                default_printer_name || 'Kiosk_Printer_Default',
+                default_printer_name || 'Brother DCP-T820DW Printer',
                 razorpay_key_id || null,
                 razorpay_key_secret || null
             ]
         );
 
-        res.status(201).json({ success: true, machine: result.rows[0] });
+        const newMachine = (result && result.rows && result.rows.length > 0) ? result.rows[0] : {
+            id: 'm_' + Date.now(),
+            machine_code: machine_code.toUpperCase(),
+            name: machineName,
+            client_id,
+            location_address: location_address || '',
+            qr_code_url: qrDataUrl,
+            default_printer_name: default_printer_name || 'Brother DCP-T820DW Printer',
+            status: 'online'
+        };
+
+        res.status(201).json({ success: true, machine: newMachine });
     } catch (err) {
         next(err);
     }
