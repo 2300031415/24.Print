@@ -138,6 +138,21 @@ const loadPersistedDb = () => {
             if (Array.isArray(data.clients)) mockDb.clients = data.clients;
             if (Array.isArray(data.users)) mockDb.users = data.users;
             if (Array.isArray(data.machines)) mockDb.machines = data.machines;
+            // Ensure Super Admin easyxerox@gmail.com always exists
+            const adminUser = mockDb.users.find(u => u.email.toLowerCase() === 'easyxerox@gmail.com');
+            if (!adminUser) {
+                mockDb.users.unshift({
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+                    email: 'easyxerox@gmail.com',
+                    password_hash: ADMIN_HASH,
+                    full_name: 'EasyXerox Super Admin',
+                    phone: '+919876543210',
+                    role: 'admin',
+                    status: 'active',
+                    refresh_token: null,
+                    created_at: new Date().toISOString()
+                });
+            }
             console.log(`✅ Loaded mockDb state from disk (${mockDb.clients.length} clients, ${mockDb.machines.length} machines).`);
         }
     } catch (e) {
