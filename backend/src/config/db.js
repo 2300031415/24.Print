@@ -20,69 +20,25 @@ let isPostgresAvailable = false;
 
 
 // Pre-hashed passwords for seed users
-const ADMIN_HASH = bcrypt.hashSync('Admin@123', 10);
-const CLIENT_HASH = bcrypt.hashSync('Client@123', 10);
+const ADMIN_HASH = bcrypt.hashSync('FFpvt@2026', 10);
 
 // In-Memory Database Store for dev fallback if local PostgreSQL is not running
 const mockDb = {
     users: [
         {
             id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-            email: 'admin@printkiosk.com',
+            email: 'easyxerox@gmail.com',
             password_hash: ADMIN_HASH,
-            full_name: 'System Super Admin',
+            full_name: 'EasyXerox Super Admin',
             phone: '+919876543210',
             role: 'admin',
             status: 'active',
             refresh_token: null,
             created_at: new Date().toISOString()
-        },
-        {
-            id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
-            email: 'owner@metroprints.com',
-            password_hash: CLIENT_HASH,
-            full_name: 'Rajesh Kumar (Metro Prints)',
-            phone: '+919812345678',
-            role: 'client',
-            status: 'active',
-            refresh_token: null,
-            created_at: new Date().toISOString()
         }
     ],
-    clients: [
-        {
-            id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
-            user_id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
-            business_name: 'Metro Xerox & Print Zone',
-            contact_phone: '+919812345678',
-            address: '102 Connaught Place, Block B',
-            city: 'New Delhi',
-            state: 'Delhi',
-            pincode: '110001',
-            commission_rate: 80.00,
-            status: 'active',
-            created_at: new Date().toISOString()
-        }
-    ],
-    machines: [
-        {
-            id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
-            machine_code: 'FFPVT_EasyXerox-001',
-            name: 'FFPVT_EasyXerox-001',
-            client_id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
-            location_address: 'Metro Station Gate 2, Connaught Place',
-            city: 'New Delhi',
-            state: 'Delhi',
-            pincode: '110001',
-            qr_code_url: '',
-            status: 'online',
-            default_printer_name: 'Brother DCP-T820DW Printer',
-
-            printer_status: 'ready',
-            ip_address: '192.168.1.105',
-            created_at: new Date().toISOString()
-        }
-    ],
+    clients: [],
+    machines: [],
     pricing: [
         {
             id: 'e4eebc99-9c0b-4ef8-bb6d-6bb9bd380a55',

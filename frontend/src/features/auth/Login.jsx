@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, Loader2, ShieldCheck, Building, ArrowLeft, KeyRound, X, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, ArrowLeft, KeyRound, X, CheckCircle2 } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -72,12 +72,8 @@ const Login = ({ defaultRole }) => {
   const isClientMode = defaultRole === 'client';
   const isAdminMode = defaultRole === 'admin';
 
-  const [email, setEmail] = useState(
-    isAdminMode ? 'admin@printkiosk.com' : 'owner@metroprints.com'
-  );
-  const [password, setPassword] = useState(
-    isAdminMode ? 'Admin@123' : 'Client@123'
-  );
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -86,16 +82,6 @@ const Login = ({ defaultRole }) => {
   const [resetEmail, setResetEmail] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState('');
-
-  useEffect(() => {
-    if (isAdminMode) {
-      setEmail('admin@printkiosk.com');
-      setPassword('Admin@123');
-    } else if (isClientMode) {
-      setEmail('owner@metroprints.com');
-      setPassword('Client@123');
-    }
-  }, [defaultRole, isAdminMode, isClientMode]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -132,16 +118,6 @@ const Login = ({ defaultRole }) => {
       setResetSuccess('Password reset link dispatched! Please check your email.');
     } finally {
       setResetLoading(false);
-    }
-  };
-
-  const handleQuickFill = (roleType) => {
-    if (roleType === 'admin') {
-      setEmail('admin@printkiosk.com');
-      setPassword('Admin@123');
-    } else {
-      setEmail('owner@metroprints.com');
-      setPassword('Client@123');
     }
   };
 
@@ -258,30 +234,6 @@ const Login = ({ defaultRole }) => {
             )}
           </button>
         </form>
-
-        {/* DEMO QUICK FILL SELECTOR */}
-        <div className="mt-8 pt-6 border-t border-slate-200">
-          <p className="text-xs text-slate-500 font-extrabold mb-3 text-center">Auto-fill Demo Credentials:</p>
-          {isAdminMode ? (
-            <button
-              type="button"
-              onClick={() => handleQuickFill('admin')}
-              className="w-full p-3.5 rounded-xl border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-black transition-all flex items-center justify-center gap-2 btn-touch"
-            >
-              <ShieldCheck className="w-4 h-4 text-blue-700" />
-              <span>Fill Super Admin Credentials (admin@printkiosk.com)</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => handleQuickFill('client')}
-              className="w-full p-3.5 rounded-xl border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-black transition-all flex items-center justify-center gap-2 btn-touch"
-            >
-              <Building className="w-4 h-4 text-blue-700" />
-              <span>Fill Partner Credentials (owner@metroprints.com)</span>
-            </button>
-          )}
-        </div>
       </motion.div>
 
       {/* FORGOT PASSWORD MODAL */}
@@ -328,7 +280,7 @@ const Login = ({ defaultRole }) => {
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
                     className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
-                    placeholder="owner@metroprints.com"
+                    placeholder="user@example.com"
                   />
                 </div>
 
