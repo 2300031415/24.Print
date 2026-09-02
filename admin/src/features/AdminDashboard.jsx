@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Users, Monitor, DollarSign, Printer, ArrowUpRight, TrendingUp, Tv, Clock } from 'lucide-react';
+import { Users, Monitor, DollarSign, Printer, TrendingUp } from 'lucide-react';
 
-import PortalLayout from '../../components/PortalLayout';
-import api from '../../services/api';
+import PortalLayout from '../components/PortalLayout';
+import api from '../services/api';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -37,7 +36,7 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <PortalLayout title="Super Admin Dashboard" role="admin">
+    <PortalLayout title="Super Admin Dashboard">
       <div className="space-y-8">
         {/* METRICS CARDS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -7,7 +7,7 @@ const backendPort = process.env.BACKEND_PORT || 5000;
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    port: 8501,
+    port: 8502,
     host: true,
     proxy: {
       '/api': {

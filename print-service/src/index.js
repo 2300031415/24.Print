@@ -4,7 +4,7 @@ const fs = require('fs');
 const axios = require('axios');
 const FormData = require('form-data');
 const pdfPrinter = require('pdf-to-printer');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const { getPrinterStatus } = require('./printerMonitor');
 const { startUSBMonitoring, listDriveFiles, readDriveFile, getCurrentDrivesList } = require('./usbMonitor');

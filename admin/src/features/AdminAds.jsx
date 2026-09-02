@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Tv, CheckCircle, XCircle, Clock, Video, Image as ImageIcon, Filter, Plus, Upload } from 'lucide-react';
+import { Tv, CheckCircle, XCircle, Plus, Upload } from 'lucide-react';
 
-import PortalLayout from '../../components/PortalLayout';
-import api from '../../services/api';
+import PortalLayout from '../components/PortalLayout';
+import api from '../services/api';
 
 const AdminAds = () => {
   const [ads, setAds] = useState([]);
@@ -21,7 +21,6 @@ const AdminAds = () => {
     const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:5000';
     return `${backendUrl}${url}`;
   };
-
 
   const fetchAds = async () => {
     try {
@@ -85,7 +84,7 @@ const AdminAds = () => {
   const pendingCount = ads.filter(a => a.status === 'pending').length;
 
   return (
-    <PortalLayout title="Advertisements Review & Approval" role="admin">
+    <PortalLayout title="Advertisements Review & Approval">
       <div className="space-y-6">
         {/* TOP CONTROLS & FILTER TABS */}
         <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-4">

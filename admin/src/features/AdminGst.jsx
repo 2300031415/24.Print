@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Percent, Save } from 'lucide-react';
 
-import PortalLayout from '../../components/PortalLayout';
-import api from '../../services/api';
+import PortalLayout from '../components/PortalLayout';
+import api from '../services/api';
 
-const AdminGst = ({ role = 'admin' }) => {
+const AdminGst = () => {
   const [formData, setFormData] = useState({
     tax_name: 'GST 18%',
     percentage: 18.00,
@@ -12,7 +12,6 @@ const AdminGst = ({ role = 'admin' }) => {
     sgst_percentage: 9.00,
     igst_percentage: 18.00
   });
-
 
   useEffect(() => {
     const fetchGst = async () => {
@@ -48,8 +47,7 @@ const AdminGst = ({ role = 'admin' }) => {
   };
 
   return (
-    <PortalLayout title="GST Tax Configuration" role={role}>
-
+    <PortalLayout title="GST Tax Configuration">
       <div className="max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
         <h3 className="text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
           <Percent className="w-6 h-6 text-cyan-400" />

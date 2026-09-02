@@ -5,14 +5,17 @@ echo          STARTING EASYXEROX LOCAL KIOSK SYSTEM
 echo ========================================================
 cd /d "%~dp0"
 
-echo [1/3] Starting Backend API Server (Port 5000)...
+echo [1/4] Starting Backend API Server (Port 5000)...
 start "EasyXerox Backend" /min node backend/src/server.js
 
-echo [2/3] Starting Print & USB Daemon Service...
+echo [2/4] Starting Print & USB Daemon Service...
 start "EasyXerox Print Daemon" /min node print-service/src/index.js
 
-echo [3/3] Starting Frontend Kiosk Web Server (Port 8501)...
+echo [3/4] Starting Frontend Kiosk Web Server (Port 8501)...
 start "EasyXerox Frontend" /min npm --prefix frontend run dev
+
+echo [4/4] Starting Standalone Super Admin Control Portal (Port 8502)...
+start "EasyXerox Admin" /min npm --prefix admin run dev
 
 timeout /t 5 /nobreak >nul
 
@@ -21,6 +24,7 @@ start msedge --kiosk http://localhost:8501/kiosk/KIOSK-001 --edge-kiosk-type=ful
 
 echo ========================================================
 echo EasyXerox Local Kiosk System is active!
-echo Kiosk Display: http://localhost:8501/kiosk/KIOSK-001
-echo Portal Login:  http://localhost:8501/login
+echo Website & Kiosk Display: http://localhost:8501/
+echo Client Partner Login:    http://localhost:8501/client/login
+echo Super Admin Portal:      http://localhost:8502/
 echo ========================================================

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart3, Download, Calendar, CheckSquare, Square, Send, DollarSign, ShieldCheck } from 'lucide-react';
+import { Send, ShieldCheck } from 'lucide-react';
 
-import PortalLayout from '../../components/PortalLayout';
-import api from '../../services/api';
+import PortalLayout from '../components/PortalLayout';
+import api from '../services/api';
 
 const AdminReports = () => {
   const [printJobs, setPrintJobs] = useState([]);
@@ -55,7 +55,7 @@ const AdminReports = () => {
   };
 
   return (
-    <PortalLayout title="Platform Revenue & Print History Reports" role="admin">
+    <PortalLayout title="Platform Revenue & Print History Reports">
       <div className="space-y-6">
         {/* SUMMARY & TRANSFER HEADER */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -93,7 +93,7 @@ const AdminReports = () => {
         </div>
 
         {successMsg && (
-          <div className="bg-emerald-950/80 border border-emerald-800 text-emerald-300 px-6 py-4 rounded-2xl flex items-center gap-3 font-semibold text-sm animate-fade-in">
+          <div className="bg-emerald-950/80 border border-emerald-800 text-emerald-300 px-6 py-4 rounded-2xl flex items-center gap-3 font-semibold text-sm">
             <ShieldCheck className="w-6 h-6 text-emerald-400" />
             <span>{successMsg}</span>
           </div>
@@ -174,4 +174,3 @@ const AdminReports = () => {
 };
 
 export default AdminReports;
-

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { History, Shield, Activity } from 'lucide-react';
+import { Activity } from 'lucide-react';
 
-import PortalLayout from '../../components/PortalLayout';
-import api from '../../services/api';
+import PortalLayout from '../components/PortalLayout';
+import api from '../services/api';
 
 const AdminLogs = () => {
   const [logs, setLogs] = useState([]);
@@ -20,7 +20,7 @@ const AdminLogs = () => {
   }, []);
 
   return (
-    <PortalLayout title="System Audit Logs" role="admin">
+    <PortalLayout title="System Audit Logs">
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
         <h3 className="text-xl font-bold text-white font-heading mb-4 flex items-center gap-2">
           <Activity className="w-5 h-5 text-cyan-400" />

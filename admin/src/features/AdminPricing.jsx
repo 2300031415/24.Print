@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { DollarSign, Save, Percent, Monitor } from 'lucide-react';
+import { DollarSign, Save, Monitor } from 'lucide-react';
 
-import PortalLayout from '../../components/PortalLayout';
-import api from '../../services/api';
+import PortalLayout from '../components/PortalLayout';
+import api from '../services/api';
 
-const AdminPricing = ({ role = 'admin' }) => {
+const AdminPricing = () => {
   const [machines, setMachines] = useState([]);
   const [selectedMachineId, setSelectedMachineId] = useState('all');
   const [formData, setFormData] = useState({
@@ -27,8 +27,7 @@ const AdminPricing = ({ role = 'admin' }) => {
       }
     };
     fetchMachines();
-  }, [role]);
-
+  }, []);
 
   const fetchPricing = async () => {
     try {
@@ -67,7 +66,7 @@ const AdminPricing = ({ role = 'admin' }) => {
   };
 
   return (
-    <PortalLayout title={role === 'admin' ? 'Global Print Pricing Rate Management' : 'My Kiosks Print Rates Configuration'} role={role}>
+    <PortalLayout title="Global Print Pricing Rate Management">
       <div className="max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
         <h3 className="text-xl font-bold text-white font-heading mb-6 flex items-center gap-2">
           <DollarSign className="w-6 h-6 text-cyan-400" />
@@ -164,4 +163,3 @@ const AdminPricing = ({ role = 'admin' }) => {
 };
 
 export default AdminPricing;
-

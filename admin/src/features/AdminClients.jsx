@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Users, Plus, Building, Phone, Mail, Percent, CheckCircle, AlertCircle, X, Edit, ShieldOff, ShieldCheck, Key, Trash2 } from 'lucide-react';
 
-import PortalLayout from '../../components/PortalLayout';
-import api from '../../services/api';
+import PortalLayout from '../components/PortalLayout';
+import api from '../services/api';
 
 const AdminClients = () => {
   const [clients, setClients] = useState([]);
@@ -90,9 +90,6 @@ const AdminClients = () => {
     }
   };
 
-
-
-
   const handleDeleteClient = async (client) => {
     if (!window.confirm(`Are you sure you want to delete client "${client.business_name}"? This will also remove their registered kiosk boards.`)) {
       return;
@@ -131,9 +128,8 @@ const AdminClients = () => {
     }
   };
 
-
   return (
-    <PortalLayout title="Client Owner Management" role="admin">
+    <PortalLayout title="Client Owner Management">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -170,7 +166,6 @@ const AdminClients = () => {
                 {clients.map((client) => {
                   const isSuspended = isClientSuspended(client);
                   return (
-
                     <tr key={client.id} className="hover:bg-slate-800/40 transition-all">
                       <td className="py-4 px-4 font-bold text-white flex items-center gap-2">
                         <Building className="w-4 h-4 text-cyan-400" />
@@ -235,7 +230,6 @@ const AdminClients = () => {
                           </button>
                         </div>
                       </td>
-
                     </tr>
                   );
                 })}
@@ -372,4 +366,3 @@ const AdminClients = () => {
 };
 
 export default AdminClients;
-

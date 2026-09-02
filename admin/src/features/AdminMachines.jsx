@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Monitor, Plus, QrCode, MapPin, Printer, Wifi, ShieldCheck, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
-import PortalLayout from '../../components/PortalLayout';
-import api from '../../services/api';
+import PortalLayout from '../components/PortalLayout';
+import api from '../services/api';
 
 const AdminMachines = () => {
   const [machines, setMachines] = useState([]);
@@ -58,7 +58,7 @@ const AdminMachines = () => {
 
   const handlePrintQr = () => {
     const printWindow = window.open('', '_blank');
-    const publicDomain = import.meta.env.VITE_PUBLIC_DOMAIN || 'https://dazzling-maamoul-fd985e.netlify.app';
+    const publicDomain = import.meta.env.VITE_PUBLIC_DOMAIN || 'http://localhost:8501';
     const qrUrl = `${publicDomain}/upload/${selectedQrMachine.machine_code}`;
     printWindow.document.write(`
       <html>
@@ -87,7 +87,7 @@ const AdminMachines = () => {
   };
 
   return (
-    <PortalLayout title="Kiosk Machine Registry & QR Generator" role="admin">
+    <PortalLayout title="Kiosk Machine Registry & QR Generator">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <p className="text-slate-400 text-sm">Register new Windows 11 Touch Kiosks and generate unique machine QR codes.</p>
@@ -163,7 +163,7 @@ const AdminMachines = () => {
 
             <div className="p-4 bg-white rounded-2xl inline-block shadow-2xl mb-4">
               <QRCodeSVG
-                value={`${import.meta.env.VITE_PUBLIC_DOMAIN || 'https://dazzling-maamoul-fd985e.netlify.app'}/upload/${selectedQrMachine.machine_code}`}
+                value={`${import.meta.env.VITE_PUBLIC_DOMAIN || 'http://localhost:8501'}/upload/${selectedQrMachine.machine_code}`}
                 size={200}
                 level="H"
                 includeMargin={true}
@@ -172,7 +172,7 @@ const AdminMachines = () => {
 
             <p className="text-xs text-slate-400 mb-4">
               Scan URL: <br />
-              <span className="text-cyan-300 font-mono text-[11px]">{import.meta.env.VITE_PUBLIC_DOMAIN || 'https://dazzling-maamoul-fd985e.netlify.app'}/upload/{selectedQrMachine.machine_code}</span>
+              <span className="text-cyan-300 font-mono text-[11px]">{import.meta.env.VITE_PUBLIC_DOMAIN || 'http://localhost:8501'}/upload/{selectedQrMachine.machine_code}</span>
             </p>
 
             <button
