@@ -59,7 +59,9 @@ const KioskPrintOptions = () => {
 
     const handleFileUploaded = (payload) => {
       console.log('⚡ Realtime PDF Upload Event Received on Print Options:', payload);
-      if (payload.uploadToken && payload.uploadToken !== uploadToken) {
+      const targetCode = payload.machineCode || payload.machineId;
+      const isMatch = !targetCode || targetCode === machineId || targetCode?.toUpperCase() === machineId?.toUpperCase();
+      if (isMatch && payload.uploadToken && payload.uploadToken !== uploadToken) {
         navigate(`/kiosk/${machineId}/preview/${payload.uploadToken}`);
       }
     };

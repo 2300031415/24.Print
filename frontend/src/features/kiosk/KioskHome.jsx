@@ -108,7 +108,11 @@ const KioskHome = () => {
 
     const handleFileUploaded = (payload) => {
       console.log('⚡ Realtime PDF Upload Event Received on Kiosk:', payload);
-      navigate(`/kiosk/${machineId}/preview/${payload.uploadToken}`);
+      const targetCode = payload.machineCode || payload.machineId;
+      const isMatch = !targetCode || targetCode === machineId || targetCode?.toUpperCase() === machineId?.toUpperCase();
+      if (isMatch && payload.uploadToken) {
+        navigate(`/kiosk/${machineId}/preview/${payload.uploadToken}`);
+      }
     };
 
     const handleMachineStatusChange = (data) => {
