@@ -68,7 +68,7 @@ const mockDb = {
         {
             id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
             machine_code: 'FFPVT_EasyXerox-001',
-            name: 'Connaught Place Kiosk #1',
+            name: 'FFPVT_EasyXerox-001',
             client_id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
             location_address: 'Metro Station Gate 2, Connaught Place',
             city: 'New Delhi',

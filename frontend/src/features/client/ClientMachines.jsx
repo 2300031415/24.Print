@@ -90,7 +90,7 @@ const ClientMachines = () => {
 
                 {/* MACHINE NAME & LOCATION */}
                 <div>
-                  <h3 className="text-xl font-black text-slate-950 font-heading">{machine.name}</h3>
+                  <h3 className="text-xl font-black text-slate-950 font-heading">{machine.machine_code || machine.name || 'FFPVT_EasyXerox-001'}</h3>
                   <p className="text-xs text-slate-700 font-bold flex items-center gap-1 mt-1">
                     <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                     <span>{machine.location_address || 'Registered Location'}</span>

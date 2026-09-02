@@ -12,7 +12,7 @@ const AdminMachines = () => {
   const [selectedQrMachine, setSelectedQrMachine] = useState(null);
 
   const [formData, setFormData] = useState({
-    machine_code: 'KIOSK-002',
+    machine_code: 'FFPVT_EasyXerox-002',
     name: 'Metro Station Entrance #2',
     client_id: '',
     location_address: 'Gate 2 Metro Complex',

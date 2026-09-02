@@ -156,7 +156,7 @@ const ClientAds = () => {
                         className="rounded accent-blue-600 w-4 h-4 cursor-pointer"
                       />
                       <MonitorCheck className="w-4 h-4 text-blue-600" />
-                      <span>{m.name} ({m.machine_code})</span>
+                      <span>{m.machine_code || m.name || 'FFPVT_EasyXerox-001'}</span>
                     </label>
                   ))}
                 </div>
