@@ -58,8 +58,8 @@ const MobileUpload = () => {
     setErrorMsg('');
 
     const formData = new FormData();
-    formData.append('file', selectedFile);
     formData.append('machineId', machineId);
+    formData.append('file', selectedFile);
 
     try {
       const res = await api.post('/uploads', formData, {

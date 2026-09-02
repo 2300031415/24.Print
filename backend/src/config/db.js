@@ -260,7 +260,7 @@ function handleMockQuery(text, params) {
     }
 
     // 4. SELECT Machine by Code
-    if (cleanText.includes('from machines') && (cleanText.includes('machine_code = $1') || cleanText.includes('m.id::text = $1'))) {
+    if (cleanText.includes('from machines') && (cleanText.includes('machine_code = $1') || cleanText.includes('m.id::text = $1') || cleanText.includes('id::text = $1'))) {
         const mCode = params[0];
         const machine = mockDb.machines.find(m => m.machine_code === mCode || m.id === mCode) || mockDb.machines[0];
         const client = machine ? (mockDb.clients.find(c => String(c.id) === String(machine.client_id)) || mockDb.clients[0]) : mockDb.clients[0];
