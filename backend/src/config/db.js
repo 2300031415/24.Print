@@ -233,7 +233,7 @@ function handleMockQuery(text, params) {
     }
 
     // 4. SELECT Machine by Code
-    if (cleanText.includes('from machines') && (cleanText.includes('machine_code = $1') || cleanText.includes('m.id::text = $1') || cleanText.includes('id::text = $1'))) {
+    if (cleanText.includes('from machines') && (cleanText.includes('machine_code') || cleanText.includes('id::text = $1'))) {
         const mCode = String(params[0] || '').trim().toLowerCase();
         const machine = mockDb.machines.find(m => m.machine_code.toLowerCase() === mCode || String(m.id).toLowerCase() === mCode);
         if (!machine) {
@@ -360,16 +360,29 @@ function handleMockQuery(text, params) {
     // 6b. UPDATE Pricing
     if (cleanText.includes('update pricing')) {
         let pObj = mockDb.pricing[0];
-        if (pObj) {
-            pObj.bw_single_page_price = parseFloat(params[0]) || pObj.bw_single_page_price;
-            pObj.color_single_page_price = parseFloat(params[1]) || pObj.color_single_page_price;
-            pObj.bw_duplex_page_price = parseFloat(params[2]) || pObj.bw_duplex_page_price;
-            pObj.color_duplex_page_price = parseFloat(params[3]) || pObj.color_duplex_page_price;
-            pObj.paper_size = params[4] || pObj.paper_size;
-            pObj.updated_at = new Date().toISOString();
+        if (!pObj) {
+            pObj = {
+                id: 'p_' + Date.now(),
+                machine_id: null,
+                bw_single_page_price: 2.00,
+                color_single_page_price: 10.00,
+                bw_duplex_page_price: 3.50,
+                color_duplex_page_price: 18.00,
+                paper_size: 'A4',
+                is_default: true,
+                created_at: new Date().toISOString()
+            };
+            mockDb.pricing.push(pObj);
         }
+        if (params[0] !== undefined) pObj.bw_single_page_price = parseFloat(params[0]);
+        if (params[1] !== undefined) pObj.color_single_page_price = parseFloat(params[1]);
+        if (params[2] !== undefined) pObj.bw_duplex_page_price = parseFloat(params[2]);
+        if (params[3] !== undefined) pObj.color_duplex_page_price = parseFloat(params[3]);
+        if (params[4]) pObj.paper_size = params[4];
+        pObj.updated_at = new Date().toISOString();
+
         persistDb();
-        return { rows: pObj ? [pObj] : [], rowCount: pObj ? 1 : 0 };
+        return { rows: [pObj], rowCount: 1 };
     }
 
     // 6c. INSERT Pricing
