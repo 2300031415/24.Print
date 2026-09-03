@@ -18,7 +18,7 @@ const uploadPdfHandler = async (req, res, next) => {
 
         // Verify target kiosk machine exists
         const machineRes = await db.query(
-            'SELECT id, machine_code, name FROM machines WHERE machine_code = $1 OR id::text = $1',
+            'SELECT id, machine_code, name FROM machines WHERE LOWER(machine_code) = LOWER($1) OR id::text = $1',
             [machineCode]
         );
 

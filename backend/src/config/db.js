@@ -234,8 +234,8 @@ function handleMockQuery(text, params) {
 
     // 4. SELECT Machine by Code
     if (cleanText.includes('from machines') && (cleanText.includes('machine_code = $1') || cleanText.includes('m.id::text = $1') || cleanText.includes('id::text = $1'))) {
-        const mCode = String(params[0] || '').trim();
-        const machine = mockDb.machines.find(m => m.machine_code === mCode || m.id === mCode);
+        const mCode = String(params[0] || '').trim().toLowerCase();
+        const machine = mockDb.machines.find(m => m.machine_code.toLowerCase() === mCode || String(m.id).toLowerCase() === mCode);
         if (!machine) {
             return { rows: [], rowCount: 0 };
         }
@@ -355,6 +355,39 @@ function handleMockQuery(text, params) {
     if (cleanText.includes('from pricing')) {
         const rows = mockDb.pricing;
         return { rows, rowCount: rows.length };
+    }
+
+    // 6b. UPDATE Pricing
+    if (cleanText.includes('update pricing')) {
+        let pObj = mockDb.pricing[0];
+        if (pObj) {
+            pObj.bw_single_page_price = parseFloat(params[0]) || pObj.bw_single_page_price;
+            pObj.color_single_page_price = parseFloat(params[1]) || pObj.color_single_page_price;
+            pObj.bw_duplex_page_price = parseFloat(params[2]) || pObj.bw_duplex_page_price;
+            pObj.color_duplex_page_price = parseFloat(params[3]) || pObj.color_duplex_page_price;
+            pObj.paper_size = params[4] || pObj.paper_size;
+            pObj.updated_at = new Date().toISOString();
+        }
+        persistDb();
+        return { rows: pObj ? [pObj] : [], rowCount: pObj ? 1 : 0 };
+    }
+
+    // 6c. INSERT Pricing
+    if (cleanText.includes('insert into pricing')) {
+        const pObj = {
+            id: 'p_' + Date.now(),
+            machine_id: params[0] || null,
+            bw_single_page_price: parseFloat(params[1]) || 2.00,
+            color_single_page_price: parseFloat(params[2]) || 10.00,
+            bw_duplex_page_price: parseFloat(params[3]) || 3.50,
+            color_duplex_page_price: parseFloat(params[4]) || 18.00,
+            paper_size: params[5] || 'A4',
+            is_default: true,
+            created_at: new Date().toISOString()
+        };
+        mockDb.pricing = [pObj];
+        persistDb();
+        return { rows: [pObj], rowCount: 1 };
     }
 
     // 7. SELECT GST
