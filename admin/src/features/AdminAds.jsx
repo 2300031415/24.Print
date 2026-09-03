@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Tv, CheckCircle, XCircle, Plus, Upload } from 'lucide-react';
+import { Tv, CheckCircle, XCircle, Plus, Upload, Monitor } from 'lucide-react';
 
 import PortalLayout from '../components/PortalLayout';
 import api from '../services/api';
 
 const AdminAds = () => {
   const [ads, setAds] = useState([]);
+  const [machines, setMachines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'pending' | 'approved' | 'rejected'
   
@@ -13,6 +14,7 @@ const AdminAds = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [title, setTitle] = useState('');
   const [file, setFile] = useState(null);
+  const [selectedMachines, setSelectedMachines] = useState([]); // ['all'] or array of machine IDs/codes
   const [uploading, setUploading] = useState(false);
 
   const getMediaUrl = (url) => {
@@ -40,9 +42,34 @@ const AdminAds = () => {
     }
   };
 
+  const fetchMachines = async () => {
+    try {
+      const res = await api.get('/machines');
+      if (res.data.success) setMachines(res.data.machines || []);
+    } catch (err) {
+      console.error('Error fetching machines for ad target:', err);
+    }
+  };
+
   useEffect(() => {
     fetchAds();
+    fetchMachines();
   }, []);
+
+  const handleToggleMachine = (mId) => {
+    if (mId === 'all') {
+      setSelectedMachines((prev) => (prev.includes('all') ? [] : ['all']));
+      return;
+    }
+    setSelectedMachines((prev) => {
+      const filtered = prev.filter((item) => item !== 'all');
+      if (filtered.includes(mId)) {
+        return filtered.filter((item) => item !== mId);
+      } else {
+        return [...filtered, mId];
+      }
+    });
+  };
 
   const handleStatusUpdate = async (id, status, reason = '') => {
     try {
@@ -62,6 +89,11 @@ const AdminAds = () => {
     formData.append('media', file);
     formData.append('title', title);
     formData.append('duration_seconds', 10);
+    
+    // Add target machine ids if specific boards selected
+    if (selectedMachines.length > 0 && !selectedMachines.includes('all')) {
+      formData.append('machine_ids', JSON.stringify(selectedMachines));
+    }
 
     try {
       const res = await api.post('/ads/upload', formData, {
@@ -70,6 +102,7 @@ const AdminAds = () => {
       if (res.data.success) {
         setTitle('');
         setFile(null);
+        setSelectedMachines([]);
         setShowUploadModal(false);
         fetchAds();
         alert('Advertisement created & approved successfully!');
@@ -157,48 +190,81 @@ const AdminAds = () => {
 
         {/* UPLOAD FORM MODAL / PANEL */}
         {showUploadModal && (
-          <div className="bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-2xl text-slate-950">
-            <h3 className="text-xl font-black text-slate-950 font-heading mb-4 flex items-center gap-2">
+          <div className="bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-2xl text-slate-950 space-y-5">
+            <h3 className="text-xl font-black text-slate-950 font-heading flex items-center gap-2">
               <Upload className="w-5 h-5 text-blue-600" />
               <span>Create System Advertisement</span>
             </h3>
 
-            <form onSubmit={handleAdminUploadAd} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-              <div>
-                <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Ad Title / Campaign Name</label>
-                <input
-                  type="text"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-xs text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
-                  placeholder="e.g. Festival Printing Offer 30% Off"
-                />
+            <form onSubmit={handleAdminUploadAd} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Ad Title / Campaign Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-xs text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
+                    placeholder="e.g. Festival Printing Offer 30% Off"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Media File (JPG, PNG, GIF, MP4)</label>
+                  <input
+                    type="file"
+                    required
+                    accept="image/*,video/mp4"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 text-xs text-slate-950 font-bold"
+                  />
+                </div>
               </div>
 
+              {/* TARGET KIOSK BOARD SELECTION */}
               <div>
-                <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Media File (JPG, PNG, GIF, MP4)</label>
-                <input
-                  type="file"
-                  required
-                  accept="image/*,video/mp4"
-                  onChange={(e) => setFile(e.target.files[0])}
-                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 text-xs text-slate-950 font-bold"
-                />
+                <label className="text-xs font-black text-blue-700 uppercase tracking-wider flex items-center gap-1 mb-2">
+                  <Monitor className="w-4 h-4 text-blue-600" />
+                  <span>Target Kiosk Board Selection (Single Board or All Boards)</span>
+                </label>
+                <div className="flex flex-wrap items-center gap-3 bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
+                  <label className="flex items-center gap-2 cursor-pointer bg-white px-4 py-2.5 rounded-xl border border-slate-300 hover:border-blue-500 shadow-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedMachines.includes('all') || selectedMachines.length === 0}
+                      onChange={() => handleToggleMachine('all')}
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-xs font-black text-slate-900">All Kiosk Boards (System Wide)</span>
+                  </label>
+
+                  {machines.map((m) => (
+                    <label key={m.id} className="flex items-center gap-2 cursor-pointer bg-white px-4 py-2.5 rounded-xl border border-slate-300 hover:border-blue-500 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={selectedMachines.includes(m.id) || selectedMachines.includes(m.machine_code)}
+                        onChange={() => handleToggleMachine(m.id)}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-xs font-black text-slate-900">{m.machine_code} ({m.business_name || m.name || 'Kiosk Board'})</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 pt-2">
                 <button
                   type="submit"
                   disabled={uploading}
-                  className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs transition-all shadow-md btn-touch"
+                  className="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs transition-all shadow-md btn-touch"
                 >
                   {uploading ? 'Uploading...' : 'Upload & Approve'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-xl text-xs"
+                  className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-xl text-xs"
                 >
                   Cancel
                 </button>
@@ -234,8 +300,14 @@ const AdminAds = () => {
                   <p className="text-xs text-slate-600 font-bold mt-1">
                     Submitted by: <span className="text-slate-950 font-black">{ad.client_name || 'System Admin'}</span>
                   </p>
-                  <p className="text-xs text-slate-600 font-bold">
+                  <p className="text-xs text-slate-600 font-bold mt-0.5">
                     Duration: <span className="text-blue-700 font-mono font-black">{ad.duration_seconds || 10} seconds</span>
+                  </p>
+                  <p className="text-xs text-slate-600 font-bold mt-1.5 flex items-center gap-1.5">
+                    <span>Target Board(s):</span>
+                    <span className="px-2.5 py-0.5 bg-blue-100 text-blue-950 font-mono font-black text-[11px] rounded-md border border-blue-300">
+                      {ad.target_machines || ad.target_kiosk_code || 'All Kiosk Boards'}
+                    </span>
                   </p>
                 </div>
 

@@ -24,10 +24,28 @@ const getAds = async (req, res, next) => {
             params.push(clientId);
         }
 
-        queryStr += ` ORDER BY a.created_at DESC`;
-
         const result = await db.query(queryStr, params);
-        res.json({ success: true, ads: result.rows });
+
+        const adsWithMachines = await Promise.all((result.rows || []).map(async (ad) => {
+            try {
+                const maRes = await db.query(
+                    `SELECT m.machine_code, m.name 
+                     FROM machine_ads ma 
+                     JOIN machines m ON ma.machine_id = m.id OR ma.machine_id = m.machine_code 
+                     WHERE ma.advertisement_id::text = $1::text`,
+                    [ad.id]
+                );
+                const codes = (maRes && maRes.rows) ? maRes.rows.map(m => m.machine_code || m.name) : [];
+                return {
+                    ...ad,
+                    target_machines: codes.length > 0 ? codes.join(', ') : 'All Kiosk Boards'
+                };
+            } catch (e) {
+                return { ...ad, target_machines: 'All Kiosk Boards' };
+            }
+        }));
+
+        res.json({ success: true, ads: adsWithMachines });
     } catch (err) {
         next(err);
     }

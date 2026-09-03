@@ -464,6 +464,18 @@ function handleMockQuery(text, params) {
             persistDb();
         }
         return { rows: [], rowCount: 1 };
+    // 8c2. SELECT Machine Ads Mapping for Advertisement
+    if (cleanText.includes('from machine_ads') && cleanText.includes('join machines')) {
+        const adId = String(params[0] || '').trim();
+        const mappings = mockDb.machine_ads.filter(ma => String(ma.advertisement_id) === adId);
+        const rows = mappings.map(ma => {
+            const m = mockDb.machines.find(mObj => String(mObj.id) === String(ma.machine_id) || mObj.machine_code === ma.machine_id);
+            return {
+                machine_code: m ? m.machine_code : 'All Boards',
+                name: m ? m.name : 'All Boards'
+            };
+        });
+        return { rows, rowCount: rows.length };
     }
 
     // 8d. DELETE Advertisement

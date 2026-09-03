@@ -199,6 +199,12 @@ const ClientAds = () => {
                     <div className="overflow-hidden">
                       <h4 className="font-black text-slate-950 text-base truncate">{ad.title}</h4>
                       <p className="text-xs text-slate-600 font-bold mt-1">Rotation Duration: {ad.duration_seconds || 10}s</p>
+                      <p className="text-xs text-slate-600 font-bold mt-1 flex items-center gap-1">
+                        <span>Target Board(s):</span>
+                        <span className="px-2.5 py-0.5 bg-blue-100 text-blue-950 font-mono font-black text-[11px] rounded border border-blue-300">
+                          {ad.target_machines || ad.target_kiosk_code || 'All Kiosk Boards'}
+                        </span>
+                      </p>
                       <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm">
                         Live Broadcasting
                       </span>

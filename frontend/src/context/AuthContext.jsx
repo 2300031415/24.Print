@@ -4,7 +4,14 @@ import api from '../services/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,12 +23,12 @@ export const AuthProvider = ({ children }) => {
       }
       try {
         const res = await api.get('/auth/me');
-        if (res.data.success) {
+        if (res.data.success && res.data.user) {
           setUser(res.data.user);
+          localStorage.setItem('user', JSON.stringify(res.data.user));
         }
       } catch (err) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        console.warn('Background auth check failed, retaining session state:', err.message);
       } finally {
         setLoading(false);
       }
@@ -31,9 +38,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
-    if (res.data.success) {
+    if (res.data.success && res.data.user) {
       localStorage.setItem('accessToken', res.data.accessToken);
       localStorage.setItem('refreshToken', res.data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
       setUser(res.data.user);
     }
     return res.data;
@@ -42,6 +50,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
     setUser(null);
   };
 
@@ -53,3 +62,5 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+export default AuthContext;
