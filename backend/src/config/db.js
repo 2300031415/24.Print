@@ -196,16 +196,15 @@ function handleMockQuery(text, params) {
 
 
     // 1. SELECT Users by Email
-    if (cleanText.includes('from users') && (cleanText.includes('u.email = $1') || cleanText.includes('email = $1'))) {
+    if (cleanText.includes('from users') && cleanText.includes('email')) {
         const email = (params[0] || '').toLowerCase().trim();
         const user = mockDb.users.find(u => u.email.toLowerCase() === email);
-        let client = user ? mockDb.clients.find(c => c.user_id === user.id || c.email === email) : null;
-        if (!client && user && user.role === 'client') client = mockDb.clients[0];
+        let client = user ? mockDb.clients.find(c => String(c.user_id) === String(user.id) || (c.email && c.email.toLowerCase() === email)) : null;
         const rows = user ? [{
             ...user,
-            client_id: client ? client.id : (user.role === 'client' ? 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33' : null),
-            business_name: client ? client.business_name : (user.role === 'client' ? 'Metro Xerox & Print Zone' : null),
-            client_status: client ? client.status : (user.role === 'client' ? 'active' : 'active')
+            client_id: client ? client.id : null,
+            business_name: client ? client.business_name : null,
+            client_status: client ? client.status : 'active'
         }] : [];
         return { rows, rowCount: rows.length };
     }
@@ -267,8 +266,15 @@ function handleMockQuery(text, params) {
 
         // Restrict to client's machines when client filter is present in query
         if ((cleanText.includes('m.client_id') || cleanText.includes('c.user_id')) && params.length > 0) {
-            const targetId = String(params[0]).trim();
-            rows = rows.filter(m => String(m.client_id) === targetId || String(m.client_user_id) === targetId);
+            const targetId = String(params[0] || '').trim();
+            const matchingClientIds = mockDb.clients
+                .filter(c => String(c.id) === targetId || String(c.user_id) === targetId)
+                .map(c => String(c.id));
+            rows = rows.filter(m => 
+                String(m.client_id) === targetId || 
+                matchingClientIds.includes(String(m.client_id)) || 
+                String(m.client_user_id) === targetId
+            );
         }
 
         return { rows, rowCount: rows.length };
@@ -749,13 +755,21 @@ function handleMockQuery(text, params) {
     }
 
     // 20. Admin / Client Dashboard Summaries
-    if (cleanText.includes('count(*) from clients') || cleanText.includes('sum(amount)')) {
+    if (cleanText.includes('count(') || cleanText.includes('sum(amount)')) {
+        const totalClients = mockDb.clients.filter(c => c.status === 'active' || !c.status).length;
+        const totalMachines = mockDb.machines.length;
+        const onlineMachines = mockDb.machines.filter(m => m.status === 'online').length;
         const totalRev = mockDb.payments.filter(p => p.status === 'captured').reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
         const totalPages = mockDb.print_jobs.filter(pj => pj.status === 'completed').reduce((sum, pj) => sum + ((pj.total_pages || 1) * (pj.copies || 1)), 0);
-        const onlineMachines = mockDb.machines.filter(m => m.status === 'online').length;
+        const pendingAds = mockDb.advertisements.filter(a => a.status === 'pending').length;
+
+        const countVal = cleanText.includes('from clients')
+            ? totalClients
+            : (cleanText.includes('advertisements') ? pendingAds : totalMachines);
+
         return {
             rows: [{
-                count: String(mockDb.clients.length),
+                count: String(countVal),
                 online_count: String(onlineMachines),
                 total: String(totalRev),
                 today: '0',
