@@ -225,8 +225,12 @@ function handleMockQuery(text, params) {
         }
         const client = mockDb.clients.find(c => String(c.id) === String(machine.client_id) || String(c.user_id) === String(machine.client_id));
         const isClientSuspended = client && (client.status === 'suspended' || client.status === 'inactive' || client.status === 'disabled');
+        const pName = (!machine.default_printer_name || machine.default_printer_name.includes('Brother')) ? 'No Active Printer Connected' : machine.default_printer_name;
+        const pStatus = (pName === 'No Active Printer Connected') ? 'disconnected' : (machine.printer_status || 'offline');
         const rows = [{
             ...machine,
+            default_printer_name: pName,
+            printer_status: pStatus,
             status: isClientSuspended ? 'maintenance' : machine.status,
             business_name: client ? client.business_name : 'Unassigned Partner',
             client_status: client ? client.status : 'active'
@@ -239,8 +243,12 @@ function handleMockQuery(text, params) {
         let rows = mockDb.machines.map(m => {
             const client = mockDb.clients.find(c => String(c.id) === String(m.client_id) || String(c.user_id) === String(m.client_id));
             const isClientSuspended = client && (client.status === 'suspended' || client.status === 'inactive' || client.status === 'disabled');
+            const pName = (!m.default_printer_name || m.default_printer_name.includes('Brother')) ? 'No Active Printer Connected' : m.default_printer_name;
+            const pStatus = (pName === 'No Active Printer Connected') ? 'disconnected' : (m.printer_status || 'offline');
             return {
                 ...m,
+                default_printer_name: pName,
+                printer_status: pStatus,
                 status: isClientSuspended ? 'maintenance' : m.status,
                 client_name: client ? client.business_name : 'Unassigned Client',
                 client_user_id: client ? client.user_id : null,

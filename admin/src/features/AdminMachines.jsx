@@ -155,7 +155,7 @@ const AdminMachines = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Default Printer</span>
-                    <span className="text-blue-700 font-mono font-bold">{machine.default_printer_name || 'Auto-Detecting Printer...'}</span>
+                    <span className="text-blue-700 font-mono font-bold">{machine.default_printer_name || 'No Active Printer Connected'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Printed Jobs</span>

@@ -131,11 +131,14 @@ const ClientMachines = () => {
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 font-bold">
                   <div className="flex justify-between">
                     <span className="text-slate-600">Printer Hardware Status</span>
-                    <span className="text-emerald-700 font-black capitalize">{machine.printer_status || 'ready'}</span>
+                    <span className={`font-black capitalize ${
+                      machine.printer_status === 'ready' ? 'text-emerald-700' :
+                      machine.printer_status === 'paper_out' ? 'text-rose-600' : 'text-amber-600'
+                    }`}>{machine.printer_status || 'Disconnected'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Printer Model</span>
-                    <span className="text-slate-950 font-mono font-black">{machine.default_printer_name || 'Auto-Detecting Printer...'}</span>
+                    <span className="text-slate-950 font-mono font-black">{machine.default_printer_name || 'No Active Printer Connected'}</span>
                   </div>
                 </div>
               </div>
