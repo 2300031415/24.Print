@@ -149,9 +149,6 @@ const loadPersistedDb = () => {
         console.warn('Could not load persisted mockDb:', e.message);
     }
 };
-        console.warn('Could not reset mockDb:', e.message);
-    }
-};
 
 loadPersistedDb();
 
@@ -249,7 +246,7 @@ function handleMockQuery(text, params) {
     }
 
     // 4. SELECT Machine by Code
-    if (cleanText.includes('from machines') && (cleanText.includes('machine_code') || cleanText.includes('id::text = $1'))) {
+    if (cleanText.includes('from machines') && (cleanText.includes('lower(machine_code)') || cleanText.includes('m.machine_code = $1') || cleanText.includes('machines/code'))) {
         const mCode = String(params[0] || '').trim().toLowerCase();
         const machine = mockDb.machines.find(m => m.machine_code.toLowerCase() === mCode || String(m.id).toLowerCase() === mCode);
         if (!machine) {
