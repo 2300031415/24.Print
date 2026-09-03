@@ -365,14 +365,20 @@ function handleMockQuery(text, params) {
 
     // 8. SELECT Ads
     if (cleanText.includes('from advertisements')) {
-        // INNER JOIN with machine_ads: only return ads assigned to this specific machine
-        if (cleanText.includes('inner join machine_ads') || cleanText.includes('join machine_ads')) {
-            const machineId = String(params[0] || '').trim();
+        // INNER/LEFT JOIN with machine_ads: return active/approved ads assigned to this machine or client
+        if (cleanText.includes('join machine_ads')) {
+            const targetMachineId = String(params[0] || '').trim();
+            const targetClientId = String(params[1] || '').trim();
+
             const assignedAdIds = mockDb.machine_ads
-                .filter(ma => String(ma.machine_id) === machineId)
+                .filter(ma => String(ma.machine_id) === targetMachineId)
                 .map(ma => String(ma.advertisement_id));
+
             const rows = mockDb.advertisements
-                .filter(a => assignedAdIds.includes(String(a.id)) && a.status === 'approved');
+                .filter(a => 
+                    (assignedAdIds.includes(String(a.id)) || (targetClientId && String(a.client_id) === targetClientId)) &&
+                    (a.status === 'approved' || a.status === 'active' || !a.status)
+                );
             return { rows, rowCount: rows.length };
         }
         // Filter by client if client_id = $1 is present in query
@@ -380,11 +386,11 @@ function handleMockQuery(text, params) {
             const targetClientId = String(params[0]).trim();
             const rows = mockDb.advertisements
                 .filter(a => String(a.client_id) === targetClientId)
-                .map(a => ({ ...a, client_name: 'Metro Xerox Zone' }));
+                .map(a => ({ ...a, client_name: 'Partner Client' }));
             return { rows, rowCount: rows.length };
         }
         // Default: return all ads (for superadmin)
-        const rows = mockDb.advertisements.map(a => ({ ...a, client_name: 'Metro Xerox Zone' }));
+        const rows = mockDb.advertisements.map(a => ({ ...a, client_name: 'Partner Client' }));
         return { rows, rowCount: rows.length };
     }
 

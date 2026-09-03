@@ -230,23 +230,25 @@ const getMachineAds = async (req, res, next) => {
     try {
         const { machineCode } = req.params;
 
-        const mRes = await db.query('SELECT id FROM machines WHERE machine_code = $1 OR id::text = $1', [machineCode]);
+        const mRes = await db.query('SELECT id, client_id FROM machines WHERE machine_code = $1 OR id::text = $1', [machineCode]);
         if (mRes.rows.length === 0) {
             return res.json({ success: true, ads: [] });
         }
 
         const machineId = mRes.rows[0].id;
+        const clientId = mRes.rows[0].client_id;
 
         const result = await db.query(
-            `SELECT a.* 
+            `SELECT DISTINCT a.* 
              FROM advertisements a
-             JOIN machine_ads ma ON a.id = ma.advertisement_id
-             WHERE ma.machine_id = $1 AND a.status = 'approved'
+             LEFT JOIN machine_ads ma ON a.id = ma.advertisement_id
+             WHERE (ma.machine_id::text = $1::text OR a.client_id::text = $2::text)
+               AND a.status IN ('active', 'approved')
              ORDER BY a.created_at DESC`,
-            [machineId]
+            [machineId, clientId]
         );
 
-        res.json({ success: true, ads: [] });
+        res.json({ success: true, ads: result.rows || [] });
     } catch (err) {
         next(err);
     }
