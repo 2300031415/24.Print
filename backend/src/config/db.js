@@ -69,36 +69,7 @@ const mockDb = {
     uploads: [],
     payments: [],
     transactions: [],
-    print_jobs: [
-        {
-            id: 'job_101928371',
-            machine_id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
-            machine_code: 'KIOSK-001',
-            upload_id: 'upl_sample1',
-            original_filename: 'Aadhaar_Card_Copy.pdf',
-            copies: 2,
-            color_mode: 'bw',
-            duplex_mode: 'single',
-            total_pages: 1,
-            total_amount: '4.00',
-            status: 'completed',
-            created_at: new Date(Date.now() - 3600000).toISOString()
-        },
-        {
-            id: 'job_101928372',
-            machine_id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
-            machine_code: 'KIOSK-001',
-            upload_id: 'upl_sample2',
-            original_filename: 'College_Project_Report.pdf',
-            copies: 1,
-            color_mode: 'color',
-            duplex_mode: 'duplex',
-            total_pages: 15,
-            total_amount: '150.00',
-            status: 'completed',
-            created_at: new Date(Date.now() - 7200000).toISOString()
-        }
-    ],
+    print_jobs: [],
 
     activity_logs: [],
     notifications: [],
