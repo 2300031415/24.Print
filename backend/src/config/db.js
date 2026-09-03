@@ -194,6 +194,32 @@ const query = async (text, params = []) => {
 function handleMockQuery(text, params) {
     const cleanText = text.trim().toLowerCase().replace(/\s+/g, ' ');
 
+    // 0. Dashboard Aggregation Queries (COUNT / SUM)
+    if ((cleanText.includes('select count(') || cleanText.includes('select coalesce(sum(')) && !cleanText.includes('select m.*')) {
+        const totalClients = mockDb.clients.filter(c => c.status === 'active' || !c.status).length;
+        const totalMachines = mockDb.machines.length;
+        const onlineMachines = mockDb.machines.filter(m => m.status === 'online').length;
+        const totalRev = mockDb.payments.filter(p => p.status === 'captured').reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+        const totalPages = mockDb.print_jobs.filter(pj => pj.status === 'completed').reduce((sum, pj) => sum + ((pj.total_pages || 1) * (pj.copies || 1)), 0);
+        const pendingAds = mockDb.advertisements.filter(a => a.status === 'pending').length;
+
+        const countVal = cleanText.includes('from clients')
+            ? totalClients
+            : (cleanText.includes('advertisements') ? pendingAds : totalMachines);
+
+        return {
+            rows: [{
+                count: String(countVal),
+                online_count: String(onlineMachines),
+                total: String(totalRev),
+                today: '0',
+                pages: String(totalPages),
+                month: String(totalRev)
+            }],
+            rowCount: 1
+        };
+    }
+
 
     // 1. SELECT Users by Email
     if (cleanText.includes('from users') && cleanText.includes('email')) {
