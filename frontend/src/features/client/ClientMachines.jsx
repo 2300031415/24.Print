@@ -135,7 +135,7 @@ const ClientMachines = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Printer Model</span>
-                    <span className="text-slate-950 font-mono font-black">{machine.default_printer_name || 'Brother DCP-T820DW Printer'}</span>
+                    <span className="text-slate-950 font-mono font-black">{machine.default_printer_name || 'Auto-Detecting Printer...'}</span>
                   </div>
                 </div>
               </div>

@@ -58,7 +58,9 @@ const MobileUpload = () => {
     setErrorMsg('');
 
     const formData = new FormData();
+    formData.append('machineCode', machineId);
     formData.append('machineId', machineId);
+    formData.append('uploadToken', `upl_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`);
     formData.append('file', selectedFile);
 
     try {

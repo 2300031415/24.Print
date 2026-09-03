@@ -129,7 +129,7 @@ const createMachine = async (req, res, next) => {
                 state || '',
                 pincode || '',
                 qrCodeBase64,
-                default_printer_name || 'Brother DCP-T820DW Printer',
+                default_printer_name || 'Auto-Detecting Printer...',
                 razorpay_key_id || null,
                 razorpay_key_secret || null
             ]

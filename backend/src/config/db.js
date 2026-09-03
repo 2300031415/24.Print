@@ -564,7 +564,7 @@ function handleMockQuery(text, params) {
             original_filename: upload?.original_filename || 'document.pdf',
             machine_code: machine ? machine.machine_code : 'KIOSK-001',
             client_id: machine ? machine.client_id : 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
-            default_printer_name: machine ? machine.default_printer_name : 'Brother DCP-T820DW Printer'
+            default_printer_name: machine ? machine.default_printer_name : 'Auto-Detecting Printer...'
         }] : [];
         return { rows, rowCount: rows.length };
     }
@@ -599,7 +599,7 @@ function handleMockQuery(text, params) {
             machine_id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
             upload_id: 'upl_sample',
             payment_id: 'pay_sample',
-            printer_name: 'Brother DCP-T820DW Printer',
+            printer_name: 'Auto-Detecting Printer...',
 
             copies: 1,
             color_mode: 'bw',
@@ -713,7 +713,7 @@ function handleMockQuery(text, params) {
             state: params[5] || '',
             pincode: params[6] || '',
             qr_code_url: params[7] || '',
-            default_printer_name: params[8] || 'Brother DCP-T820DW Printer',
+            default_printer_name: params[8] || 'Auto-Detecting Printer...',
             razorpay_key_id: params[9] || null,
             razorpay_key_secret: params[10] || null,
             status: 'online',

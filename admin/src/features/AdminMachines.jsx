@@ -19,7 +19,7 @@ const AdminMachines = () => {
     city: 'New Delhi',
     state: 'Delhi',
     pincode: '110001',
-    default_printer_name: 'Brother DCP-T820DW Printer'
+    default_printer_name: 'Auto-Detecting Printer...'
   });
 
   const openRegisterModal = () => {
@@ -33,7 +33,7 @@ const AdminMachines = () => {
       city: 'New Delhi',
       state: 'Delhi',
       pincode: '110001',
-      default_printer_name: 'Brother DCP-T820DW Printer'
+      default_printer_name: 'Auto-Detecting Printer...'
     });
     setShowModal(true);
   };
@@ -155,7 +155,7 @@ const AdminMachines = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Default Printer</span>
-                    <span className="text-blue-700 font-mono">{machine.default_printer_name || 'Brother DCP-T820DW Printer'}</span>
+                    <span className="text-blue-700 font-mono font-bold">{machine.default_printer_name || 'Auto-Detecting Printer...'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Printed Jobs</span>

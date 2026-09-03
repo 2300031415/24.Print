@@ -440,9 +440,9 @@ const KioskHome = () => {
             </main>
 
             {/* FOOTER BAR */}
-            <footer className="relative z-10 flex items-center justify-between text-xs text-[#0066FF] font-semibold border-t border-[#0066FF]/20 pt-4">
-              <p>© 2026 EasyXerox Commercial Kiosks. All rights reserved.</p>
-              <div className="flex items-center gap-4 text-[#0066FF]/80">
+            <footer className="relative z-10 flex flex-wrap items-center justify-between gap-2 text-xs text-[#0066FF] font-semibold border-t border-[#0066FF]/20 pt-3 pb-1">
+              <p className="text-[11px] sm:text-xs">© 2026 EasyXerox Commercial Kiosks. All rights reserved.</p>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[#0066FF]/90 text-[11px] sm:text-xs font-bold">
                 <span>Max File Upload: 100MB</span>
                 <span>•</span>
                 <span>Formats: PDF, Word, Images, Text</span>

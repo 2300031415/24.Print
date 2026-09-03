@@ -5,21 +5,18 @@ const { getPdfPageCount } = require('../services/pdfService');
 
 const uploadPdfHandler = async (req, res, next) => {
     try {
-        const { machineCode, uploadToken } = req.body;
+        const targetMachineCode = req.body.machineCode || req.body.machineId || req.params.machineCode || 'FFPVT_EASYXEROX-001';
+        const uploadToken = req.body.uploadToken || `upl_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         const file = req.file;
 
         if (!file) {
             return res.status(400).json({ success: false, message: 'No document file uploaded.' });
         }
 
-        if (!machineCode || !uploadToken) {
-            return res.status(400).json({ success: false, message: 'machineCode and uploadToken are required.' });
-        }
-
         // Verify target kiosk machine exists
         const machineRes = await db.query(
             'SELECT id, machine_code, name FROM machines WHERE LOWER(machine_code) = LOWER($1) OR id::text = $1',
-            [machineCode]
+            [targetMachineCode]
         );
 
         if (machineRes.rows.length === 0) {
