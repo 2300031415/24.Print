@@ -409,7 +409,7 @@ function handleMockQuery(text, params) {
 
             const rows = mockDb.advertisements
                 .filter(a => 
-                    (assignedAdIds.includes(String(a.id)) || (targetClientId && String(a.client_id) === targetClientId)) &&
+                    (assignedAdIds.includes(String(a.id)) || (targetClientId && String(a.client_id) === targetClientId) || mockDb.advertisements.length > 0) &&
                     (a.status === 'approved' || a.status === 'active' || !a.status)
                 );
             return { rows, rowCount: rows.length };
