@@ -132,32 +132,23 @@ const persistDb = () => {
 const loadPersistedDb = () => {
     try {
         if (fs.existsSync(PERSIST_FILE)) {
-            try { fs.unlinkSync(PERSIST_FILE); } catch(e){}
+            const fileData = fs.readFileSync(PERSIST_FILE, 'utf8');
+            const data = JSON.parse(fileData);
+            if (data.advertisements) mockDb.advertisements = data.advertisements;
+            if (data.machine_ads) mockDb.machine_ads = data.machine_ads;
+            if (data.clients) mockDb.clients = data.clients;
+            if (data.users) mockDb.users = data.users;
+            if (data.machines) mockDb.machines = data.machines;
+            if (data.pricing) mockDb.pricing = data.pricing;
+            if (data.gst) mockDb.gst = data.gst;
+            console.log(`✅ Loaded persisted database: ${mockDb.clients.length} clients, ${mockDb.machines.length} machines, ${mockDb.users.length} users.`);
+            return;
         }
-        mockDb.clients = [];
-        mockDb.machines = [];
-        mockDb.print_jobs = [];
-        mockDb.uploads = [];
-        mockDb.payments = [];
-        mockDb.transactions = [];
-        mockDb.advertisements = [];
-        mockDb.machine_ads = [];
-        mockDb.users = [
-            {
-                id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-                email: 'easyxerox@gmail.com',
-                password_hash: ADMIN_HASH,
-                full_name: 'EasyXerox Super Admin',
-                phone: '+919876543210',
-                role: 'admin',
-                status: 'active',
-                refresh_token: null,
-                created_at: new Date().toISOString()
-            }
-        ];
         persistDb();
-        console.log('✅ Clean database initialized: 0 clients, 0 machines, 0 print jobs, 1 Super Admin (easyxerox@gmail.com).');
     } catch (e) {
+        console.warn('Could not load persisted mockDb:', e.message);
+    }
+};
         console.warn('Could not reset mockDb:', e.message);
     }
 };
