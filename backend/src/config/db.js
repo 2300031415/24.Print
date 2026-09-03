@@ -464,6 +464,8 @@ function handleMockQuery(text, params) {
             persistDb();
         }
         return { rows: [], rowCount: 1 };
+    }
+
     // 8c2. SELECT Machine Ads Mapping for Advertisement
     if (cleanText.includes('from machine_ads') && cleanText.includes('join machines')) {
         const adId = String(params[0] || '').trim();
