@@ -234,7 +234,7 @@ export default function AboutPage({ onOpenFranchise }) {
               </p>
               <div className="flex items-center justify-center gap-2">
                 <a 
-                  href="https://www.linkedin.com/company/future-forbes-pvt-ltd/"
+                  href="https://www.linkedin.com/company/easy-xerox/"
                   target="_blank"
                   rel="noreferrer"
                   title="Connect on LinkedIn"

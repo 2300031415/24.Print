@@ -153,7 +153,7 @@ export default function ContactPage() {
 
               {/* LinkedIn */}
               <a 
-                href="https://www.linkedin.com/company/future-forbes-pvt-ltd/"
+                href="https://www.linkedin.com/company/easy-xerox/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 p-2 rounded-xl border border-gray-200 hover:border-[#0A66C2] hover:bg-blue-50/40 text-gray-800 transition-all group"

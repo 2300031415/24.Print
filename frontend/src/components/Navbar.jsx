@@ -234,7 +234,7 @@ export default function Navbar({ activePage, setActivePage, onOpenPrintModal }) 
                   </svg>
                 </a>
                 <a 
-                  href="https://www.linkedin.com/company/future-forbes-pvt-ltd/" 
+                  href="https://www.linkedin.com/company/easy-xerox/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="p-2 rounded-lg bg-gray-50 text-gray-700 hover:text-[#0A66C2] hover:bg-blue-50 transition-colors"
