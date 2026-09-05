@@ -35,21 +35,17 @@ export default function Navbar({ activePage, setActivePage, onOpenPrintModal }) 
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
           {/* Brand Logo & Future Forbes Attribution */}
-          <div className="flex items-center space-x-3 flex-shrink-0">
+          <div className="flex items-center space-x-3.5 flex-shrink-0">
             <button
               onClick={() => handleNavClick('home')}
-              className="flex items-center space-x-2.5 group focus:outline-none"
+              className="flex items-center space-x-2 group focus:outline-none"
             >
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#0C3D97] flex items-center justify-center text-white font-black text-lg shadow-sm group-hover:bg-[#082e75] transition-colors">
-                <span className="leading-none">E</span>
-              </div>
-              <div className="flex flex-col items-start text-left">
-                <div className="flex items-baseline font-bold text-xl sm:text-2xl tracking-tight text-gray-900 leading-none">
-                  <span className="text-[#0C3D97]">Easy</span>
-                  <span className="text-gray-900">Xerox</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0C3D97] ml-0.5"></span>
-                </div>
-                <span className="text-[9px] font-extrabold text-blue-900 tracking-wider uppercase mt-0.5 hidden sm:block">
+              <img src="/logo.png" alt="EasyXerox" className="h-10 sm:h-12 w-auto object-contain group-hover:scale-105 transition-transform" />
+              <div className="flex flex-col items-start text-left border-l border-gray-200 pl-2.5">
+                <span className="text-[10px] font-black text-[#0C3D97] tracking-wider uppercase leading-tight">
+                  EasyXerox
+                </span>
+                <span className="text-[9px] font-bold text-slate-500 tracking-wide uppercase leading-tight">
                   By Future Forbes Pvt Ltd
                 </span>
               </div>

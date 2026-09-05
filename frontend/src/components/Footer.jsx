@@ -13,15 +13,8 @@ export default function Footer({ setActivePage, onOpenPrintModal }) {
           {/* Col 1: Brand & Tagline */}
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-[#0C3D97] flex items-center justify-center text-white font-black text-lg shadow-sm">
-                  <span>E</span>
-                </div>
-                <span className="font-extrabold text-2xl tracking-tight text-gray-900">
-                  <span className="text-[#0C3D97]">Easy</span>Xerox
-                </span>
-              </div>
-              <div className="h-6 w-px bg-gray-200" />
+              <img src="/logo.png" alt="EasyXerox" className="h-12 w-auto object-contain" />
+              <div className="h-7 w-px bg-gray-200" />
               <img src="/future-forbes-logo.png" alt="Future Forbes Pvt Ltd" className="h-8 w-auto object-contain rounded" />
             </div>
 
