@@ -50,7 +50,7 @@ CREATE TABLE clients (
 -- 3. MACHINES TABLE
 CREATE TABLE machines (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    machine_code VARCHAR(50) UNIQUE NOT NULL, -- e.g. KIOSK-001
+    machine_code VARCHAR(50) UNIQUE NOT NULL, -- e.g. FFPVT_EasyXerox-001
     name VARCHAR(150) NOT NULL,
     client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
     location_address TEXT NOT NULL,

@@ -9,7 +9,7 @@ import { useSocket } from '../../context/SocketContext';
 import USBDriveModal from './USBDriveModal';
 
 const KioskHome = () => {
-  const { machineId = 'KIOSK-001' } = useParams();
+  const { machineId = 'FFPVT_EasyXerox-001' } = useParams();
   const navigate = useNavigate();
   const { socket, isConnected } = useSocket();
 
@@ -19,30 +19,35 @@ const KioskHome = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [printerStatus, setPrinterStatus] = useState('ready');
 
-  // Kiosk Mode State: 'standby_ad' (Full-screen ad) vs 'qr_interactive' (QR Scan screen)
-  const [kioskState, setKioskState] = useState('standby_ad');
+  // Default to 'qr_interactive' if no ads exist
+  const [kioskState, setKioskState] = useState('qr_interactive');
 
   // Helper to construct full media URL for ad images/videos
   const getMediaUrl = (url) => {
     if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    const backendUrl = import.meta.env.VITE_API_URL 
-      ? import.meta.env.VITE_API_URL.replace('/api/v1', '') 
-      : 'https://vymecmonmluvhgtsfezw.supabase.co';
-    return `${backendUrl}${url}`;
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    const port = window.location.port;
+
+    const backendBase = (hostname === 'localhost' || hostname === '127.0.0.1')
+      ? 'http://localhost:5000'
+      : (port === '5173' || port === '8501' ? `http://${hostname}:5000` : `${protocol}//${hostname}`);
+
+    return `${backendBase}${url}`;
   };
 
 
-  // Hoisted so it can be called from both useEffect and the socket ADS_UPDATED handler
+  // Fetch machine ads from backend
   const fetchMachineAds = async () => {
     try {
       const res = await api.get(`/machines/code/${machineId}/ads`);
       if (res.data.success && res.data.ads && res.data.ads.length > 0) {
         setAds(res.data.ads);
         setCurrentAdIndex(0);
-        setKioskState('standby_ad'); // Ads exist → show ad slideshow
+        setKioskState('standby_ad'); // Ads exist -> show ad slideshow
       } else {
-        // No ads at all → show QR code screen directly
+        // No active ads -> stay on QR code screen directly
         setAds([]);
         setKioskState('qr_interactive');
       }
@@ -53,17 +58,23 @@ const KioskHome = () => {
     }
   };
 
+  const [machineNotFound, setMachineNotFound] = useState(false);
+
   // Load Machine Details & Advertisements
   useEffect(() => {
     const fetchMachineDetails = async () => {
       try {
         const res = await api.get(`/machines/code/${machineId}`);
-        if (res.data.success) {
+        if (res.data.success && res.data.machine) {
           setMachine(res.data.machine);
           setPrinterStatus(res.data.machine.printer_status || 'ready');
+          setMachineNotFound(false);
+        } else {
+          setMachineNotFound(true);
         }
       } catch (err) {
         console.error('Error fetching machine details:', err);
+        setMachineNotFound(true);
       }
     };
 
@@ -86,15 +97,14 @@ const KioskHome = () => {
     return () => clearInterval(adInterval);
   }, [ads]);
 
-  // 60-Second Inactivity Auto-Return to Standby Ads Screen
+  // 60-Second Inactivity Auto-Return to Standby Ads Screen ONLY if ads exist
   useEffect(() => {
-    if (kioskState !== 'qr_interactive') return;
+    if (kioskState !== 'qr_interactive' || ads.length === 0) return;
     const idleTimer = setTimeout(() => {
       setKioskState('standby_ad');
-    }, 60000); // Exactly 60 seconds (1 minute)
+    }, 60000);
     return () => clearTimeout(idleTimer);
-  }, [kioskState]);
-
+  }, [kioskState, ads]);
 
   // Listen to Socket.IO for Machine Events & Direct Upload Notification
   useEffect(() => {
@@ -104,7 +114,11 @@ const KioskHome = () => {
 
     const handleFileUploaded = (payload) => {
       console.log('⚡ Realtime PDF Upload Event Received on Kiosk:', payload);
-      navigate(`/kiosk/${machineId}/preview/${payload.uploadToken}`);
+      const targetCode = payload.machineCode || payload.machineId;
+      const isMatch = !targetCode || targetCode === machineId || targetCode?.toUpperCase() === machineId?.toUpperCase();
+      if (isMatch && payload.uploadToken) {
+        navigate(`/kiosk/${machineId}/preview/${payload.uploadToken}`);
+      }
     };
 
     const handleMachineStatusChange = (data) => {
@@ -134,15 +148,38 @@ const KioskHome = () => {
       socket.off('PRINTER_STATUS_CHANGE', handlePrinterStatusChange);
       socket.off('ADS_UPDATED', handleAdsUpdated);
     };
-  }, [socket, machineId, navigate, fetchMachineAds]);
+  }, [socket, machineId, navigate]);
 
   const uploadUrl = `${window.location.origin}/upload/${machineId}`;
-
 
   // Handle Touch Screen Anywhere on Ad to reveal QR Screen
   const handleAdTouchScreen = () => {
     setKioskState('qr_interactive');
   };
+
+  if (machineNotFound) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col items-center justify-center p-8 select-none font-sans">
+        <div className="relative mb-6">
+          <div className="w-24 h-24 rounded-3xl bg-rose-500/10 border-2 border-rose-500/30 flex items-center justify-center">
+            <Monitor className="w-12 h-12 text-rose-500" />
+          </div>
+        </div>
+        <span className="px-4 py-1.5 bg-rose-950/80 text-rose-300 border border-rose-800/80 rounded-full text-xs font-mono font-bold uppercase tracking-widest mb-4">
+          Fleet Registry Notice • {machineId}
+        </span>
+        <h1 className="text-3xl font-black text-white font-heading text-center mb-3">
+          Unregistered Kiosk Board
+        </h1>
+        <p className="text-slate-400 font-bold max-w-md text-sm text-center mb-8 leading-relaxed">
+          Kiosk Machine Code <code className="text-blue-400 font-mono font-black">{machineId}</code> is not registered in the EasyXerox fleet database.
+        </p>
+        <div className="px-6 py-3 bg-slate-900 text-slate-400 font-mono font-bold text-xs rounded-2xl border border-slate-800">
+          Status: Hardware Unassigned / No Board Active
+        </div>
+      </div>
+    );
+  }
 
   // FULL-SCREEN KIOSK MAINTENANCE OVERLAY
   if (machine?.status === 'maintenance') {
@@ -174,12 +211,13 @@ const KioskHome = () => {
     );
   }
 
+  const showStandbyAds = kioskState === 'standby_ad' && ads.length > 0;
 
   return (
     <div className="relative w-screen h-screen bg-slate-50 text-slate-800 overflow-hidden select-none font-sans">
-      {/* 1. FULL-PAGE STANDBY ADVERTISEMENT MODE */}
+      {/* 1. FULL-PAGE STANDBY ADVERTISEMENT MODE (ONLY WHEN ADS > 0) */}
       <AnimatePresence mode="wait">
-        {kioskState === 'standby_ad' && (
+        {showStandbyAds && (
           <motion.div
             key="standby_ad_view"
             initial={{ opacity: 0 }}
@@ -210,12 +248,8 @@ const KioskHome = () => {
                     />
                   ) : (
                     <img
-                      src={ads[currentAdIndex]?.media_url ? getMediaUrl(ads[currentAdIndex]?.media_url) : 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80'}
-                      alt={ads[currentAdIndex]?.title || 'Instant Self-Service Xerox Printing'}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80';
-                      }}
+                      src={getMediaUrl(ads[currentAdIndex]?.media_url)}
+                      alt={ads[currentAdIndex]?.title || 'Promotional Ad'}
                       className="w-full h-full object-cover brightness-95"
                     />
                   )}
@@ -258,7 +292,7 @@ const KioskHome = () => {
                 Promotional Offer
               </span>
               <h2 className="text-4xl font-extrabold text-white leading-tight font-heading drop-shadow-2xl">
-                {ads[currentAdIndex]?.title || 'Instant 24/7 Self-Service Xerox & Cloud Printing'}
+                {ads[currentAdIndex]?.title || 'Promotional Advertisement'}
               </h2>
             </div>
 
@@ -286,9 +320,9 @@ const KioskHome = () => {
         )}
       </AnimatePresence>
 
-      {/* 2. INTERACTIVE QR CODE SCREEN MODE */}
+      {/* 2. INTERACTIVE QR CODE SCREEN MODE (ALWAYS SHOWN IF ADS === 0) */}
       <AnimatePresence mode="wait">
-        {kioskState === 'qr_interactive' && (
+        {!showStandbyAds && (
           <motion.div
             key="qr_interactive_view"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -300,7 +334,6 @@ const KioskHome = () => {
             {/* HEADER BAR */}
             <header className="relative z-10 flex items-center justify-between bg-[#0066FF] backdrop-blur-xl border-2 border-white/40 rounded-2xl px-6 py-4 shadow-blue-glow text-white">
               <div className="flex items-center gap-3">
-                {/* Only show Back to Ads button if there are active ads */}
                 {ads.length > 0 && (
                   <button
                     onClick={() => setKioskState('standby_ad')}
@@ -426,6 +459,5 @@ const KioskHome = () => {
     </div>
   );
 };
-
 
 export default KioskHome;

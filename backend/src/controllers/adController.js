@@ -11,8 +11,17 @@ const getAds = async (req, res, next) => {
         const params = [];
 
         if (req.user && req.user.role === 'client') {
-            queryStr += ` WHERE a.client_id = $1`;
-            params.push(req.user.client_id);
+            let clientId = req.user.client_id;
+            if (!clientId && req.user.id) {
+                const clientRes = await db.query('SELECT id FROM clients WHERE user_id::text = $1::text OR id::text = $1::text', [req.user.id]);
+                if (clientRes.rows.length > 0) {
+                    clientId = clientRes.rows[0].id;
+                } else {
+                    clientId = req.user.id;
+                }
+            }
+            queryStr += ` WHERE a.client_id::text = $1::text`;
+            params.push(clientId);
         }
 
         queryStr += ` ORDER BY a.created_at DESC`;
@@ -43,7 +52,7 @@ const uploadAd = async (req, res, next) => {
 
         // Fallback: If clientId is missing in JWT payload, look up from clients table
         if (!clientId && req.user && req.user.id) {
-            const clientRes = await db.query('SELECT id FROM clients WHERE user_id = $1', [req.user.id]);
+            const clientRes = await db.query('SELECT id FROM clients WHERE user_id::text = $1::text OR id::text = $1::text', [req.user.id]);
             if (clientRes.rows.length > 0) {
                 clientId = clientRes.rows[0].id;
             }

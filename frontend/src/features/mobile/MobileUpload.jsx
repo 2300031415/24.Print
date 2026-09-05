@@ -6,7 +6,7 @@ import { UploadCloud, FileText, CheckCircle2, AlertCircle, Printer, Sparkles, Sh
 import api from '../../services/api';
 
 const MobileUpload = () => {
-  const { machineId = 'KIOSK-001' } = useParams();
+  const { machineId = 'FFPVT_EasyXerox-001' } = useParams();
 
   const [machine, setMachine] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -58,14 +58,11 @@ const MobileUpload = () => {
     setErrorMsg('');
 
     const formData = new FormData();
-    formData.append('file', selectedFile);
     formData.append('machineId', machineId);
+    formData.append('file', selectedFile);
 
     try {
       const res = await api.post('/uploads', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
         onUploadProgress: (progressEvent) => {
           const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           setUploadProgress(percent);
@@ -95,7 +92,7 @@ const MobileUpload = () => {
         </div>
 
         <div className="px-3 py-1.5 bg-white text-blue-700 rounded-xl text-xs font-mono font-black border border-blue-200 shadow-sm">
-          {machineId}
+          {machine?.machine_code || machineId || 'FFPVT_EasyXerox-001'}
         </div>
       </header>
 

@@ -32,10 +32,18 @@ const ClientAds = () => {
 
   const getMediaUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('http')) return url;
-    const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v1', '') : 'http://localhost:5000';
-    return `${backendUrl}${url}`;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    const port = window.location.port;
+
+    const backendBase = (hostname === 'localhost' || hostname === '127.0.0.1')
+      ? 'http://localhost:5000'
+      : (port === '5173' || port === '8501' ? `http://${hostname}:5000` : `${protocol}//${hostname}`);
+
+    return `${backendBase}${url}`;
   };
+
 
   const fetchAds = async () => {
     try {
@@ -148,7 +156,7 @@ const ClientAds = () => {
                         className="rounded accent-blue-600 w-4 h-4 cursor-pointer"
                       />
                       <MonitorCheck className="w-4 h-4 text-blue-600" />
-                      <span>{m.name} ({m.machine_code})</span>
+                      <span>{m.machine_code || m.name || 'FFPVT_EasyXerox-001'}</span>
                     </label>
                   ))}
                 </div>

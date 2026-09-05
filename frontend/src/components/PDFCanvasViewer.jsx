@@ -30,7 +30,7 @@ const PDFCanvasViewer = ({ fileUrl, totalPages: propTotalPages, onPageChange }) 
         setLoading(false);
       },
       (error) => {
-        console.error('Error loading PDF canvas, activating fallback iframe:', error);
+        console.error('Error loading PDF canvas:', error);
         if (isMounted) {
           setLoadError(true);
           setLoading(false);
@@ -96,84 +96,84 @@ const PDFCanvasViewer = ({ fileUrl, totalPages: propTotalPages, onPageChange }) 
   const handleZoomOut = () => setScale((s) => Math.max(s - 0.25, 0.75));
 
   return (
-    <div className="flex flex-col items-center w-full h-full bg-slate-900/90 rounded-2xl border border-slate-800 p-4 shadow-2xl">
+    <div className="flex flex-col items-center w-full h-full bg-white rounded-3xl border-2 border-blue-100 p-4 shadow-xl select-none font-sans">
       {/* Touch Action Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 w-full bg-slate-800/80 backdrop-blur-md rounded-xl p-3 mb-3 border border-slate-700">
+      <div className="flex flex-wrap items-center justify-between gap-3 w-full bg-blue-50/80 rounded-2xl p-3 mb-3 border border-blue-200">
         <div className="flex items-center gap-2">
           <button
             onClick={handlePrevPage}
             disabled={currentPage <= 1}
-            className="p-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 disabled:opacity-40 text-white rounded-lg transition-all"
+            className="p-3 bg-white hover:bg-blue-100 active:scale-95 disabled:opacity-40 text-blue-900 font-bold rounded-xl transition-all shadow-sm border border-blue-200"
             title="Previous Page"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 text-blue-600" />
           </button>
 
-          <span className="text-sm font-semibold text-slate-200 px-3 py-1.5 bg-slate-900/80 rounded-md">
+          <span className="text-sm font-black text-slate-950 px-3 py-1.5 bg-white rounded-xl border border-blue-200 font-mono">
             Page {currentPage} of {totalPages}
           </span>
 
           <button
             onClick={handleNextPage}
             disabled={currentPage >= totalPages}
-            className="p-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 disabled:opacity-40 text-white rounded-lg transition-all"
+            className="p-3 bg-white hover:bg-blue-100 active:scale-95 disabled:opacity-40 text-blue-900 font-bold rounded-xl transition-all shadow-sm border border-blue-200"
             title="Next Page"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 text-blue-600" />
           </button>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={handleZoomOut}
-            className="p-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-lg transition-all"
+            className="p-3 bg-white hover:bg-blue-100 active:scale-95 text-blue-900 font-bold rounded-xl transition-all shadow-sm border border-blue-200"
             title="Zoom Out"
           >
-            <ZoomOut className="w-5 h-5" />
+            <ZoomOut className="w-5 h-5 text-blue-600" />
           </button>
 
-          <span className="text-xs font-semibold text-cyan-400 px-2.5 py-1 bg-cyan-950/60 rounded border border-cyan-800">
+          <span className="text-xs font-black text-blue-600 px-3 py-1.5 bg-blue-100/80 rounded-xl border border-blue-300 font-mono">
             {Math.round(scale * 100)}%
           </span>
 
           <button
             onClick={handleZoomIn}
-            className="p-3 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-lg transition-all"
+            className="p-3 bg-white hover:bg-blue-100 active:scale-95 text-blue-900 font-bold rounded-xl transition-all shadow-sm border border-blue-200"
             title="Zoom In"
           >
-            <ZoomIn className="w-5 h-5" />
+            <ZoomIn className="w-5 h-5 text-blue-600" />
           </button>
 
-          <div className="h-6 w-px bg-slate-700 mx-1"></div>
+          <div className="h-6 w-px bg-blue-200 mx-1"></div>
 
           <button
             onClick={handleRotate}
-            className="p-3 bg-indigo-600/80 hover:bg-indigo-500 active:scale-95 text-white rounded-lg transition-all flex items-center gap-1.5 font-medium text-xs"
+            className="p-3 bg-[#0066FF] hover:bg-[#0052CC] active:scale-95 text-white font-extrabold rounded-xl transition-all flex items-center gap-1.5 text-xs shadow-md"
             title="Rotate 90°"
           >
-            <RotateCw className="w-5 h-5" />
+            <RotateCw className="w-4 h-4" />
             <span>Rotate</span>
           </button>
         </div>
       </div>
 
-      {/* PDF Viewport Canvas / Native Iframe Fallback */}
-      <div className="relative flex-1 w-full overflow-auto flex items-center justify-center bg-slate-950 rounded-xl border border-slate-800/80 p-4 min-h-[420px]">
+      {/* PDF Viewport Canvas */}
+      <div className="relative flex-1 w-full overflow-auto flex items-center justify-center bg-slate-100/60 rounded-2xl border border-blue-100 p-4 min-h-[420px]">
         {loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-sm z-10">
-            <Loader2 className="w-10 h-10 text-cyan-500 animate-spin mb-3" />
-            <p className="text-sm font-medium text-slate-300">Rendering Document Preview...</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm z-10 rounded-2xl">
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-3" />
+            <p className="text-sm font-bold text-slate-700">Rendering Document Preview...</p>
           </div>
         )}
 
         {loadError ? (
           <iframe
             src={`${fileUrl}#toolbar=0&navpanes=0`}
-            className="w-full h-full min-h-[450px] rounded border-0"
+            className="w-full h-full min-h-[450px] rounded-xl border-0 bg-white"
             title="PDF Document Preview"
           />
         ) : (
-          <canvas ref={canvasRef} className="max-w-full shadow-2xl rounded border border-slate-800" />
+          <canvas ref={canvasRef} className="max-w-full shadow-xl rounded-xl border border-slate-200" />
         )}
       </div>
     </div>

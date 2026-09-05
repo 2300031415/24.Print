@@ -29,22 +29,22 @@ const PortalLayout = ({ children, title = 'Super Admin Portal' }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex overflow-hidden font-sans">
-      {/* SIDEBAR NAVIGATION */}
-      <aside className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col justify-between p-6 shrink-0 shadow-2xl">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex overflow-hidden font-sans select-none">
+      {/* SIDEBAR NAVIGATION (Royal Blue Brand Palette) */}
+      <aside className="w-72 bg-blue-600 border-r border-blue-700 flex flex-col justify-between p-6 shrink-0 shadow-2xl text-white">
         <div>
-          {/* Logo */}
+          {/* Logo Badge */}
           <div className="flex flex-col mb-8 px-2 gap-2">
-            <div className="logo-badge self-start py-2 px-4 shadow-cyan-glow border border-cyan-500/40">
-              <img src="/logo.png" alt="EasyXerox" className="h-9 w-auto object-contain" />
+            <div className="bg-white p-1 px-4 rounded-2xl border-2 border-blue-200 shadow-md self-start overflow-hidden">
+              <img src="/logo.png" alt="EasyXerox" className="h-10 w-auto object-contain scale-140 transform" />
             </div>
-            <span className="text-[10px] uppercase font-extrabold tracking-widest text-cyan-400 block pl-1">
+            <span className="text-[10px] uppercase font-black tracking-widest text-blue-100 block pl-1">
               Super Admin Control Portal
             </span>
           </div>
 
           {/* Navigation Items */}
-          <nav className="space-y-1.5">
+          <nav className="space-y-2">
             {adminNav.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -52,17 +52,17 @@ const PortalLayout = ({ children, title = 'Super Admin Portal' }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                  className={`flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-black transition-all ${
                     isActive
-                      ? 'bg-cyan-500 text-slate-950 shadow-cyan-glow'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+                      ? 'bg-white text-blue-600 shadow-xl'
+                      : 'text-blue-100 hover:text-white hover:bg-blue-700/80'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-slate-950' : 'text-slate-400'}`} />
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-blue-200'}`} />
                     <span>{item.name}</span>
                   </div>
-                  {isActive && <ChevronRight className="w-4 h-4 text-slate-950" />}
+                  {isActive && <ChevronRight className="w-4 h-4 text-blue-600" />}
                 </Link>
               );
             })}
@@ -70,20 +70,20 @@ const PortalLayout = ({ children, title = 'Super Admin Portal' }) => {
         </div>
 
         {/* User Footer Profile & Logout */}
-        <div className="pt-6 border-t border-slate-800">
+        <div className="pt-6 border-t border-blue-500/80">
           <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-9 h-9 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center font-black text-cyan-400">
+            <div className="w-10 h-10 rounded-2xl bg-white text-blue-600 border-2 border-blue-200 flex items-center justify-center font-black text-base shadow-sm">
               {user?.full_name?.charAt(0) || 'A'}
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-bold text-white truncate">{user?.full_name || 'System Super Admin'}</p>
-              <p className="text-[11px] text-slate-400 truncate">{user?.email}</p>
+              <p className="text-xs font-black text-white truncate">{user?.full_name || 'System Super Admin'}</p>
+              <p className="text-[11px] font-bold text-blue-200 truncate">{user?.email}</p>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="w-full py-2.5 px-4 bg-slate-950 hover:bg-rose-950/60 hover:text-rose-400 hover:border-rose-800/80 text-slate-300 font-semibold rounded-xl text-xs border border-slate-800 transition-all flex items-center justify-center gap-2 btn-touch"
+            className="w-full py-3 px-4 bg-blue-700 hover:bg-rose-600 text-white font-black rounded-xl text-xs border border-blue-500 transition-all flex items-center justify-center gap-2 shadow-sm btn-touch"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
@@ -92,14 +92,14 @@ const PortalLayout = ({ children, title = 'Super Admin Portal' }) => {
       </aside>
 
       {/* MAIN VIEW CONTENT AREA */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50">
         {/* Top Navbar */}
-        <header className="h-20 bg-slate-900/60 border-b border-slate-800/80 px-8 flex items-center justify-between sticky top-0 z-20 backdrop-blur-md">
-          <h2 className="text-2xl font-bold text-white font-heading">{title}</h2>
+        <header className="h-20 bg-white border-b-2 border-blue-100 px-8 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+          <h2 className="text-2xl font-black text-slate-950 font-heading">{title}</h2>
           
           <div className="flex items-center gap-4">
-            <span className="px-3 py-1 bg-slate-900 text-slate-300 text-xs font-semibold rounded-lg border border-slate-800">
-              Port 8502 • Admin Service
+            <span className="px-4 py-1.5 bg-blue-50 text-blue-700 text-xs font-black rounded-xl border border-blue-200 font-mono shadow-sm">
+              System Date: {new Date().toLocaleDateString()}
             </span>
           </div>
         </header>

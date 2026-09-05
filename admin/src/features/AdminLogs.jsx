@@ -21,29 +21,31 @@ const AdminLogs = () => {
 
   return (
     <PortalLayout title="System Audit Logs">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
-        <h3 className="text-xl font-bold text-white font-heading mb-4 flex items-center gap-2">
-          <Activity className="w-5 h-5 text-cyan-400" />
-          <span>Security & System Action Audit Logs</span>
-        </h3>
+      <div className="w-full max-w-7xl mx-auto space-y-6 select-none font-sans">
+        <div className="bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-xl text-slate-950">
+          <h3 className="text-2xl font-black text-slate-950 font-heading mb-6 flex items-center gap-3 border-b border-blue-100 pb-4">
+            <Activity className="w-7 h-7 text-blue-600" />
+            <span>Security & System Action Audit Logs</span>
+          </h3>
 
-        <div className="space-y-3">
-          {logs.map((log) => (
-            <div key={log.id} className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-3">
-                <span className="px-2.5 py-1 bg-cyan-950 text-cyan-400 font-bold uppercase rounded-lg border border-cyan-800">
-                  {log.category}
-                </span>
-                <div>
-                  <p className="font-bold text-white text-sm">{log.action}</p>
-                  <p className="text-slate-400 mt-0.5">By: {log.full_name || 'System'} ({log.email || 'Automated'})</p>
+          <div className="space-y-3">
+            {logs.map((log) => (
+              <div key={log.id} className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-200 flex items-center justify-between text-xs font-bold hover:border-blue-300 transition-all">
+                <div className="flex items-center gap-3">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-900 font-black uppercase rounded-lg border border-blue-300">
+                    {log.category}
+                  </span>
+                  <div>
+                    <p className="font-black text-slate-950 text-sm">{log.action}</p>
+                    <p className="text-slate-600 font-bold mt-0.5">By: {log.full_name || 'System'} ({log.email || 'Automated'})</p>
+                  </div>
                 </div>
+                <span className="text-slate-600 font-mono font-bold">
+                  {new Date(log.created_at).toLocaleString()}
+                </span>
               </div>
-              <span className="text-slate-500 font-mono">
-                {new Date(log.created_at).toLocaleString()}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </PortalLayout>

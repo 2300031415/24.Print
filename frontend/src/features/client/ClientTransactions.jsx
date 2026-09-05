@@ -67,10 +67,10 @@ const ClientTransactions = () => {
               onChange={(e) => setSelectedMachineId(e.target.value)}
               className="bg-slate-50 border-2 border-blue-200 text-blue-900 text-sm font-black rounded-xl px-4 py-3 outline-none focus:border-blue-600 cursor-pointer shadow-sm"
             >
-              <option value="ALL">🌐 All Kiosk Boards (Combined Revenue)</option>
+              <option value="ALL">All Kiosk Boards</option>
               {machines.map((m) => (
                 <option key={m.id} value={m.id}>
-                  🖥️ {m.name} ({m.machine_code})
+                  {m.machine_code || m.name || 'FFPVT_EasyXerox-001'}
                 </option>
               ))}
             </select>
@@ -140,8 +140,8 @@ const ClientTransactions = () => {
                         <div className="flex items-center gap-2">
                           <Monitor className="w-4 h-4 text-blue-600 shrink-0" />
                           <div>
-                            <p className="text-sm font-black text-slate-950">{job.machine_name || 'Connaught Place Kiosk #1'}</p>
-                            <span className="text-[10px] font-mono text-blue-700 uppercase font-black">{job.machine_code || 'KIOSK-001'}</span>
+                            <p className="text-sm font-black text-slate-950">{job.machine_code || job.machine_name || 'FFPVT_EasyXerox-001'}</p>
+                            <span className="text-[10px] font-mono text-blue-700 uppercase font-black">{job.machine_code || 'FFPVT_EasyXerox-001'}</span>
                           </div>
                         </div>
                       </td>

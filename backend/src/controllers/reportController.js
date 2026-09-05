@@ -52,17 +52,25 @@ const getAdminDashboard = async (req, res, next) => {
 
 const getClientDashboard = async (req, res, next) => {
     try {
-        const clientId = req.user?.client_id || 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33';
+        let clientId = req.user?.client_id;
+        if (!clientId && req.user?.id) {
+            const clientRes = await db.query('SELECT id FROM clients WHERE user_id::text = $1::text OR id::text = $1::text', [req.user.id]);
+            if (clientRes.rows.length > 0) {
+                clientId = clientRes.rows[0].id;
+            } else {
+                clientId = req.user.id;
+            }
+        }
 
-        const machinesCount = await db.query("SELECT COUNT(*), COUNT(CASE WHEN status = 'online' THEN 1 END) as online_count FROM machines WHERE client_id = $1", [clientId]);
-        const totalEarnings = await db.query("SELECT COALESCE(SUM(client_share), 0) as total FROM transactions WHERE client_id = $1 AND status = 'settled'", [clientId]);
-        const todayEarnings = await db.query("SELECT COALESCE(SUM(client_share), 0) as today FROM transactions WHERE client_id = $1 AND status = 'settled' AND created_at >= CURRENT_DATE", [clientId]);
-        const monthlyEarnings = await db.query("SELECT COALESCE(SUM(client_share), 0) as month FROM transactions WHERE client_id = $1 AND status = 'settled' AND created_at >= DATE_TRUNC('month', CURRENT_DATE)", [clientId]);
+        const machinesCount = await db.query("SELECT COUNT(*), COUNT(CASE WHEN status = 'online' THEN 1 END) as online_count FROM machines WHERE client_id::text = $1::text", [clientId]);
+        const totalEarnings = await db.query("SELECT COALESCE(SUM(client_share), 0) as total FROM transactions WHERE client_id::text = $1::text AND status = 'settled'", [clientId]);
+        const todayEarnings = await db.query("SELECT COALESCE(SUM(client_share), 0) as today FROM transactions WHERE client_id::text = $1::text AND status = 'settled' AND created_at >= CURRENT_DATE", [clientId]);
+        const monthlyEarnings = await db.query("SELECT COALESCE(SUM(client_share), 0) as month FROM transactions WHERE client_id::text = $1::text AND status = 'settled' AND created_at >= DATE_TRUNC('month', CURRENT_DATE)", [clientId]);
         const pagesPrinted = await db.query(`
             SELECT COALESCE(SUM(pj.total_pages * pj.copies), 0) as pages 
             FROM print_jobs pj
             JOIN machines m ON pj.machine_id = m.id
-            WHERE m.client_id = $1 AND pj.status = 'completed'`,
+            WHERE m.client_id::text = $1::text AND pj.status = 'completed'`,
             [clientId]
         );
 
@@ -72,51 +80,28 @@ const getClientDashboard = async (req, res, next) => {
             FROM transactions t
             JOIN machines m ON t.machine_id = m.id
             JOIN payments p ON t.payment_id = p.id
-            WHERE t.client_id = $1
+            WHERE t.client_id::text = $1::text
             ORDER BY t.created_at DESC
             LIMIT 10`,
             [clientId]
         );
 
-        // Sample transactions fallback for client view if empty
-        const sampleTxns = [
-            {
-                id: 'tx_101',
-                machine_name: 'Connaught Place Kiosk #1',
-                gross_amount: '150.00',
-                gst_amount: '27.00',
-                client_share: '123.00',
-                status: 'settled',
-                created_at: new Date(Date.now() - 3600000).toISOString()
-            },
-            {
-                id: 'tx_102',
-                machine_name: 'Connaught Place Kiosk #1',
-                gross_amount: '4.00',
-                gst_amount: '0.72',
-                client_share: '3.28',
-                status: 'settled',
-                created_at: new Date(Date.now() - 7200000).toISOString()
-            }
-        ];
-
         res.json({
             success: true,
             stats: {
-                totalMachines: parseInt(machinesCount.rows[0]?.count || 1, 10),
-                onlineMachines: parseInt(machinesCount.rows[0]?.online_count || 1, 10),
-                totalEarnings: parseFloat(totalEarnings.rows[0]?.total || 1250.00),
-                todayRevenue: parseFloat(todayEarnings.rows[0]?.today || 450.00),
-                monthlyRevenue: parseFloat(monthlyEarnings.rows[0]?.month || 1250.00),
-                totalPagesPrinted: parseInt(pagesPrinted.rows[0]?.pages || 120, 10)
+                totalMachines: parseInt(machinesCount.rows[0]?.count || 0, 10),
+                onlineMachines: parseInt(machinesCount.rows[0]?.online_count || 0, 10),
+                totalEarnings: parseFloat(totalEarnings.rows[0]?.total || 0),
+                todayRevenue: parseFloat(todayEarnings.rows[0]?.today || 0),
+                monthlyRevenue: parseFloat(monthlyEarnings.rows[0]?.month || 0),
+                totalPagesPrinted: parseInt(pagesPrinted.rows[0]?.pages || 0, 10)
             },
-            recentTransactions: recentTxns.rows.length > 0 ? recentTxns.rows : sampleTxns
+            recentTransactions: recentTxns.rows || []
         });
     } catch (err) {
         next(err);
     }
 };
-
 
 const getActivityLogs = async (req, res, next) => {
     try {

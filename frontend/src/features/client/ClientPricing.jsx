@@ -36,10 +36,10 @@ const ClientPricing = () => {
         const def = res.data.pricingList[0];
         setFormData({
           id: def.id,
-          bw_single_page_price: def.bw_single_page_price,
-          color_single_page_price: def.color_single_page_price,
-          bw_duplex_page_price: def.bw_duplex_page_price,
-          color_duplex_page_price: def.color_duplex_page_price,
+          bw_single_page_price: parseFloat(def.bw_single_page_price || 2.00),
+          color_single_page_price: parseFloat(def.color_single_page_price || 10.00),
+          bw_duplex_page_price: parseFloat(def.bw_duplex_page_price || 3.50),
+          color_duplex_page_price: parseFloat(def.color_duplex_page_price || 18.00),
           paper_size: def.paper_size || 'A4'
         });
       }
@@ -55,26 +55,34 @@ const ClientPricing = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/settings/pricing', { ...formData, machine_id: selectedMachineId });
+      const payload = {
+        ...formData,
+        bw_single_page_price: Number(formData.bw_single_page_price) || 0,
+        color_single_page_price: Number(formData.color_single_page_price) || 0,
+        bw_duplex_page_price: Number(formData.bw_duplex_page_price) || 0,
+        color_duplex_page_price: Number(formData.color_duplex_page_price) || 0,
+        machine_id: selectedMachineId
+      };
+      const res = await api.post('/settings/pricing', payload);
       if (res.data.success) {
-        alert('Print rates updated successfully!');
+        alert(`Pricing rates updated successfully for ${selectedMachineId === 'all' ? 'All Kiosk Boards' : 'Selected Kiosk Board'}!`);
         fetchPricing();
       }
     } catch (err) {
-      alert('Error updating pricing rates.');
+      alert(err.response?.data?.message || 'Error updating pricing rates.');
     }
   };
 
   return (
     <PortalLayout title="My Kiosk Print Rates Configuration" role="client">
-      <div className="w-full max-w-7xl mx-auto space-y-8 select-none font-sans">
-        <div className="bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-xl space-y-8">
-          <h3 className="text-2xl font-black text-slate-950 font-heading flex items-center gap-3 border-b border-blue-100 pb-4">
+      <div className="w-full max-w-4xl mx-auto space-y-6 select-none font-sans">
+        <div className="bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-xl space-y-6 text-slate-950">
+          <h3 className="text-2xl font-black text-slate-950 font-heading border-b border-blue-100 pb-4 flex items-center gap-3">
             <DollarSign className="w-7 h-7 text-blue-600" />
             <span>Configure Kiosk Print Pricing</span>
           </h3>
 
-          {/* Target Kiosk Selection */}
+          {/* KIOSK MACHINE / PRODUCT SELECTION */}
           <div className="bg-slate-50 p-6 rounded-2xl border-2 border-blue-100 shadow-sm">
             <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-2 flex items-center gap-2">
               <Monitor className="w-4 h-4 text-blue-600" />
@@ -85,10 +93,10 @@ const ClientPricing = () => {
               onChange={(e) => setSelectedMachineId(e.target.value)}
               className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-base font-black text-slate-950 cursor-pointer focus:border-blue-600 focus:outline-none shadow-sm transition-all"
             >
-              <option value="all">🌐 All Kiosks (Default Rate)</option>
+              <option value="all">All Kiosk Boards</option>
               {machines.map((m) => (
                 <option key={m.id} value={m.id}>
-                  📍 {m.name} ({m.machine_code || 'KIOSK'})
+                  {m.machine_code || m.name || 'FFPVT_EasyXerox-001'}
                 </option>
               ))}
             </select>
@@ -104,8 +112,8 @@ const ClientPricing = () => {
                   type="number"
                   step="0.5"
                   required
-                  value={formData.bw_single_page_price}
-                  onChange={(e) => setFormData({ ...formData, bw_single_page_price: parseFloat(e.target.value) })}
+                  value={isNaN(formData.bw_single_page_price) ? '' : formData.bw_single_page_price}
+                  onChange={(e) => setFormData({ ...formData, bw_single_page_price: e.target.value === '' ? '' : parseFloat(e.target.value) })}
                   className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-xl font-black text-slate-950 font-mono focus:outline-none focus:border-blue-600 transition-all"
                 />
               </div>
@@ -118,8 +126,8 @@ const ClientPricing = () => {
                   type="number"
                   step="0.5"
                   required
-                  value={formData.color_single_page_price}
-                  onChange={(e) => setFormData({ ...formData, color_single_page_price: parseFloat(e.target.value) })}
+                  value={isNaN(formData.color_single_page_price) ? '' : formData.color_single_page_price}
+                  onChange={(e) => setFormData({ ...formData, color_single_page_price: e.target.value === '' ? '' : parseFloat(e.target.value) })}
                   className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-xl font-black text-blue-700 font-mono focus:outline-none focus:border-blue-600 transition-all"
                 />
               </div>
@@ -134,8 +142,8 @@ const ClientPricing = () => {
                   type="number"
                   step="0.5"
                   required
-                  value={formData.bw_duplex_page_price}
-                  onChange={(e) => setFormData({ ...formData, bw_duplex_page_price: parseFloat(e.target.value) })}
+                  value={isNaN(formData.bw_duplex_page_price) ? '' : formData.bw_duplex_page_price}
+                  onChange={(e) => setFormData({ ...formData, bw_duplex_page_price: e.target.value === '' ? '' : parseFloat(e.target.value) })}
                   className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-xl font-black text-slate-950 font-mono focus:outline-none focus:border-blue-600 transition-all"
                 />
               </div>
@@ -148,8 +156,8 @@ const ClientPricing = () => {
                   type="number"
                   step="0.5"
                   required
-                  value={formData.color_duplex_page_price}
-                  onChange={(e) => setFormData({ ...formData, color_duplex_page_price: parseFloat(e.target.value) })}
+                  value={isNaN(formData.color_duplex_page_price) ? '' : formData.color_duplex_page_price}
+                  onChange={(e) => setFormData({ ...formData, color_duplex_page_price: e.target.value === '' ? '' : parseFloat(e.target.value) })}
                   className="w-full bg-white border-2 border-slate-200 rounded-xl p-3.5 text-xl font-black text-blue-700 font-mono focus:outline-none focus:border-blue-600 transition-all"
                 />
               </div>
@@ -158,9 +166,9 @@ const ClientPricing = () => {
             <div className="pt-4 flex justify-end">
               <button
                 type="submit"
-                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-base rounded-xl transition-all shadow-blue-glow btn-touch flex items-center justify-center gap-2"
+                className="w-full md:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-md btn-touch text-base flex items-center justify-center gap-2"
               >
-                <Save className="w-5 h-5 text-white" />
+                <Save className="w-5 h-5" />
                 <span>Save Kiosk Rates</span>
               </button>
             </div>

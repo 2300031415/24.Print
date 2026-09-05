@@ -20,69 +20,25 @@ let isPostgresAvailable = false;
 
 
 // Pre-hashed passwords for seed users
-const ADMIN_HASH = bcrypt.hashSync('Admin@123', 10);
-const CLIENT_HASH = bcrypt.hashSync('Client@123', 10);
+const ADMIN_HASH = bcrypt.hashSync('FFpvt@2026', 10);
 
 // In-Memory Database Store for dev fallback if local PostgreSQL is not running
 const mockDb = {
     users: [
         {
             id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-            email: 'admin@printkiosk.com',
+            email: 'easyxerox@gmail.com',
             password_hash: ADMIN_HASH,
-            full_name: 'System Super Admin',
+            full_name: 'EasyXerox Super Admin',
             phone: '+919876543210',
             role: 'admin',
             status: 'active',
             refresh_token: null,
             created_at: new Date().toISOString()
-        },
-        {
-            id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
-            email: 'owner@metroprints.com',
-            password_hash: CLIENT_HASH,
-            full_name: 'Rajesh Kumar (Metro Prints)',
-            phone: '+919812345678',
-            role: 'client',
-            status: 'active',
-            refresh_token: null,
-            created_at: new Date().toISOString()
         }
     ],
-    clients: [
-        {
-            id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
-            user_id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
-            business_name: 'Metro Xerox & Print Zone',
-            contact_phone: '+919812345678',
-            address: '102 Connaught Place, Block B',
-            city: 'New Delhi',
-            state: 'Delhi',
-            pincode: '110001',
-            commission_rate: 80.00,
-            status: 'active',
-            created_at: new Date().toISOString()
-        }
-    ],
-    machines: [
-        {
-            id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
-            machine_code: 'KIOSK-001',
-            name: 'Connaught Place Kiosk #1',
-            client_id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
-            location_address: 'Metro Station Gate 2, Connaught Place',
-            city: 'New Delhi',
-            state: 'Delhi',
-            pincode: '110001',
-            qr_code_url: '',
-            status: 'online',
-            default_printer_name: 'Brother DCP-T820DW Printer',
-
-            printer_status: 'ready',
-            ip_address: '192.168.1.105',
-            created_at: new Date().toISOString()
-        }
-    ],
+    clients: [],
+    machines: [],
     pricing: [
         {
             id: 'e4eebc99-9c0b-4ef8-bb6d-6bb9bd380a55',
@@ -176,16 +132,33 @@ const persistDb = () => {
 const loadPersistedDb = () => {
     try {
         if (fs.existsSync(PERSIST_FILE)) {
-            const data = JSON.parse(fs.readFileSync(PERSIST_FILE, 'utf8'));
-            if (Array.isArray(data.advertisements)) mockDb.advertisements = data.advertisements;
-            if (Array.isArray(data.machine_ads)) mockDb.machine_ads = data.machine_ads;
-            if (Array.isArray(data.clients)) mockDb.clients = data.clients;
-            if (Array.isArray(data.users)) mockDb.users = data.users;
-            if (Array.isArray(data.machines)) mockDb.machines = data.machines;
-            console.log(`✅ Loaded mockDb state from disk (${mockDb.clients.length} clients, ${mockDb.machines.length} machines).`);
+            try { fs.unlinkSync(PERSIST_FILE); } catch(e){}
         }
+        mockDb.clients = [];
+        mockDb.machines = [];
+        mockDb.print_jobs = [];
+        mockDb.uploads = [];
+        mockDb.payments = [];
+        mockDb.transactions = [];
+        mockDb.advertisements = [];
+        mockDb.machine_ads = [];
+        mockDb.users = [
+            {
+                id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+                email: 'easyxerox@gmail.com',
+                password_hash: ADMIN_HASH,
+                full_name: 'EasyXerox Super Admin',
+                phone: '+919876543210',
+                role: 'admin',
+                status: 'active',
+                refresh_token: null,
+                created_at: new Date().toISOString()
+            }
+        ];
+        persistDb();
+        console.log('✅ Clean database initialized: 0 clients, 0 machines, 0 print jobs, 1 Super Admin (easyxerox@gmail.com).');
     } catch (e) {
-        console.warn('Could not load persisted mockDb:', e.message);
+        console.warn('Could not reset mockDb:', e.message);
     }
 };
 
@@ -260,9 +233,9 @@ function handleMockQuery(text, params) {
     }
 
     // 4. SELECT Machine by Code
-    if (cleanText.includes('from machines') && (cleanText.includes('machine_code = $1') || cleanText.includes('m.id::text = $1'))) {
+    if (cleanText.includes('from machines') && (cleanText.includes('machine_code = $1') || cleanText.includes('m.id::text = $1') || cleanText.includes('id::text = $1'))) {
         const mCode = params[0];
-        const machine = mockDb.machines.find(m => m.machine_code === mCode || m.id === mCode) || mockDb.machines[0];
+        const machine = mockDb.machines.find(m => m.machine_code === mCode || m.id === mCode || (mCode === 'KIOSK-001' && m.machine_code === 'FFPVT_EasyXerox-001')) || mockDb.machines[0];
         const client = machine ? (mockDb.clients.find(c => String(c.id) === String(machine.client_id)) || mockDb.clients[0]) : mockDb.clients[0];
         const isClientSuspended = client && (client.status === 'suspended' || client.status === 'inactive' || client.status === 'disabled');
         const rows = machine ? [{
@@ -276,17 +249,25 @@ function handleMockQuery(text, params) {
 
     // 5. SELECT Machines List
     if (cleanText.includes('from machines')) {
-        const rows = mockDb.machines.map(m => {
-            const client = mockDb.clients.find(c => String(c.id) === String(m.client_id)) || mockDb.clients[0];
+        let rows = mockDb.machines.map(m => {
+            const client = mockDb.clients.find(c => String(c.id) === String(m.client_id) || String(c.user_id) === String(m.client_id));
             const isClientSuspended = client && (client.status === 'suspended' || client.status === 'inactive' || client.status === 'disabled');
             return {
                 ...m,
                 status: isClientSuspended ? 'maintenance' : m.status,
-                client_name: client ? client.business_name : 'Metro Xerox & Print Zone',
+                client_name: client ? client.business_name : 'Unassigned Client',
+                client_user_id: client ? client.user_id : null,
                 client_status: client ? client.status : 'active',
-                total_jobs_printed: mockDb.print_jobs.length
+                total_jobs_printed: mockDb.print_jobs.filter(pj => String(pj.machine_id) === String(m.id)).length
             };
         });
+
+        // Restrict to client's machines when client filter is present in query
+        if ((cleanText.includes('m.client_id') || cleanText.includes('c.user_id')) && params.length > 0) {
+            const targetId = String(params[0]).trim();
+            rows = rows.filter(m => String(m.client_id) === targetId || String(m.client_user_id) === targetId);
+        }
+
         return { rows, rowCount: rows.length };
     }
 
@@ -391,7 +372,15 @@ function handleMockQuery(text, params) {
                 .filter(a => assignedAdIds.includes(String(a.id)) && a.status === 'approved');
             return { rows, rowCount: rows.length };
         }
-        // Default: return all ads
+        // Filter by client if client_id = $1 is present in query
+        if (cleanText.includes('a.client_id') && params.length > 0) {
+            const targetClientId = String(params[0]).trim();
+            const rows = mockDb.advertisements
+                .filter(a => String(a.client_id) === targetClientId)
+                .map(a => ({ ...a, client_name: 'Metro Xerox Zone' }));
+            return { rows, rowCount: rows.length };
+        }
+        // Default: return all ads (for superadmin)
         const rows = mockDb.advertisements.map(a => ({ ...a, client_name: 'Metro Xerox Zone' }));
         return { rows, rowCount: rows.length };
     }
@@ -567,10 +556,23 @@ function handleMockQuery(text, params) {
         return { rows: [jobObj], rowCount: 1 };
     }
 
-    // 15. SELECT Users by Email
-    if (cleanText.includes('from users') && cleanText.includes('email = $1')) {
-        const user = mockDb.users.find(u => u.email.toLowerCase() === String(params[0] || '').toLowerCase());
-        return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
+    // 15. SELECT Users by Email or ID
+    if (cleanText.includes('from users')) {
+        const targetSearch = String(params[0] || '').toLowerCase().trim();
+        const user = mockDb.users.find(u => u.email.toLowerCase().trim() === targetSearch || String(u.id) === targetSearch);
+        if (user) {
+            const client = mockDb.clients.find(c => String(c.user_id) === String(user.id) || String(c.id) === String(user.id));
+            return {
+                rows: [{
+                    ...user,
+                    client_id: client ? client.id : null,
+                    business_name: client ? client.business_name : null,
+                    client_status: client ? client.status : 'active'
+                }],
+                rowCount: 1
+            };
+        }
+        return { rows: [], rowCount: 0 };
     }
 
     // 16. INSERT User
@@ -605,7 +607,61 @@ function handleMockQuery(text, params) {
             created_at: new Date().toISOString()
         };
         mockDb.clients.push(cObj);
+        persistDb();
         return { rows: [cObj], rowCount: 1 };
+    }
+
+    // 17b. UPDATE Client
+    if (cleanText.includes('update clients')) {
+        const clientId = String(params[10] || params[8] || params[0] || '').trim();
+        let client = mockDb.clients.find(c => String(c.id) === clientId || String(c.user_id) === clientId) || mockDb.clients[0];
+        if (client) {
+            if (params[0]) client.business_name = params[0];
+            if (params[1]) client.contact_phone = params[1];
+            if (params[2]) client.address = params[2];
+            if (params[3]) client.city = params[3];
+            if (params[4]) client.state = params[4];
+            if (params[5]) client.pincode = params[5];
+            if (params[7]) client.status = params[7];
+            persistDb();
+        }
+        return { rows: client ? [client] : [], rowCount: client ? 1 : 0 };
+    }
+
+    // 17c. UPDATE User (email, password_hash, status)
+    if (cleanText.includes('update users')) {
+        const userId = String(params[1] || params[0] || '').trim();
+        let user = mockDb.users.find(u => String(u.id) === userId || String(u.email).toLowerCase() === userId.toLowerCase()) || mockDb.users[0];
+        if (user) {
+            if (cleanText.includes('email = $1')) user.email = params[0];
+            if (cleanText.includes('password_hash = $1')) user.password_hash = params[0];
+            if (cleanText.includes('status = $1')) user.status = params[0];
+            persistDb();
+        }
+        return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
+    }
+
+    // 17d. INSERT Machine
+    if (cleanText.includes('insert into machines')) {
+        const mObj = {
+            id: 'm_' + Date.now(),
+            machine_code: String(params[0] || '').toUpperCase(),
+            name: params[1] || params[0],
+            client_id: params[2],
+            location_address: params[3] || '',
+            city: params[4] || '',
+            state: params[5] || '',
+            pincode: params[6] || '',
+            qr_code_url: params[7] || '',
+            default_printer_name: params[8] || 'Brother DCP-T820DW Printer',
+            razorpay_key_id: params[9] || null,
+            razorpay_key_secret: params[10] || null,
+            status: 'online',
+            created_at: new Date().toISOString()
+        };
+        mockDb.machines.unshift(mObj);
+        persistDb();
+        return { rows: [mObj], rowCount: 1 };
     }
 
     // 18. SELECT Print Jobs History
@@ -613,7 +669,7 @@ function handleMockQuery(text, params) {
         const rows = mockDb.print_jobs.map(pj => ({
             ...pj,
             machine_code: pj.machine_code || 'KIOSK-001',
-            machine_name: 'Connaught Place Kiosk #1',
+            machine_name: 'Kiosk Board',
             original_filename: pj.original_filename || 'document.pdf'
         }));
         return { rows, rowCount: rows.length };
@@ -623,12 +679,15 @@ function handleMockQuery(text, params) {
     if (cleanText.includes('from clients')) {
         const rows = mockDb.clients.map(c => {
             const user = mockDb.users.find(u => u.id === c.user_id);
+            const clientMachines = mockDb.machines.filter(m => String(m.client_id) === String(c.id) || String(m.client_id) === String(c.user_id));
+            const clientTxns = mockDb.transactions.filter(t => String(t.client_id) === String(c.id) || String(t.client_id) === String(c.user_id));
+            const totalEarned = clientTxns.reduce((acc, t) => acc + (parseFloat(t.client_share) || 0), 0);
             return {
                 ...c,
                 email: user ? user.email : (c.email || 'client@shop.com'),
                 full_name: user ? user.full_name : c.business_name,
-                total_machines: 1,
-                total_earnings: 1250.00
+                total_machines: clientMachines.length,
+                total_earnings: totalEarned
             };
         });
         return { rows, rowCount: rows.length };
@@ -636,7 +695,20 @@ function handleMockQuery(text, params) {
 
     // 20. Admin / Client Dashboard Summaries
     if (cleanText.includes('count(*) from clients') || cleanText.includes('sum(amount)')) {
-        return { rows: [{ count: String(mockDb.clients.length), online_count: '1', total: '2450.00', today: '450.00', pages: '120', month: '2450.00' }], rowCount: 1 };
+        const totalRev = mockDb.payments.filter(p => p.status === 'captured').reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+        const totalPages = mockDb.print_jobs.filter(pj => pj.status === 'completed').reduce((sum, pj) => sum + ((pj.total_pages || 1) * (pj.copies || 1)), 0);
+        const onlineMachines = mockDb.machines.filter(m => m.status === 'online').length;
+        return {
+            rows: [{
+                count: String(mockDb.clients.length),
+                online_count: String(onlineMachines),
+                total: String(totalRev),
+                today: '0',
+                pages: String(totalPages),
+                month: String(totalRev)
+            }],
+            rowCount: 1
+        };
     }
 
     // Default Fallback Empty Result

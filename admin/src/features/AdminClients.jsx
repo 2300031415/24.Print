@@ -26,6 +26,7 @@ const AdminClients = () => {
 
   const [editData, setEditData] = useState({
     business_name: '',
+    email: '',
     phone: '',
     password: ''
   });
@@ -108,6 +109,7 @@ const AdminClients = () => {
     setSelectedClient(client);
     setEditData({
       business_name: client.business_name || '',
+      email: client.email || '',
       phone: client.contact_phone || client.phone || '',
       password: ''
     });
@@ -130,16 +132,17 @@ const AdminClients = () => {
 
   return (
     <PortalLayout title="Client Owner Management">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="w-full max-w-7xl mx-auto space-y-6 select-none font-sans">
+        <div className="bg-white p-6 rounded-3xl border-2 border-blue-100 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <p className="text-slate-400 text-sm">
+            <h3 className="text-xl font-black text-slate-950 font-heading">Client Partner Network</h3>
+            <p className="text-slate-600 font-bold text-xs mt-1">
               Manage Xerox Shop Partners, edit credentials, or toggle active/disabled status to control board operation.
             </p>
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="px-5 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-cyan-glow flex items-center gap-2 btn-touch text-sm"
+            className="px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-md flex items-center gap-2 btn-touch text-sm shrink-0"
           >
             <Plus className="w-5 h-5" />
             <span>Onboard New Client</span>
@@ -147,10 +150,10 @@ const AdminClients = () => {
         </div>
 
         {/* CLIENTS TABLE */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 shadow-xl">
+        <div className="bg-white border-2 border-blue-100 rounded-3xl p-6 shadow-xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950/80 text-xs uppercase font-bold text-slate-400 border-b border-slate-800">
+            <table className="w-full text-left text-sm text-slate-900">
+              <thead className="bg-blue-50/80 text-xs uppercase font-black text-blue-900 border-b border-blue-200">
                 <tr>
                   <th className="py-3.5 px-4">Business Name</th>
                   <th className="py-3.5 px-4">Owner Name</th>
@@ -162,27 +165,27 @@ const AdminClients = () => {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-blue-100 font-bold">
                 {clients.map((client) => {
                   const isSuspended = isClientSuspended(client);
                   return (
-                    <tr key={client.id} className="hover:bg-slate-800/40 transition-all">
-                      <td className="py-4 px-4 font-bold text-white flex items-center gap-2">
-                        <Building className="w-4 h-4 text-cyan-400" />
+                    <tr key={client.id} className="hover:bg-blue-50/50 transition-all">
+                      <td className="py-4 px-4 font-black text-slate-950 flex items-center gap-2">
+                        <Building className="w-4 h-4 text-blue-600" />
                         <span>{client.business_name}</span>
                       </td>
-                      <td className="py-4 px-4">{client.full_name}</td>
-                      <td className="py-4 px-4 text-slate-400">{client.email}</td>
-                      <td className="py-4 px-4 font-bold text-white">{client.total_machines || 0}</td>
-                      <td className="py-4 px-4 font-mono font-bold text-emerald-400">
+                      <td className="py-4 px-4 text-slate-900">{client.full_name}</td>
+                      <td className="py-4 px-4 text-blue-700">{client.email}</td>
+                      <td className="py-4 px-4 font-black text-slate-950">{client.total_machines || 0}</td>
+                      <td className="py-4 px-4 font-mono font-black text-emerald-600">
                         ₹{parseFloat(client.total_earnings || 0).toLocaleString()}
                       </td>
                       <td className="py-4 px-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                          className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
                             isSuspended
-                              ? 'bg-rose-950 text-rose-400 border border-rose-800'
-                              : 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                              ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                              : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                           }`}
                         >
                           {isSuspended ? 'Disabled' : 'Active'}
@@ -194,7 +197,7 @@ const AdminClients = () => {
                         <button
                           onClick={() => handleToggleStatus(client)}
                           title={isSuspended ? 'Click to Enable Client & Kiosk Boards' : 'Click to Disable Client & Stop Boards'}
-                          className={`relative mx-auto w-14 h-8 rounded-full transition-colors p-1 flex items-center ${
+                          className={`relative mx-auto w-14 h-8 rounded-full transition-colors p-1 flex items-center shadow-inner ${
                             isSuspended ? 'bg-rose-600' : 'bg-emerald-500'
                           }`}
                         >
@@ -216,7 +219,7 @@ const AdminClients = () => {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => openEditModal(client)}
-                            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-semibold rounded-lg text-xs border border-slate-700 transition-all flex items-center gap-1.5"
+                            className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-black rounded-xl text-xs border border-blue-200 transition-all flex items-center gap-1.5"
                           >
                             <Edit className="w-3.5 h-3.5" />
                             <span>Edit</span>
@@ -224,7 +227,7 @@ const AdminClients = () => {
                           <button
                             onClick={() => handleDeleteClient(client)}
                             title="Delete Client Shop & Kiosks"
-                            className="p-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 rounded-lg text-xs border border-rose-800 transition-all"
+                            className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs border border-rose-200 transition-all"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -241,65 +244,65 @@ const AdminClients = () => {
 
       {/* CREATE CLIENT MODAL */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative">
-            <button onClick={() => setShowModal(false)} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
+          <div className="w-full max-w-lg bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-2xl relative text-slate-950">
+            <button onClick={() => setShowModal(false)} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-950">
               <X className="w-6 h-6" />
             </button>
 
-            <h3 className="text-2xl font-bold text-white font-heading mb-6">Onboard New Client Shop</h3>
+            <h3 className="text-2xl font-black text-slate-950 font-heading mb-6">Onboard New Client Shop</h3>
 
             <form onSubmit={handleCreateClient} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Business Name</label>
+                <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Business Name</label>
                 <input
                   type="text"
                   required
                   value={formData.business_name}
                   onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white"
+                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
                   placeholder="e.g. Metro Xerox Zone"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Owner Email</label>
+                  <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Owner Email</label>
                   <input
                     type="email"
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white"
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
                     placeholder="owner@shop.com"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">Phone Number</label>
+                  <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Phone Number</label>
                   <input
                     type="text"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white"
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
                     placeholder="+919876543210"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Password</label>
+                <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Password</label>
                 <input
                   type="text"
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white"
+                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-cyan-glow btn-touch text-base mt-4"
+                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl transition-all shadow-md btn-touch text-base mt-4"
               >
                 Create Partner Account
               </button>
@@ -310,50 +313,63 @@ const AdminClients = () => {
 
       {/* EDIT CLIENT MODAL */}
       {showEditModal && selectedClient && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative">
-            <button onClick={() => setShowEditModal(false)} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
+          <div className="w-full max-w-lg bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-2xl relative text-slate-950">
+            <button onClick={() => setShowEditModal(false)} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-950">
               <X className="w-6 h-6" />
             </button>
 
-            <h3 className="text-2xl font-bold text-white font-heading mb-6">Edit Client Partner Account</h3>
+            <h3 className="text-2xl font-black text-slate-950 font-heading mb-6">Edit Client Partner Account</h3>
 
             <form onSubmit={handleUpdateClient} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Business Name</label>
+                <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Business Name</label>
                 <input
                   type="text"
                   required
                   value={editData.business_name}
                   onChange={(e) => setEditData({ ...editData, business_name: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white"
+                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Phone Number</label>
-                <input
-                  type="text"
-                  value={editData.phone}
-                  onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Contact Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={editData.email}
+                    onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
+                    placeholder="owner@shop.com"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={editData.phone}
+                    onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-1">Reset Password (Leave blank to keep existing)</label>
+                <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Reset Password (Leave blank to keep existing)</label>
                 <input
                   type="text"
                   value={editData.password}
                   onChange={(e) => setEditData({ ...editData, password: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white"
+                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-bold focus:border-blue-600 focus:bg-white"
                   placeholder="New password (optional)"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-cyan-glow btn-touch text-base mt-4"
+                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl transition-all shadow-md btn-touch text-base mt-4"
               >
                 Save Changes
               </button>

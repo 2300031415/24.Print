@@ -56,34 +56,34 @@ const AdminReports = () => {
 
   return (
     <PortalLayout title="Platform Revenue & Print History Reports">
-      <div className="space-y-6">
+      <div className="w-full max-w-7xl mx-auto space-y-6 select-none font-sans">
         {/* SUMMARY & TRANSFER HEADER */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
-            <p className="text-xs font-bold uppercase text-slate-400">Total System Revenue</p>
-            <h3 className="text-3xl font-extrabold text-white mt-1 font-mono">
+          <div className="bg-white border-2 border-blue-100 rounded-3xl p-6 shadow-xl">
+            <p className="text-xs font-black uppercase text-slate-500">Total System Revenue</p>
+            <h3 className="text-3xl font-black text-emerald-600 mt-2 font-mono">
               ₹{printJobs.reduce((acc, job) => acc + parseFloat(job.total_amount || 0), 0).toFixed(2)}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">{printJobs.length} Completed Print Jobs</p>
+            <p className="text-xs text-slate-600 font-bold mt-1">{printJobs.length} Completed Print Jobs</p>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
-            <p className="text-xs font-bold uppercase text-slate-400">Selected Jobs Amount</p>
-            <h3 className="text-3xl font-extrabold text-cyan-400 mt-1 font-mono">
+          <div className="bg-white border-2 border-blue-100 rounded-3xl p-6 shadow-xl">
+            <p className="text-xs font-black uppercase text-slate-500">Selected Jobs Amount</p>
+            <h3 className="text-3xl font-black text-blue-600 mt-2 font-mono">
               ₹{selectedTotalAmount.toFixed(2)}
             </h3>
-            <p className="text-xs text-cyan-300 mt-1">{selectedJobIds.length} Products / Jobs Selected</p>
+            <p className="text-xs text-blue-700 font-extrabold mt-1">{selectedJobIds.length} Products / Jobs Selected</p>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between">
-            <p className="text-xs font-bold uppercase text-slate-400">Transfer Selected Earnings</p>
+          <div className="bg-white border-2 border-blue-100 rounded-3xl p-6 shadow-xl flex flex-col justify-between">
+            <p className="text-xs font-black uppercase text-slate-500">Transfer Selected Earnings</p>
             <button
               onClick={handleTransferFunds}
               disabled={selectedJobIds.length === 0 || transferring}
-              className={`w-full py-3.5 px-4 rounded-xl font-extrabold flex items-center justify-center gap-2 transition-all text-sm btn-touch shadow-lg ${
+              className={`w-full py-3.5 px-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all text-sm btn-touch shadow-md mt-2 ${
                 selectedJobIds.length === 0
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                  : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-emerald-glow'
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'
               }`}
             >
               <Send className="w-4 h-4" />
@@ -93,29 +93,29 @@ const AdminReports = () => {
         </div>
 
         {successMsg && (
-          <div className="bg-emerald-950/80 border border-emerald-800 text-emerald-300 px-6 py-4 rounded-2xl flex items-center gap-3 font-semibold text-sm">
-            <ShieldCheck className="w-6 h-6 text-emerald-400" />
+          <div className="bg-emerald-50 border-2 border-emerald-200 text-emerald-800 px-6 py-4 rounded-2xl flex items-center gap-3 font-extrabold text-sm shadow-md">
+            <ShieldCheck className="w-6 h-6 text-emerald-600" />
             <span>{successMsg}</span>
           </div>
         )}
 
         {/* PRINT AUDIT TRAIL & PRODUCT SELECTION TABLE */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-white font-heading">Complete Print Audit Trail</h3>
-            <span className="text-xs text-slate-400">Select individual products or jobs to transfer payouts</span>
+        <div className="bg-white border-2 border-blue-100 rounded-3xl p-6 shadow-xl text-slate-950">
+          <div className="flex items-center justify-between mb-4 border-b border-blue-100 pb-4">
+            <h3 className="text-xl font-black text-slate-950 font-heading">Complete Print Audit Trail</h3>
+            <span className="text-xs text-slate-600 font-bold">Select individual products or jobs to transfer payouts</span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950 text-xs uppercase font-bold text-slate-400 border-b border-slate-800">
+            <table className="w-full text-left text-sm text-slate-900">
+              <thead className="bg-blue-50/80 text-xs uppercase font-black text-blue-900 border-b border-blue-200">
                 <tr>
                   <th className="py-3.5 px-4 w-10">
                     <input
                       type="checkbox"
                       checked={printJobs.length > 0 && selectedJobIds.length === printJobs.length}
                       onChange={handleSelectAll}
-                      className="w-4 h-4 accent-cyan-500 rounded cursor-pointer"
+                      className="w-4 h-4 accent-blue-600 rounded cursor-pointer"
                     />
                   </th>
                   <th className="py-3.5 px-4">Job ID</th>
@@ -127,38 +127,38 @@ const AdminReports = () => {
                   <th className="py-3.5 px-4">Timestamp</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-blue-100 font-bold">
                 {printJobs.map((job) => {
                   const isSelected = selectedJobIds.includes(job.id);
                   return (
                     <tr
                       key={job.id}
                       onClick={() => handleToggleJob(job.id)}
-                      className={`cursor-pointer transition-colors ${isSelected ? 'bg-cyan-950/40' : 'hover:bg-slate-800/40'}`}
+                      className={`cursor-pointer transition-colors ${isSelected ? 'bg-blue-100/60' : 'hover:bg-blue-50/50'}`}
                     >
                       <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => handleToggleJob(job.id)}
-                          className="w-4 h-4 accent-cyan-500 rounded cursor-pointer"
+                          className="w-4 h-4 accent-blue-600 rounded cursor-pointer"
                         />
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-xs text-cyan-400 font-bold">{job.id.substring(0, 8)}</td>
-                      <td className="py-3.5 px-4 font-bold text-white">{job.machine_code || 'KIOSK-001'}</td>
-                      <td className="py-3.5 px-4 text-slate-200 font-medium truncate max-w-[200px]">{job.original_filename || 'PDF Print Job'}</td>
-                      <td className="py-3.5 px-4 text-xs">
-                        {job.copies}x • <span className="uppercase text-cyan-300 font-semibold">{job.color_mode}</span> • <span className="capitalize text-slate-400">{job.duplex_mode}</span>
+                      <td className="py-3.5 px-4 font-mono text-xs text-blue-700 font-black">{job.id.substring(0, 8)}</td>
+                      <td className="py-3.5 px-4 font-black text-slate-950">{job.machine_code || 'FFPVT_EasyXerox-001'}</td>
+                      <td className="py-3.5 px-4 text-blue-700 font-bold truncate max-w-[200px]">{job.original_filename || 'PDF Print Job'}</td>
+                      <td className="py-3.5 px-4 text-xs font-bold text-slate-700">
+                        {job.copies}x • <span className="uppercase text-blue-800 font-black">{job.color_mode}</span> • <span className="capitalize text-slate-600">{job.duplex_mode}</span>
                       </td>
-                      <td className="py-3.5 px-4 font-mono font-extrabold text-emerald-400">₹{parseFloat(job.total_amount || 0).toFixed(2)}</td>
+                      <td className="py-3.5 px-4 font-mono font-black text-emerald-600">₹{parseFloat(job.total_amount || 0).toFixed(2)}</td>
                       <td className="py-3.5 px-4">
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                          job.status === 'completed' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-black capitalize ${
+                          job.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'
                         }`}>
                           {job.status}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-xs text-slate-400">
+                      <td className="py-3.5 px-4 text-xs text-slate-600 font-medium">
                         {new Date(job.created_at).toLocaleString()}
                       </td>
                     </tr>
