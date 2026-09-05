@@ -68,8 +68,8 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState('admin@printkiosk.com');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -136,7 +136,7 @@ const AdminLogin = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-3.5 pl-12 pr-4 text-sm text-slate-950 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white font-bold transition-all"
-                placeholder="admin@printkiosk.com"
+                placeholder="admin@easyxerox.com"
               />
             </div>
           </div>
@@ -173,21 +173,6 @@ const AdminLogin = () => {
             )}
           </button>
         </form>
-
-        {/* Demo Quick Fill Button */}
-        <div className="mt-8 pt-6 border-t border-slate-200">
-          <button
-            type="button"
-            onClick={() => {
-              setEmail('admin@printkiosk.com');
-              setPassword('Admin@123');
-            }}
-            className="w-full p-3.5 rounded-xl border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-black transition-all flex items-center justify-center gap-2 btn-touch"
-          >
-            <ShieldCheck className="w-4 h-4 text-blue-700" />
-            <span>Fill Super Admin Credentials (admin@printkiosk.com)</span>
-          </button>
-        </div>
       </motion.div>
     </div>
   );
