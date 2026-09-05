@@ -263,21 +263,12 @@ export default function Kiosk3D({ onInteract }) {
           </div>
 
           {/* EasyXerox Brand Emblem (Integrated Chassis Logo) */}
-          <div className="my-2 py-1.5 px-3 bg-black/25 rounded-xl border border-white/10 flex items-center justify-center space-x-2.5 relative z-10">
-            {/* Brand Emblem Icon */}
-            <div className="w-7 h-7 rounded-lg bg-[#0C3D97] border border-blue-300/40 flex items-center justify-center text-white font-black text-sm shadow-sm flex-shrink-0">
-              <span>E</span>
-            </div>
-
-            {/* Brand Typography */}
-            <div className="text-left">
-              <div className="flex items-baseline space-x-0.5">
-                <span className="font-extrabold text-base tracking-tight text-white">Easy</span>
-                <span className="font-extrabold text-base tracking-tight text-blue-300">Xerox</span>
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 ml-0.5"></div>
-              </div>
-              <p className="text-[7.5px] font-bold text-blue-200/80 tracking-widest uppercase">Smart Self-Service Kiosk</p>
-            </div>
+          <div className="my-2 py-1.5 px-4 bg-white/95 backdrop-blur-md rounded-xl border border-white/20 flex items-center justify-center space-x-3 relative z-10 shadow-md">
+            <img src="/logo.png" alt="EasyXerox" className="h-7 sm:h-8 w-auto object-contain" />
+            <div className="h-4 w-px bg-slate-300" />
+            <span className="text-[8px] font-black text-[#0C3D97] tracking-widest uppercase">
+              Smart Kiosk
+            </span>
           </div>
 
           {/* Paper Output Slot & Dispensing Area */}
