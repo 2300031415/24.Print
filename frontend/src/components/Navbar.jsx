@@ -34,7 +34,7 @@ export default function Navbar({ activePage, setActivePage, onOpenPrintModal }) 
         scrolled ? 'border-gray-200 shadow-sm' : 'border-gray-100'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
-          {/* Brand Logo & Future Forbes Attribution */}
+          {/* Brand Logo */}
           <div className="flex items-center space-x-3.5 flex-shrink-0">
             <button
               onClick={() => handleNavClick('home')}
@@ -50,12 +50,6 @@ export default function Navbar({ activePage, setActivePage, onOpenPrintModal }) 
                 </span>
               </div>
             </button>
-
-            {/* Future Forbes Badge (XL screens) */}
-            <div className="hidden xl:flex items-center space-x-1.5 bg-slate-100/90 border border-slate-200/80 px-2.5 py-1 rounded-full text-[11px] font-bold text-slate-700 whitespace-nowrap">
-              <img src="/future-forbes-logo.png" alt="Future Forbes Pvt Ltd" className="w-4 h-4 object-contain rounded" />
-              <span>A Product of <strong className="text-blue-900 font-extrabold">Future Forbes Pvt Ltd</strong></span>
-            </div>
           </div>
 
           {/* Navigation Links (Center - Desktop) */}
