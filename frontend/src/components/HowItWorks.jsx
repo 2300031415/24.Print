@@ -115,27 +115,6 @@ export default function HowItWorks({ onOpenPrintModal }) {
           );
         })}
       </div>
-
-      {/* Interactive Flow Bar */}
-      <div className="mt-10 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 via-white to-blue-50 border border-blue-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-        <div className="flex items-center space-x-3 text-left">
-          <div className="w-10 h-10 rounded-xl bg-[#0C3D97] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
-            <Touchpad className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-sm font-bold text-gray-950">Walk up → Touch → Upload → Select → Pay → Print</h4>
-            <p className="text-xs text-gray-500">Fast, cashless, and 100% self-service on the touchscreen display.</p>
-          </div>
-        </div>
-
-        <button
-          onClick={onOpenPrintModal}
-          className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#0C3D97] hover:bg-[#082e75] text-white text-xs sm:text-sm font-bold shadow-sm transition-all hover:scale-105 active:scale-95 flex items-center justify-center space-x-1.5 flex-shrink-0"
-        >
-          <span>Try Touchscreen Simulator</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
     </section>
   );
 }
