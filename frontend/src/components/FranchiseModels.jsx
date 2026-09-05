@@ -23,25 +23,6 @@ export default function FranchiseModels({ onSelectModel }) {
       bestFor: "Entrepreneurs, Individuals, Startups, Retailers, Investors",
     },
     {
-      id: "space-partner",
-      title: "Space Partner Model",
-      tag: "Zero Capex",
-      tagColor: "bg-orange-500 text-white",
-      borderColor: "border-orange-300",
-      subtitle: "You provide the space. EasyXerox handles everything else.",
-      yourRole: [
-        "Provide prime space, power, and internet",
-        "Ensure basic accessibility and safety of location",
-        "Earn fixed monthly rent or rev-share payout",
-      ],
-      ourRole: [
-        "Complete kiosk hardware & printer deployment",
-        "Order flow and payment processing",
-        "Full machine maintenance, paper & ink refilling",
-      ],
-      bestFor: "Colleges, Malls, Offices, Hostels, Transit Hubs, Government",
-    },
-    {
       id: "custom-partnership",
       title: "Custom Partnership",
       tag: "Enterprise",
@@ -74,8 +55,8 @@ export default function FranchiseModels({ onSelectModel }) {
         </p>
       </div>
 
-      {/* 3 Models Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
+      {/* 2 Models Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
         {models.map((m) => (
           <div
             key={m.id}
