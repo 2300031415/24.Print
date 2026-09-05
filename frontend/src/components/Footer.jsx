@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpRight, Phone, Mail, MapPin, ShieldCheck, Globe, Award, User, Lock } from 'lucide-react';
+import { ArrowUpRight, Phone, Mail, MapPin, ShieldCheck, Globe, Award } from 'lucide-react';
 
 export default function Footer({ setActivePage, onOpenPrintModal }) {
   const navigate = useNavigate();
@@ -67,18 +67,6 @@ export default function Footer({ setActivePage, onOpenPrintModal }) {
               <li>
                 <button onClick={() => { setActivePage('contact'); window.scrollTo(0,0); }} className="hover:text-[#0C3D97] transition-colors">
                   Contact Us
-                </button>
-              </li>
-              <li className="pt-2 border-t border-gray-100">
-                <button onClick={() => navigate('/client/login')} className="font-bold text-[#0C3D97] hover:underline flex items-center gap-1">
-                  <User className="w-3.5 h-3.5" />
-                  <span>Partner Portal Login</span>
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigate('/admin/login')} className="font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1">
-                  <Lock className="w-3.5 h-3.5" />
-                  <span>Admin Control Portal</span>
                 </button>
               </li>
             </ul>
