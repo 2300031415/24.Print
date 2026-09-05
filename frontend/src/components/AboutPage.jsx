@@ -154,7 +154,7 @@ export default function AboutPage({ onOpenFranchise }) {
               <div>
                 <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-snug">Pragada Eswar</h3>
                 <p className="text-xs font-bold text-[#0C3D97] uppercase tracking-wide mt-0.5">
-                  Co-Founder & Executive Director • Partner
+                  Co-Founder & Partner
                 </p>
                 <p className="text-[11px] text-gray-500 font-medium">
                   Future Forbes Private Limited
