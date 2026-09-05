@@ -140,12 +140,12 @@ export default function AboutPage({ onOpenFranchise }) {
             </div>
           </div>
 
-          {/* Pragada Eswar - Co-Founder & Partner */}
+          {/* Pragada Eswar - Co-Founder & COO */}
           <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row items-center sm:items-start gap-5">
             <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 flex-shrink-0">
               <img 
                 src="/team/pragada_eswar_cofounder.jpg" 
-                alt="Pragada Eswar - Co-Founder & Partner"
+                alt="Pragada Eswar - Co-Founder & COO"
                 className="w-full h-full object-cover object-top"
               />
             </div>
@@ -154,7 +154,7 @@ export default function AboutPage({ onOpenFranchise }) {
               <div>
                 <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-snug">Pragada Eswar</h3>
                 <p className="text-xs font-bold text-[#0C3D97] uppercase tracking-wide mt-0.5">
-                  Co-Founder & Partner
+                  Co-Founder & COO
                 </p>
                 <p className="text-[11px] text-gray-500 font-medium">
                   Future Forbes Private Limited
