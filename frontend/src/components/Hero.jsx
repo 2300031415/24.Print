@@ -5,11 +5,15 @@ import Kiosk3D from './Kiosk3D';
 export default function Hero({ onOpenPrintModal, onOpenFranchise }) {
   return (
     <section className="relative pt-28 sm:pt-36 pb-16 px-4 max-w-7xl mx-auto overflow-hidden">
-      {/* Top Differentiator Badge */}
-      <div className="flex justify-center mb-5">
+      {/* Top Differentiator & Future Forbes Attribution Badge */}
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
         <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-blue-50 border border-[#0C3D97]/30 text-[#0C3D97] text-xs sm:text-sm font-bold shadow-xs hover:border-[#0C3D97] transition-all backdrop-blur-md">
           <span className="w-2 h-2 rounded-full bg-[#0C3D97] animate-ping"></span>
           <span>No App. No OTP. Just Touch, Pay & Print.</span>
+        </div>
+        <div className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-slate-900 text-white text-xs font-bold shadow-xs">
+          <img src="/future-forbes-logo.png" alt="Future Forbes" className="w-4 h-4 object-contain rounded" />
+          <span>A Product of <strong className="text-cyan-300 font-extrabold">Future Forbes Pvt Ltd</strong></span>
         </div>
       </div>
 

@@ -12,13 +12,17 @@ export default function Footer({ setActivePage, onOpenPrintModal }) {
           
           {/* Col 1: Brand & Tagline */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-[#0C3D97] flex items-center justify-center text-white font-black text-lg shadow-sm">
-                <span>E</span>
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-full bg-[#0C3D97] flex items-center justify-center text-white font-black text-lg shadow-sm">
+                  <span>E</span>
+                </div>
+                <span className="font-extrabold text-2xl tracking-tight text-gray-900">
+                  <span className="text-[#0C3D97]">Easy</span>Xerox
+                </span>
               </div>
-              <span className="font-extrabold text-2xl tracking-tight text-gray-900">
-                <span className="text-[#0C3D97]">Easy</span>Xerox
-              </span>
+              <div className="h-6 w-px bg-gray-200" />
+              <img src="/future-forbes-logo.png" alt="Future Forbes Pvt Ltd" className="h-8 w-auto object-contain rounded" />
             </div>
 
             <p className="text-sm font-semibold text-gray-800">
@@ -26,7 +30,7 @@ export default function Footer({ setActivePage, onOpenPrintModal }) {
             </p>
 
             <p className="text-xs text-gray-500 max-w-sm leading-relaxed">
-              Engineered and powered by <strong>Future Forbes Private Limited</strong> (Startup India Recognized, DIPP209399). Join the modern self-service revolution.
+              A flagship product engineered and powered by <strong>Future Forbes Private Limited</strong> (Startup India Recognized, DIPP209399). Join the modern self-service revolution.
             </p>
 
             <div className="pt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
@@ -178,13 +182,13 @@ export default function Footer({ setActivePage, onOpenPrintModal }) {
               <div className="flex items-center space-x-2">
                 <Phone className="w-3.5 h-3.5 text-[#0C3D97] flex-shrink-0" />
                 <a href="tel:+918885600899" className="font-bold text-gray-900 hover:text-[#0C3D97]">
-                  +91 88856 00899 / 08047363360
+                  +91 88856 00899 / +91 99088 49889
                 </a>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="w-3.5 h-3.5 text-[#0C3D97] flex-shrink-0" />
-                <a href="mailto:support@easyxerox.in" className="hover:text-[#0C3D97]">
-                  support@easyxerox.in
+                <a href="mailto:info@futureforbes.in" className="font-bold text-gray-900 hover:text-[#0C3D97]">
+                  info@futureforbes.in
                 </a>
               </div>
               <div className="flex items-start space-x-2 pt-1">
@@ -200,8 +204,9 @@ export default function Footer({ setActivePage, onOpenPrintModal }) {
 
         {/* Copyright & Disclaimer */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 gap-4">
-          <div>
-            © {new Date().getFullYear()} EasyXerox. A product powered by <a href="http://futureforbes.in/" target="_blank" rel="noreferrer" className="text-gray-600 font-bold hover:underline">Future Forbes Private Limited</a>. All rights reserved.
+          <div className="flex items-center space-x-2">
+            <img src="/future-forbes-logo.png" alt="Future Forbes" className="h-5 w-auto object-contain rounded" />
+            <span>© {new Date().getFullYear()} EasyXerox. A product of <a href="http://futureforbes.in/" target="_blank" rel="noreferrer" className="text-blue-900 font-extrabold hover:underline">Future Forbes Private Limited</a>. All rights reserved.</span>
           </div>
           <div className="flex space-x-4 text-gray-500">
             <a href="#terms" className="hover:underline">Terms of Service</a>

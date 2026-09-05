@@ -34,8 +34,8 @@ export default function ContactPage() {
                     +91 88856 00899
                   </a>
                   <span className="text-gray-300 font-bold">/</span>
-                  <a href="tel:08047363360" className="text-sm font-black text-gray-900 hover:text-[#0C3D97] transition-colors">
-                    08047363360
+                  <a href="tel:+919908849889" className="text-sm font-black text-gray-900 hover:text-[#0C3D97] transition-colors">
+                    +91 99088 49889
                   </a>
                 </div>
               </div>
@@ -53,8 +53,8 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Email Enquiries</h3>
-                <a href="mailto:support@easyxerox.in" className="text-sm font-black text-gray-900 hover:text-[#0C3D97] transition-colors">
-                  support@easyxerox.in
+                <a href="mailto:info@futureforbes.in" className="text-sm font-black text-gray-900 hover:text-[#0C3D97] transition-colors">
+                  info@futureforbes.in
                 </a>
               </div>
             </div>

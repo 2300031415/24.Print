@@ -37,9 +37,15 @@ export default function AboutPage({ onOpenFranchise }) {
             <span>Our Origin & Mission</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-black text-gray-950 tracking-tight">
-            About <span className="text-[#0C3D97]">EasyXerox</span>
-          </h1>
+          <div className="flex items-center space-x-4 flex-wrap gap-2">
+            <h1 className="text-4xl sm:text-5xl font-black text-gray-950 tracking-tight">
+              About <span className="text-[#0C3D97]">EasyXerox</span>
+            </h1>
+            <div className="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl">
+              <img src="/future-forbes-logo.png" alt="Future Forbes Pvt Ltd" className="h-7 w-auto object-contain rounded" />
+              <span className="text-xs font-black text-blue-950">A Product of Future Forbes Pvt Ltd</span>
+            </div>
+          </div>
 
           <p className="text-base text-gray-700 leading-relaxed">
             <strong>EasyXerox</strong> is India's pioneer in self-service smart printing kiosks, engineered and powered by <strong>Future Forbes Private Limited</strong> (a recognized #StartupIndia venture) to make document printing instant, secure, and available 24/7.
