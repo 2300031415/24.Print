@@ -35,7 +35,7 @@ export default function Navbar({ activePage, setActivePage, onOpenPrintModal }) 
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
           {/* Brand Logo & Future Forbes Attribution */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 flex-shrink-0">
             <button
               onClick={() => handleNavClick('home')}
               className="flex items-center space-x-2.5 group focus:outline-none"
@@ -43,51 +43,56 @@ export default function Navbar({ activePage, setActivePage, onOpenPrintModal }) 
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#0C3D97] flex items-center justify-center text-white font-black text-lg shadow-sm group-hover:bg-[#082e75] transition-colors">
                 <span className="leading-none">E</span>
               </div>
-              <div className="flex items-baseline font-bold text-xl sm:text-2xl tracking-tight text-gray-900">
-                <span className="text-[#0C3D97]">Easy</span>
-                <span className="text-gray-900">Xerox</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#0C3D97] ml-0.5"></span>
+              <div className="flex flex-col items-start text-left">
+                <div className="flex items-baseline font-bold text-xl sm:text-2xl tracking-tight text-gray-900 leading-none">
+                  <span className="text-[#0C3D97]">Easy</span>
+                  <span className="text-gray-900">Xerox</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0C3D97] ml-0.5"></span>
+                </div>
+                <span className="text-[9px] font-extrabold text-blue-900 tracking-wider uppercase mt-0.5 hidden sm:block">
+                  By Future Forbes Pvt Ltd
+                </span>
               </div>
             </button>
 
-            {/* Future Forbes Badge */}
-            <div className="hidden lg:flex items-center space-x-1.5 bg-slate-100/90 border border-slate-200/80 px-2.5 py-1 rounded-full text-[11px] font-bold text-slate-700">
+            {/* Future Forbes Badge (XL screens) */}
+            <div className="hidden xl:flex items-center space-x-1.5 bg-slate-100/90 border border-slate-200/80 px-2.5 py-1 rounded-full text-[11px] font-bold text-slate-700 whitespace-nowrap">
               <img src="/future-forbes-logo.png" alt="Future Forbes Pvt Ltd" className="w-4 h-4 object-contain rounded" />
               <span>A Product of <strong className="text-blue-900 font-extrabold">Future Forbes Pvt Ltd</strong></span>
             </div>
           </div>
 
           {/* Navigation Links (Center - Desktop) */}
-          <nav className="hidden md:flex items-center space-x-7 text-[14px] font-medium text-gray-700">
+          <nav className="hidden md:flex items-center space-x-5 lg:space-x-7 text-[14px] font-medium text-gray-700 whitespace-nowrap">
             <button
               onClick={() => handleNavClick('about')}
-              className={`transition-colors hover:text-[#0C3D97] ${activePage === 'about' ? 'text-[#0C3D97] font-bold' : ''}`}
+              className={`transition-colors hover:text-[#0C3D97] whitespace-nowrap ${activePage === 'about' ? 'text-[#0C3D97] font-bold' : ''}`}
             >
               About Us
             </button>
             <button
               onClick={() => handleNavClick('home', 'features-section')}
-              className="transition-colors hover:text-[#0C3D97]"
+              className="transition-colors hover:text-[#0C3D97] whitespace-nowrap"
             >
               Features
             </button>
             <button
               onClick={() => handleNavClick('franchise')}
-              className={`transition-colors hover:text-[#0C3D97] ${activePage === 'franchise' ? 'text-[#0C3D97] font-bold' : ''}`}
+              className={`transition-colors hover:text-[#0C3D97] whitespace-nowrap ${activePage === 'franchise' ? 'text-[#0C3D97] font-bold' : ''}`}
             >
               Franchise
             </button>
             <button
               onClick={() => handleNavClick('xerox-shop')}
-              className={`transition-colors hover:text-[#0C3D97] ${activePage === 'xerox-shop' ? 'text-[#0C3D97] font-bold' : ''}`}
+              className={`transition-colors hover:text-[#0C3D97] whitespace-nowrap ${activePage === 'xerox-shop' ? 'text-[#0C3D97] font-bold' : ''}`}
             >
               Xerox Shops
             </button>
             <button
               onClick={() => handleNavClick('contact')}
-              className={`transition-colors hover:text-[#0C3D97] ${activePage === 'contact' ? 'text-[#0C3D97] font-bold' : ''}`}
+              className={`transition-colors hover:text-[#0C3D97] whitespace-nowrap ${activePage === 'contact' ? 'text-[#0C3D97] font-bold' : ''}`}
             >
-              Contact us
+              Contact Us
             </button>
           </nav>
 
