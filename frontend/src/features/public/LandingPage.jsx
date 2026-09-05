@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/Navbar';
 import Hero from '../../components/Hero';
+import TouchscreenExperience from '../../components/TouchscreenExperience';
 import HowItWorks from '../../components/HowItWorks';
 import IdleAdsFeature from '../../components/IdleAdsFeature';
 import LivePrintModal from '../../components/LivePrintModal';
 import FeaturesGrid from '../../components/FeaturesGrid';
+import ROICalculator from '../../components/ROICalculator';
+import LocationsStats from '../../components/LocationsStats';
 import WhereItFits from '../../components/WhereItFits';
 import KioskSpecs from '../../components/KioskSpecs';
 import FranchiseModels from '../../components/FranchiseModels';
@@ -15,6 +18,7 @@ import Footer from '../../components/Footer';
 import AboutPage from '../../components/AboutPage';
 import XeroxShopPage from '../../components/XeroxShopPage';
 import ContactPage from '../../components/ContactPage';
+import FloatingWhatsAppWidget from '../../components/FloatingWhatsAppWidget';
 
 export default function LandingPage() {
   const [activePage, setActivePage] = useState('home'); // 'home', 'about', 'franchise', 'xerox-shop', 'contact'
@@ -54,31 +58,40 @@ export default function LandingPage() {
               onOpenFranchise={() => handleOpenFranchise('own')}
             />
 
-            {/* 2. How to Use Section */}
+            {/* 2. Interactive Touchscreen Hardware Experience */}
+            <TouchscreenExperience onOpenPrintModal={() => setIsPrintModalOpen(true)} />
+
+            {/* 3. How to Use Section */}
             <HowItWorks onOpenPrintModal={() => setIsPrintModalOpen(true)} />
 
-            {/* 3. Idle Screen Advertisement Monetization Feature */}
+            {/* 4. Idle Screen Advertisement Monetization Feature */}
             <IdleAdsFeature onOpenFranchise={() => handleOpenFranchise('host')} />
 
-            {/* 4. Features Section */}
+            {/* 5. Features Section */}
             <FeaturesGrid />
 
-            {/* 5. Where Does EasyXerox Fit */}
+            {/* 6. Interactive ROI & Profit Calculator */}
+            <ROICalculator onOpenFranchise={() => handleOpenFranchise('own')} />
+
+            {/* 7. Live Kiosk Locations & Network Map */}
+            <LocationsStats />
+
+            {/* 8. Where Does EasyXerox Fit */}
             <WhereItFits onOpenFranchise={() => handleOpenFranchise('host')} />
 
-            {/* 6. Hardware Specs: PRO vs MINI */}
+            {/* 9. Hardware Specs: PRO vs MINI */}
             <KioskSpecs onOpenFranchise={() => handleOpenFranchise('own')} />
 
-            {/* 7. Franchise Models */}
+            {/* 10. Franchise Models */}
             <FranchiseModels onSelectModel={(model) => handleOpenFranchise(model)} />
 
-            {/* 8. Multi-Step Franchise Application Form */}
+            {/* 11. Multi-Step Franchise Application Form */}
             <FranchiseForm initialModel={selectedFranchiseModel} />
 
-            {/* 9. FAQ Accordions */}
+            {/* 12. FAQ Accordions */}
             <FAQSection />
 
-            {/* 10. Host Kiosk CTA Banner */}
+            {/* 13. Host Kiosk CTA Banner */}
             <CTAHostBanner onOpenFranchise={() => handleOpenFranchise('host')} />
           </>
         )}
@@ -90,6 +103,7 @@ export default function LandingPage() {
         {activePage === 'franchise' && (
           <div className="pt-10">
             <FranchiseModels onSelectModel={(model) => handleOpenFranchise(model)} />
+            <ROICalculator onOpenFranchise={() => handleOpenFranchise('own')} />
             <KioskSpecs onOpenFranchise={() => handleOpenFranchise('own')} />
             <FranchiseForm initialModel={selectedFranchiseModel} />
             <FAQSection />
@@ -110,6 +124,9 @@ export default function LandingPage() {
         setActivePage={setActivePage}
         onOpenPrintModal={() => setIsPrintModalOpen(true)}
       />
+
+      {/* Floating Instant Inquiry & WhatsApp Support Button */}
+      <FloatingWhatsAppWidget />
 
       {/* Interactive Print Simulator Modal */}
       <LivePrintModal 
