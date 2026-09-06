@@ -14,19 +14,40 @@ export default function FranchiseForm({ initialModel = 'own', embedded = false }
     venueType: 'College / University',
     message: '',
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleNext = (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     } else {
-      setSubmitted(true);
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      setIsSubmitting(true);
+      try {
+        const selectedObj = partnerOptions.find(o => o.id === selectedOption);
+        await fetch('/api/v1/inquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: formData.fullName,
+            phone: formData.phone,
+            email: formData.email,
+            city: formData.city,
+            venueType: formData.venueType,
+            message: formData.message,
+            partnerModel: selectedObj ? selectedObj.title : selectedOption
+          })
+        });
+      } catch (err) {
+        console.error('Inquiry submission error:', err);
+      } finally {
+        setIsSubmitting(false);
+        setSubmitted(true);
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
     }
   };
 
@@ -304,9 +325,10 @@ export default function FranchiseForm({ initialModel = 'own', embedded = false }
                     </button>
                     <button
                       type="submit"
-                      className="px-8 py-3 rounded-full bg-[#0C3D97] hover:bg-[#082e75] text-white font-bold text-sm flex items-center space-x-2 brand-glow"
+                      disabled={isSubmitting}
+                      className="px-8 py-3 rounded-full bg-[#0C3D97] hover:bg-[#082e75] text-white font-bold text-sm flex items-center space-x-2 brand-glow disabled:opacity-50 cursor-pointer"
                     >
-                      <span>Submit Franchise Enquiry</span>
+                      <span>{isSubmitting ? 'Submitting...' : 'Submit Franchise Enquiry'}</span>
                       <CheckCircle className="w-4 h-4" />
                     </button>
                   </div>
