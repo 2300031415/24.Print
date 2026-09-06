@@ -16,13 +16,16 @@ import {
   Award,
   Layers,
   FileCheck,
-  Check
+  Check,
+  Sliders,
+  Maximize2
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 const SAMPLE_DOCS = [
-  { id: 'doc1', name: 'University_Assignment_2026.pdf', pages: 6, size: '1.4 MB', icon: FileText, color: 'text-blue-600' },
-  { id: 'doc2', name: 'Government_Aadhaar_ID_Proof.pdf', pages: 2, size: '0.8 MB', icon: ShieldCheck, color: 'text-emerald-600' },
-  { id: 'doc3', name: 'Professional_Executive_Resume.pdf', pages: 3, size: '1.1 MB', icon: FileCheck, color: 'text-purple-600' },
+  { id: 'doc1', name: 'University_Assignment_2026.pdf', pages: 4, size: '1.4 MB', icon: FileText, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+  { id: 'doc2', name: 'Government_Aadhaar_ID_Proof.pdf', pages: 2, size: '0.8 MB', icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  { id: 'doc3', name: 'Executive_Resume_Portfolio.pdf', pages: 3, size: '1.1 MB', icon: FileCheck, color: 'text-purple-400', bg: 'bg-purple-500/10' },
 ];
 
 const InteractivePrintSimulator = ({ isOpen, onClose }) => {
@@ -32,7 +35,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
   
   // Print options
   const [colorMode, setColorMode] = useState('bw'); // 'bw' or 'color'
-  const [duplex, setDuplex] = useState(false); // single or double sided
+  const [duplex, setDuplex] = useState(true); // single or double sided
   const [copies, setCopies] = useState(1);
   const [paperSize, setPaperSize] = useState('A4');
   
@@ -54,10 +57,17 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
         setPrintProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            setTimeout(() => setStep(5), 600);
+            setTimeout(() => {
+              setStep(5);
+              confetti({
+                particleCount: 80,
+                spread: 60,
+                origin: { y: 0.6 }
+              });
+            }, 600);
             return 100;
           }
-          return prev + 20;
+          return prev + 25;
         });
       }, 400);
       return () => clearInterval(interval);
@@ -70,10 +80,11 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
       const customDoc = {
         id: 'custom',
         name: file.name,
-        pages: Math.floor(Math.random() * 8) + 2,
+        pages: Math.floor(Math.random() * 6) + 2,
         size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
         icon: FileText,
-        color: 'text-blue-600'
+        color: 'text-cyan-400',
+        bg: 'bg-cyan-500/10'
       };
       setCustomFile(file);
       setSelectedDoc(customDoc);
@@ -85,7 +96,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
     setTimeout(() => {
       setIsPaying(false);
       setStep(4);
-    }, 1500);
+    }, 1200);
   };
 
   const resetSim = () => {
@@ -93,7 +104,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
     setSelectedDoc(SAMPLE_DOCS[0]);
     setCustomFile(null);
     setColorMode('bw');
-    setDuplex(false);
+    setDuplex(true);
     setCopies(1);
     setPaperSize('A4');
     setPrintProgress(0);
@@ -103,75 +114,78 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-xl overflow-y-auto">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ opacity: 0, scale: 0.94, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-blue-200 overflow-hidden text-slate-900 my-8"
+          exit={{ opacity: 0, scale: 0.94, y: 20 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="relative w-full max-w-4xl bg-slate-900 rounded-[2.5rem] shadow-2xl border-4 border-slate-800 ring-1 ring-cyan-500/30 overflow-hidden text-slate-100 my-4"
         >
-          {/* Header Bar */}
-          <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 px-6 py-4 text-white flex items-center justify-between">
+          {/* Top Kiosk Bezel & Status Bar */}
+          <div className="bg-slate-950 px-6 py-3.5 border-b border-slate-800 flex items-center justify-between font-mono text-xs select-none">
             <div className="flex items-center gap-3">
-              <div className="bg-white p-1.5 px-3 rounded-xl border border-blue-400/50 shadow-md">
-                <img src="/logo.png" alt="EasyXerox" className="h-7 w-auto object-contain" />
-              </div>
-              <div>
-                <h3 className="text-lg font-black font-heading text-white tracking-tight flex items-center gap-2">
-                  <span>Interactive Kiosk Print Simulator</span>
-                  <span className="px-2 py-0.5 bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-[10px] uppercase tracking-wider rounded-md font-bold">
-                    Live Demo
-                  </span>
-                </h3>
-                <p className="text-xs text-blue-200 font-medium">Experience how fast self-printing works on EasyXerox kiosks</p>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse ring-4 ring-emerald-500/20" />
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold tracking-wider text-slate-200">EASYXEROX TOUCHSCREEN OS</span>
+                <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-bold text-[10px]">v2.4 LIVE</span>
               </div>
             </div>
 
-            <button
-              onClick={onClose}
-              className="p-2 text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition-all"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-4 text-[11px]">
+              <div className="hidden sm:flex items-center gap-2 text-slate-400">
+                <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">DUPLEX ENABLED</span>
+                <span className="text-emerald-400 font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> SYSTEM READY
+                </span>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          {/* Stepper Progress Bar */}
-          <div className="bg-slate-50 border-b border-blue-100 px-6 py-3.5 flex items-center justify-between">
+          {/* Touchscreen Stepper Header */}
+          <div className="bg-slate-900/90 border-b border-slate-800/80 px-6 py-3 flex items-center justify-between overflow-x-auto">
             {[
-              { num: 1, label: 'Upload' },
-              { num: 2, label: 'Print Options' },
-              { num: 3, label: 'UPI Pay' },
-              { num: 4, label: 'Kiosk Print' },
-              { num: 5, label: 'Receipt' },
+              { num: 1, label: 'Document Source' },
+              { num: 2, label: 'Print Settings' },
+              { num: 3, label: 'Razorpay UPI' },
+              { num: 4, label: 'Laser Spooling' },
+              { num: 5, label: 'Eject & Receipt' },
             ].map((st, idx) => (
               <React.Fragment key={st.num}>
-                <div
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
                   onClick={() => st.num < step && setStep(st.num)}
-                  className={`flex items-center gap-2 cursor-pointer transition-all ${
+                  className={`flex items-center gap-2.5 cursor-pointer whitespace-nowrap px-2.5 py-1 rounded-xl transition-all ${
                     step === st.num
-                      ? 'text-blue-600 font-black'
+                      ? 'text-cyan-400 font-black'
                       : step > st.num
-                      ? 'text-emerald-600 font-bold'
-                      : 'text-slate-400 font-medium'
+                      ? 'text-emerald-400 font-bold'
+                      : 'text-slate-500 font-medium'
                   }`}
                 >
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
+                    className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black transition-all ${
                       step === st.num
-                        ? 'bg-blue-600 text-white shadow-blue-glow ring-4 ring-blue-100'
+                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/30 ring-2 ring-cyan-400'
                         : step > st.num
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-slate-200 text-slate-500'
+                        ? 'bg-emerald-500 text-slate-950 font-black'
+                        : 'bg-slate-800 text-slate-500 border border-slate-700'
                     }`}
                   >
-                    {step > st.num ? <Check className="w-4 h-4" /> : st.num}
+                    {step > st.num ? <Check className="w-4 h-4 stroke-[3]" /> : st.num}
                   </div>
-                  <span className="hidden sm:inline text-xs">{st.label}</span>
-                </div>
+                  <span className="text-xs tracking-tight">{st.label}</span>
+                </motion.div>
                 {idx < 4 && (
-                  <div className="flex-1 h-1 mx-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="flex-1 min-w-[20px] h-0.5 mx-2 bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-600 transition-all duration-300"
+                      className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
                       style={{ width: step > st.num ? '100%' : '0%' }}
                     />
                   </div>
@@ -180,18 +194,30 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
             ))}
           </div>
 
-          {/* Modal Body */}
-          <div className="p-6 md:p-8 min-h-[400px] flex flex-col justify-between bg-gradient-to-b from-white to-blue-50/30">
+          {/* Simulator Screen Content */}
+          <div className="p-6 sm:p-8 min-h-[440px] flex flex-col justify-between bg-slate-900/60 relative overflow-hidden">
             
-            {/* STEP 1: UPLOAD DOCUMENT SIMULATION */}
+            {/* Ambient Background Glows */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
+
+            {/* STEP 1: SELECT DOCUMENT */}
             {step === 1 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-                <div className="text-center max-w-xl mx-auto">
-                  <span className="text-xs font-black text-blue-600 uppercase tracking-widest block mb-1">Step 01 of 03</span>
-                  <h4 className="text-2xl font-black text-slate-950 font-heading">Select or Upload a Document</h4>
-                  <p className="text-xs text-slate-600 font-semibold mt-1">
-                    On a physical kiosk, you simply scan the screen QR code with your mobile camera to pick your document.
-                  </p>
+              <motion.div
+                initial={{ opacity: 0, x: -15 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 15 }}
+                className="space-y-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest block mb-1">Step 01 of 03</span>
+                    <h4 className="text-2xl font-black text-white font-heading">1. Select Document Source</h4>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 text-xs text-slate-300 font-mono">
+                    <QrCode className="w-4 h-4 text-cyan-400" />
+                    <span>Touchscreen Ready</span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -199,32 +225,34 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                     const IconComp = doc.icon;
                     const isSelected = selectedDoc.id === doc.id;
                     return (
-                      <div
+                      <motion.div
                         key={doc.id}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => setSelectedDoc(doc)}
-                        className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
+                        className={`p-5 rounded-2xl border-2 cursor-pointer transition-all relative overflow-hidden ${
                           isSelected
-                            ? 'border-blue-600 bg-blue-50/80 shadow-lg ring-2 ring-blue-500/20'
-                            : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50'
+                            ? 'border-cyan-400 bg-gradient-to-br from-blue-900/50 via-slate-900 to-cyan-950/40 shadow-xl shadow-cyan-500/10 ring-2 ring-cyan-400/20'
+                            : 'border-slate-800 bg-slate-900/90 hover:border-slate-700 hover:bg-slate-800/50'
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-3">
-                          <IconComp className={`w-8 h-8 ${doc.color}`} />
-                          {isSelected && (
-                            <span className="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs">
-                              ✓
-                            </span>
-                          )}
+                        {isSelected && (
+                          <div className="absolute top-3 right-3 w-5 h-5 bg-cyan-400 text-slate-950 rounded-full flex items-center justify-center text-xs font-black shadow-lg">
+                            ✓
+                          </div>
+                        )}
+                        <div className={`w-12 h-12 rounded-xl ${doc.bg} flex items-center justify-center mb-4 border border-slate-700/50`}>
+                          <IconComp className={`w-6 h-6 ${doc.color}`} />
                         </div>
-                        <h5 className="text-xs font-black text-slate-900 truncate mb-1">{doc.name}</h5>
-                        <p className="text-[11px] text-slate-500 font-medium">{doc.pages} Pages • {doc.size}</p>
-                      </div>
+                        <h5 className="text-sm font-bold text-white truncate mb-1">{doc.name}</h5>
+                        <p className="text-xs text-slate-400 font-medium">{doc.pages} Pages • {doc.size}</p>
+                      </motion.div>
                     );
                   })}
                 </div>
 
-                {/* Custom File Upload Option */}
-                <div className="p-6 border-2 border-dashed border-blue-200 rounded-2xl bg-white text-center">
+                {/* Custom Upload Tile */}
+                <div className="p-6 border-2 border-dashed border-slate-800 rounded-2xl bg-slate-950/50 text-center hover:border-cyan-500/50 transition-all">
                   <input
                     type="file"
                     id="simulator-file-input"
@@ -234,179 +262,188 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                   />
                   <label
                     htmlFor="simulator-file-input"
-                    className="cursor-pointer flex flex-col items-center justify-center gap-2"
+                    className="cursor-pointer flex flex-col items-center justify-center gap-2 group"
                   >
-                    <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
+                    <div className="w-12 h-12 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                       <Upload className="w-6 h-6" />
                     </div>
                     <div>
-                      <span className="text-xs font-extrabold text-blue-700 hover:underline">Click to upload your own PDF / Document</span>
-                      <p className="text-[11px] text-slate-400 font-medium mt-0.5">Supports PDF, DOCX, JPG up to 25MB</p>
+                      <span className="text-xs font-bold text-cyan-300 group-hover:underline">Upload Custom File / PDF</span>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">Direct touchscreen file picker (PDF, DOCX, JPG)</p>
                     </div>
                   </label>
                   {customFile && (
-                    <p className="mt-2 text-xs font-bold text-emerald-600 flex items-center justify-center gap-1">
-                      <CheckCircle2 className="w-4 h-4" /> Selected: {customFile.name}
+                    <p className="mt-2 text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5 bg-emerald-950/60 py-1 px-3 rounded-lg border border-emerald-800/60 inline-flex">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Selected: {customFile.name}
                     </p>
                   )}
                 </div>
 
                 <div className="flex justify-end pt-2">
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => setStep(2)}
-                    className="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-blue-glow transition-all flex items-center gap-2 btn-touch"
+                    className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center gap-2 cursor-pointer"
                   >
-                    <span>Next: Select Print Options</span>
+                    <span>Proceed to Print Settings</span>
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </motion.button>
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 2: PRINT OPTIONS CUSTOMIZER */}
+            {/* STEP 2: PRINT OPTIONS */}
             {step === 2 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-                <div className="flex items-center justify-between border-b border-blue-100 pb-4">
+              <motion.div
+                initial={{ opacity: 0, x: -15 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 15 }}
+                className="space-y-6"
+              >
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <div>
-                    <span className="text-xs font-black text-blue-600 uppercase tracking-widest block">Step 02 of 03</span>
-                    <h4 className="text-2xl font-black text-slate-950 font-heading">Customize Print Settings</h4>
+                    <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest block mb-1">Step 02 of 03</span>
+                    <h4 className="text-2xl font-black text-white font-heading">2. Customize Print Settings</h4>
                   </div>
-                  <div className="px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl text-left">
-                    <span className="text-[10px] text-slate-500 uppercase font-bold block">Selected File</span>
-                    <span className="text-xs font-black text-blue-900 truncate max-w-[200px] block">
+                  <div className="px-4 py-2 bg-slate-800/90 border border-slate-700 rounded-xl text-right">
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase block">Selected File</span>
+                    <span className="text-xs font-black text-cyan-300 truncate max-w-[200px] block">
                       {selectedDoc.name} ({totalPages} pgs)
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Options Control Panel */}
-                  <div className="space-y-5">
-                    {/* Color Mode Switch */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* Left Column Controls */}
+                  <div className="lg:col-span-7 space-y-5">
+                    
+                    {/* Color Mode */}
                     <div>
-                      <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider block mb-2">
-                        Print Color
-                      </label>
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Color Mode</label>
                       <div className="grid grid-cols-2 gap-3">
-                        <button
+                        <motion.button
+                          whileTap={{ scale: 0.97 }}
                           onClick={() => setColorMode('bw')}
-                          className={`p-3.5 rounded-xl border-2 text-xs font-black transition-all flex items-center justify-center gap-2 ${
+                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all flex items-center justify-between ${
                             colorMode === 'bw'
-                              ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
-                              : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                              ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300 shadow-md ring-1 ring-cyan-400/30'
+                              : 'border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700'
                           }`}
                         >
-                          <span>Black & White</span>
-                          <span className="px-2 py-0.5 bg-slate-200 text-slate-800 text-[10px] rounded-md font-bold">₹2/pg</span>
-                        </button>
+                          <span>B&W (Monochrome)</span>
+                          <span className="px-2 py-0.5 bg-slate-800 text-slate-200 text-[10px] rounded border border-slate-700">₹2/pg</span>
+                        </motion.button>
 
-                        <button
+                        <motion.button
+                          whileTap={{ scale: 0.97 }}
                           onClick={() => setColorMode('color')}
-                          className={`p-3.5 rounded-xl border-2 text-xs font-black transition-all flex items-center justify-center gap-2 ${
+                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all flex items-center justify-between ${
                             colorMode === 'color'
-                              ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
-                              : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                              ? 'border-purple-400 bg-purple-950/40 text-purple-300 shadow-md ring-1 ring-purple-400/30'
+                              : 'border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700'
                           }`}
                         >
                           <span>Full Color</span>
-                          <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-[10px] rounded-md font-bold">₹10/pg</span>
-                        </button>
+                          <span className="px-2 py-0.5 bg-purple-900/60 text-purple-200 text-[10px] rounded border border-purple-700">₹10/pg</span>
+                        </motion.button>
                       </div>
                     </div>
 
-                    {/* Single / Duplex Sided */}
+                    {/* Print Sides (Duplex) */}
                     <div>
-                      <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider block mb-2">
-                        Print Sides
-                      </label>
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Sides (Duplex)</label>
                       <div className="grid grid-cols-2 gap-3">
-                        <button
+                        <motion.button
+                          whileTap={{ scale: 0.97 }}
                           onClick={() => setDuplex(false)}
-                          className={`p-3.5 rounded-xl border-2 text-xs font-black transition-all ${
+                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all ${
                             !duplex
-                              ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
-                              : 'border-slate-200 bg-white text-slate-600'
+                              ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300'
+                              : 'border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700'
                           }`}
                         >
-                          Single Sided
-                        </button>
+                          1-Sided (Single)
+                        </motion.button>
 
-                        <button
+                        <motion.button
+                          whileTap={{ scale: 0.97 }}
                           onClick={() => setDuplex(true)}
-                          className={`p-3.5 rounded-xl border-2 text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all flex items-center justify-center gap-2 ${
                             duplex
-                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700 shadow-sm'
-                              : 'border-slate-200 bg-white text-slate-600'
+                              ? 'border-emerald-400 bg-emerald-950/40 text-emerald-300 shadow-md ring-1 ring-emerald-400/30'
+                              : 'border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700'
                           }`}
                         >
-                          <span>Double Sided (Duplex)</span>
-                          <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-black">-10%</span>
-                        </button>
+                          <span>Both Sides (Duplex)</span>
+                          <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/40">-10%</span>
+                        </motion.button>
                       </div>
                     </div>
 
                     {/* Paper Size & Copies */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider block mb-2">Paper Size</label>
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Paper Output</label>
                         <select
                           value={paperSize}
                           onChange={(e) => setPaperSize(e.target.value)}
-                          className="w-full p-3 bg-white border-2 border-slate-200 rounded-xl text-xs font-extrabold text-slate-900 focus:border-blue-600 focus:outline-none"
+                          className="w-full p-3.5 bg-slate-900 border-2 border-slate-800 rounded-xl text-xs font-extrabold text-white focus:border-cyan-400 focus:outline-none"
                         >
-                          <option value="A4">Standard A4</option>
-                          <option value="A3">Large A3 (+₹5)</option>
+                          <option value="A4">Standard A4 Sheet</option>
+                          <option value="A3">Large A3 Sheet (+₹5)</option>
                         </select>
                       </div>
 
                       <div>
-                        <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider block mb-2">Number of Copies</label>
-                        <div className="flex items-center border-2 border-slate-200 rounded-xl overflow-hidden bg-white">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">Copies</label>
+                        <div className="flex items-center border-2 border-slate-800 rounded-xl overflow-hidden bg-slate-900">
                           <button
                             onClick={() => setCopies(Math.max(1, copies - 1))}
-                            className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 font-black text-sm text-slate-700"
+                            className="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-extrabold text-sm text-slate-200 transition-colors"
                           >
                             -
                           </button>
-                          <span className="flex-1 text-center font-black text-xs text-slate-900">{copies}</span>
+                          <span className="flex-1 text-center font-black text-sm text-cyan-300">{copies}</span>
                           <button
                             onClick={() => setCopies(copies + 1)}
-                            className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 font-black text-sm text-slate-700"
+                            className="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-extrabold text-sm text-slate-200 transition-colors"
                           >
                             +
                           </button>
                         </div>
                       </div>
                     </div>
+
                   </div>
 
-                  {/* Dynamic Cost Summary Box */}
-                  <div className="bg-slate-900 text-white rounded-2xl p-6 flex flex-col justify-between border border-slate-800 shadow-xl">
+                  {/* Right Column Dynamic Cost Card */}
+                  <div className="lg:col-span-5 bg-gradient-to-b from-slate-950 to-slate-900 rounded-2xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Order Estimation</span>
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Calculated Total</span>
                         <span className="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-black rounded-lg border border-emerald-500/30">
-                          Instant Spooling Ready
+                          Duplex Saved 10%
                         </span>
                       </div>
 
                       <div className="space-y-3 text-xs text-slate-300 font-medium">
                         <div className="flex justify-between">
-                          <span>Document Pages:</span>
-                          <span className="font-extrabold text-white">{totalPages} Pages</span>
+                          <span className="text-slate-400">Total Pages:</span>
+                          <span className="font-extrabold text-white">{totalPages} Pages ({duplex ? Math.ceil(totalPages/2) + ' Sheets' : totalPages + ' Sheets'})</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Rate per page:</span>
-                          <span className="font-extrabold text-cyan-300">₹{pricePerPage}.00 ({colorMode.toUpperCase()})</span>
+                          <span className="text-slate-400">Page Rate:</span>
+                          <span className="font-extrabold text-cyan-400">₹{pricePerPage}.00 / page</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Copies:</span>
+                          <span className="text-slate-400">Total Copies:</span>
                           <span className="font-extrabold text-white">{copies} Copy</span>
                         </div>
                         {duplex && (
-                          <div className="flex justify-between text-emerald-400">
-                            <span>Duplex Paper Discount:</span>
-                            <span className="font-extrabold">-₹{discount}.00</span>
+                          <div className="flex justify-between text-emerald-400 font-bold">
+                            <span>Duplex Discount:</span>
+                            <span>-₹{discount}.00</span>
                           </div>
                         )}
                       </div>
@@ -414,193 +451,220 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
 
                     <div className="pt-4 border-t border-slate-800 mt-4">
                       <div className="flex items-baseline justify-between mb-4">
-                        <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Amount:</span>
-                        <div className="text-right">
-                          <span className="text-3xl font-black font-heading text-cyan-400">₹{finalPrice}.00</span>
-                          <span className="text-[10px] text-slate-400 block">Inc. GST & Paper</span>
-                        </div>
+                        <span className="text-xs font-bold text-slate-400 uppercase">Grand Total:</span>
+                        <motion.div
+                          key={finalPrice}
+                          initial={{ scale: 1.2, color: "#38bdf8" }}
+                          animate={{ scale: 1, color: "#22d3ee" }}
+                          className="text-3xl font-black font-mono text-cyan-400"
+                        >
+                          ₹{finalPrice}.00
+                        </motion.div>
                       </div>
 
                       <div className="flex gap-3">
                         <button
                           onClick={() => setStep(1)}
-                          className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all"
+                          className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all"
                         >
                           Back
                         </button>
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.97 }}
                           onClick={() => setStep(3)}
-                          className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs rounded-xl shadow-blue-glow transition-all flex items-center justify-center gap-2"
+                          className="flex-1 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                         >
-                          <span>Proceed to UPI Payment</span>
+                          <span>TAP TO PRINT (₹{finalPrice}.00)</span>
                           <ArrowRight className="w-4 h-4" />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   </div>
+
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 3: UPI QR PAYMENT SIMULATION */}
+            {/* STEP 3: UPI PAY */}
             {step === 3 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 text-center max-w-md mx-auto">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                className="space-y-6 text-center max-w-md mx-auto py-2"
+              >
                 <div>
-                  <span className="text-xs font-black text-blue-600 uppercase tracking-widest block mb-1">Step 03 of 03</span>
-                  <h4 className="text-2xl font-black text-slate-950 font-heading">Scan UPI QR & Print</h4>
-                  <p className="text-xs text-slate-600 font-semibold mt-1">
-                    On the kiosk touch screen, a dynamic Razorpay UPI QR code is automatically generated for instant verification.
+                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest block mb-1">Step 03 of 03</span>
+                  <h4 className="text-2xl font-black text-white font-heading">Scan with Any Phone Camera or UPI App</h4>
+                  <p className="text-xs text-slate-400 font-medium mt-1">
+                    Razorpay dynamic QR auto-generated on screen. No registration required.
                   </p>
                 </div>
 
-                {/* QR Code Container */}
-                <div className="bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-xl inline-block relative overflow-hidden group">
-                  <div className="w-52 h-52 bg-slate-100 rounded-2xl flex items-center justify-center p-3 border border-slate-200 relative">
-                    {/* Simulated QR Code Canvas */}
-                    <div className="w-full h-full bg-slate-900 rounded-xl p-3 flex flex-col items-center justify-between text-white select-none">
-                      <div className="flex justify-between w-full">
-                        <div className="w-8 h-8 bg-blue-500 rounded border-2 border-white" />
-                        <div className="w-8 h-8 bg-blue-500 rounded border-2 border-white" />
-                      </div>
-                      <div className="text-center font-mono text-[10px] tracking-widest text-cyan-300 font-bold">
-                        EASYXEROX UPI QR
-                      </div>
-                      <div className="flex justify-between w-full">
-                        <div className="w-8 h-8 bg-blue-500 rounded border-2 border-white" />
-                        <div className="w-3.5 h-3.5 bg-emerald-400 rounded-full" />
-                      </div>
-                    </div>
+                {/* Animated QR Code Container with Laser Scanning Line */}
+                <div className="bg-slate-950 p-6 rounded-3xl border-2 border-cyan-500/40 shadow-2xl shadow-cyan-500/10 inline-block relative overflow-hidden group">
+                  
+                  {/* Laser Scanning Bar */}
+                  <motion.div
+                    animate={{ y: [0, 180, 0] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                    className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#00f0ff] z-20 pointer-events-none"
+                  />
 
-                    {/* Center Overlay Logo */}
+                  <div className="w-52 h-52 bg-white rounded-2xl flex items-center justify-center p-3 relative border border-cyan-400/50">
+                    <QrCode className="w-44 h-44 text-slate-950" />
+                    
+                    {/* Center Overlay Brand Icon */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="bg-white p-2 rounded-xl border border-blue-300 shadow-md">
+                      <div className="bg-white p-1.5 rounded-xl border border-blue-400 shadow-lg">
                         <img src="/logo.png" alt="EasyXerox" className="h-6 w-auto object-contain" />
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-center gap-3 text-xs font-black text-slate-700">
-                    <span className="px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">Google Pay</span>
-                    <span className="px-2.5 py-1 bg-purple-50 border border-purple-200 rounded-lg text-purple-700">PhonePe</span>
-                    <span className="px-2.5 py-1 bg-cyan-50 border border-cyan-200 rounded-lg text-cyan-700">Paytm</span>
+                  <div className="mt-4 flex items-center justify-center gap-2 text-[11px] font-bold text-slate-300">
+                    <span className="px-2.5 py-1 bg-purple-950 text-purple-300 border border-purple-800/60 rounded-lg">PhonePe</span>
+                    <span className="px-2.5 py-1 bg-blue-950 text-blue-300 border border-blue-800/60 rounded-lg">GPay</span>
+                    <span className="px-2.5 py-1 bg-cyan-950 text-cyan-300 border border-cyan-800/60 rounded-lg">Paytm</span>
                   </div>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center justify-between text-left">
+                <div className="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 flex items-center justify-between text-left">
                   <div>
-                    <span className="text-[10px] text-slate-500 font-extrabold uppercase block">Amount Payable</span>
-                    <span className="text-xl font-black text-blue-900 font-heading">₹{finalPrice}.00</span>
+                    <span className="text-[10px] text-slate-400 font-extrabold uppercase block">Amount Payable</span>
+                    <span className="text-xl font-black text-cyan-300 font-mono">₹{finalPrice}.00</span>
                   </div>
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={handlePayClick}
                     disabled={isPaying}
-                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 btn-touch disabled:opacity-50"
+                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
                   >
                     {isPaying ? (
                       <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>Verifying UPI...</span>
+                        <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
+                        <span>Verifying Payment...</span>
                       </>
                     ) : (
                       <>
-                        <CreditCard className="w-4 h-4" />
-                        <span>Simulate Successful Payment</span>
+                        <CreditCard className="w-4 h-4 text-slate-950" />
+                        <span>Simulate Pay (₹{finalPrice})</span>
                       </>
                     )}
-                  </button>
+                  </motion.button>
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 4: KIOSK PRINT SPOOLING ANIMATION */}
+            {/* STEP 4: KIOSK PRINTING SPOOLING ANIMATION */}
             {step === 4 && (
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6 text-center max-w-md mx-auto py-8">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-6 text-center max-w-md mx-auto py-8"
+              >
                 <div className="relative inline-block">
-                  <div className="w-24 h-24 bg-blue-600 text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/40 border-4 border-white animate-bounce">
+                  <motion.div
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                    className="w-24 h-24 bg-gradient-to-br from-blue-600 to-cyan-500 text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-cyan-500/30 border-4 border-slate-900"
+                  >
                     <Printer className="w-12 h-12" />
-                  </div>
+                  </motion.div>
                   <span className="absolute -top-2 -right-2 px-3 py-1 bg-cyan-400 text-slate-950 font-black text-[10px] rounded-full uppercase tracking-wider shadow-md animate-pulse">
-                    Spooling
+                    Printing 30 Ppm
                   </span>
                 </div>
 
                 <div>
-                  <h4 className="text-2xl font-black text-slate-950 font-heading">Printing Document...</h4>
-                  <p className="text-xs text-slate-600 font-semibold mt-1">
-                    Silent daemon dispatching job to laser print tray at 30 Ppm.
+                  <h4 className="text-2xl font-black text-white font-heading">Printing Your Document...</h4>
+                  <p className="text-xs text-slate-400 font-medium mt-1">
+                    Daemon dispatching file to hardware laser printer tray.
                   </p>
                 </div>
 
                 {/* Progress Bar */}
                 <div className="space-y-2">
-                  <div className="h-4 bg-slate-200 rounded-full overflow-hidden p-0.5 shadow-inner">
+                  <div className="h-4 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800 shadow-inner">
                     <motion.div
-                      className="h-full bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-500 rounded-full transition-all duration-300"
+                      className="h-full bg-gradient-to-r from-blue-600 via-cyan-400 to-emerald-400 rounded-full transition-all duration-300"
                       style={{ width: `${printProgress}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-xs font-black text-slate-600">
-                    <span>Processing Pages...</span>
+                  <div className="flex justify-between text-xs font-mono font-bold text-cyan-400">
+                    <span>Ejecting Page Output...</span>
                     <span>{printProgress}%</span>
                   </div>
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 5: PRINT COMPLETE & DIGITAL RECEIPT */}
+            {/* STEP 5: PRINT DISPATCHED & RECEIPT */}
             {step === 5 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 text-center max-w-lg mx-auto">
-                <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto border-2 border-emerald-200 shadow-xl">
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6 text-center max-w-lg mx-auto py-2"
+              >
+                <div className="w-20 h-20 bg-emerald-500/10 text-emerald-400 rounded-3xl flex items-center justify-center mx-auto border-2 border-emerald-500/30 shadow-2xl shadow-emerald-500/20">
                   <CheckCircle2 className="w-10 h-10" />
                 </div>
 
                 <div>
-                  <span className="px-3 py-1 bg-emerald-100 text-emerald-800 text-[11px] font-black uppercase tracking-wider rounded-full border border-emerald-200">
-                    Print Dispatched Successfully
+                  <span className="px-3.5 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[11px] font-black uppercase tracking-wider rounded-full">
+                    Print Ejected Successfully
                   </span>
-                  <h4 className="text-3xl font-black text-slate-950 font-heading mt-3">Job Complete!</h4>
-                  <p className="text-xs text-slate-600 font-semibold mt-1">
-                    Your printed pages have been ejected into the secure kiosk collection tray.
+                  <h4 className="text-3xl font-black text-white font-heading mt-3">Job Complete!</h4>
+                  <p className="text-xs text-slate-400 font-medium mt-1">
+                    Collect your printed sheets from the lower kiosk output tray.
                   </p>
                 </div>
 
-                {/* Receipt Card */}
-                <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 text-left shadow-lg relative font-mono text-xs text-slate-800">
-                  <div className="border-b border-dashed border-slate-300 pb-3 mb-3 flex justify-between items-center font-sans">
+                {/* Digital Receipt Card */}
+                <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 text-left shadow-2xl font-mono text-xs text-slate-300 relative">
+                  <div className="border-b border-dashed border-slate-800 pb-3 mb-3 flex justify-between items-center font-sans">
                     <div className="flex items-center gap-2">
                       <img src="/logo.png" alt="EasyXerox" className="h-6 w-auto" />
-                      <span className="font-black text-blue-900 text-sm">EasyXerox Kiosk</span>
+                      <span className="font-black text-white text-sm">EasyXerox Kiosk</span>
                     </div>
-                    <span className="text-[10px] text-slate-400 font-bold">TXN-EX8942-OK</span>
+                    <span className="text-[10px] text-cyan-400 font-bold bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800">TXN-EX9821-OK</span>
                   </div>
 
                   <div className="space-y-2 text-[11px]">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Document:</span>
-                      <span className="font-bold text-slate-900 truncate max-w-[200px]">{selectedDoc.name}</span>
+                      <span className="text-slate-500">Document Name:</span>
+                      <span className="font-bold text-white truncate max-w-[200px]">{selectedDoc.name}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Pages / Color:</span>
-                      <span className="font-bold text-slate-900">{totalPages} pgs • {colorMode.toUpperCase()}</span>
+                      <span className="font-bold text-white">{totalPages} pgs • {colorMode.toUpperCase()}</span>
                     </div>
                     <div className="flex justify-between">
+                      <span className="text-slate-500">Duplex Sided:</span>
+                      <span className="font-bold text-emerald-400">{duplex ? 'Yes (Both Sides)' : 'No (1-Sided)'}</span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-slate-900">
                       <span className="text-slate-500">Total Paid:</span>
-                      <span className="font-bold text-emerald-600 text-sm">₹{finalPrice}.00 (UPI)</span>
+                      <span className="font-bold text-cyan-300 text-sm">₹{finalPrice}.00 (Razorpay UPI)</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-center gap-4 pt-2">
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={resetSim}
-                    className="px-6 py-3 bg-slate-900 hover:bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 btn-touch"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer"
                   >
                     <RefreshCw className="w-4 h-4" />
                     <span>Run Another Demo</span>
-                  </button>
+                  </motion.button>
                   <button
                     onClick={onClose}
-                    className="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-xl transition-all"
+                    className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all"
                   >
                     Close Simulator
                   </button>
@@ -616,3 +680,4 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
 };
 
 export default InteractivePrintSimulator;
+
