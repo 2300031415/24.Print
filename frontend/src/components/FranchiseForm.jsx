@@ -42,11 +42,15 @@ export default function FranchiseForm({ initialModel = 'own', embedded = false }
       } finally {
         setIsSubmitting(false);
         setSubmitted(true);
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
+        try {
+          if (typeof confetti === 'function') {
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 }
+            });
+          }
+        } catch (e) {}
       }
     }
   };

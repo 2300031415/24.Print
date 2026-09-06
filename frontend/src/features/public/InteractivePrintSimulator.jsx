@@ -59,11 +59,15 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
             clearInterval(interval);
             setTimeout(() => {
               setStep(5);
-              confetti({
-                particleCount: 80,
-                spread: 60,
-                origin: { y: 0.6 }
-              });
+              try {
+                if (typeof confetti === 'function') {
+                  confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.6 }
+                  });
+                }
+              } catch (err) {}
             }, 600);
             return 100;
           }
