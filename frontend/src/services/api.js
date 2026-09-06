@@ -48,7 +48,6 @@ api.interceptors.response.use(
       } catch (refreshErr) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/admin/login';
       }
     }
     return Promise.reject(error);
