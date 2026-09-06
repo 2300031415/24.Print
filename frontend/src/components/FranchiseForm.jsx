@@ -15,6 +15,7 @@ export default function FranchiseForm({ initialModel = 'own', embedded = false }
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleNext = async (e) => {
     e.preventDefault();
