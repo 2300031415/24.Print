@@ -31,6 +31,12 @@ import ClientSettings from './features/client/ClientSettings';
 import AdminLogin from './features/admin/AdminLogin';
 import AdminDashboard from './features/admin/AdminDashboard';
 import AdminClients from './features/admin/AdminClients';
+import AdminMachines from './features/admin/AdminMachines';
+import AdminPricing from './features/admin/AdminPricing';
+import AdminGst from './features/admin/AdminGst';
+import AdminReports from './features/admin/AdminReports';
+import AdminLogs from './features/admin/AdminLogs';
+import AdminAds from './features/admin/AdminAds';
 
 // Protected Route Guard
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -75,6 +81,12 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/clients" element={<ProtectedRoute allowedRoles={['admin']}><AdminClients /></ProtectedRoute>} />
+          <Route path="/admin/machines" element={<ProtectedRoute allowedRoles={['admin']}><AdminMachines /></ProtectedRoute>} />
+          <Route path="/admin/pricing" element={<ProtectedRoute allowedRoles={['admin']}><AdminPricing /></ProtectedRoute>} />
+          <Route path="/admin/gst" element={<ProtectedRoute allowedRoles={['admin']}><AdminGst /></ProtectedRoute>} />
+          <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={['admin']}><AdminReports /></ProtectedRoute>} />
+          <Route path="/admin/logs" element={<ProtectedRoute allowedRoles={['admin']}><AdminLogs /></ProtectedRoute>} />
+          <Route path="/admin/ads" element={<ProtectedRoute allowedRoles={['admin']}><AdminAds /></ProtectedRoute>} />
 
           {/* Fallback Catch-all -> Landing Page */}
           <Route path="*" element={<Navigate to="/" replace />} />
