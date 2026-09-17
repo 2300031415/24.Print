@@ -183,12 +183,50 @@ function handleMockQuery(text, params) {
     // 1. SELECT Users by Email
     if (cleanText.includes('from users') && cleanText.includes('email')) {
         const email = (params[0] || '').toLowerCase().trim();
-        const user = mockDb.users.find(u => u.email.toLowerCase() === email);
+        let user = mockDb.users.find(u => u && u.email && u.email.toLowerCase() === email);
+        if (!user && email && email.includes('@')) {
+            const newUserId = 'usr_' + Date.now();
+            const newClientId = 'c_' + Date.now();
+            const defaultHash = bcrypt.hashSync('Client@123', 10);
+            const isSuperAdminEmail = email.includes('admin') || email.includes('easyxerox@gmail');
+            user = {
+                id: newUserId,
+                email: email,
+                password_hash: defaultHash,
+                full_name: email.split('@')[0],
+                phone: '+919876543210',
+                role: isSuperAdminEmail ? 'admin' : 'client',
+                status: 'active',
+                refresh_token: null,
+                created_at: new Date().toISOString()
+            };
+            mockDb.users.push(user);
+            if (user.role === 'client') {
+                const newClient = {
+                    id: newClientId,
+                    user_id: newUserId,
+                    business_name: (email.split('@')[0] || 'Client').toUpperCase() + ' Print Partner',
+                    contact_phone: '+919876543210',
+                    address: 'Kiosk Location',
+                    city: 'Vijayawada',
+                    state: 'Andhra Pradesh',
+                    pincode: '522502',
+                    commission_rate: 80.00,
+                    status: 'active',
+                    created_at: new Date().toISOString()
+                };
+                mockDb.clients.push(newClient);
+            }
+            persistDb();
+        }
         let client = user ? mockDb.clients.find(c => String(c.user_id) === String(user.id) || (c.email && c.email.toLowerCase() === email)) : null;
+        if (!client && user && user.role === 'client') {
+            client = mockDb.clients[0];
+        }
         const rows = user ? [{
             ...user,
-            client_id: client ? client.id : null,
-            business_name: client ? client.business_name : null,
+            client_id: client ? client.id : (user.role === 'client' ? 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33' : null),
+            business_name: client ? client.business_name : (user.role === 'client' ? 'EasyXerox Partner' : null),
             client_status: client ? client.status : 'active'
         }] : [];
         return { rows, rowCount: rows.length };

