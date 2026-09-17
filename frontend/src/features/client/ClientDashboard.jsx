@@ -83,10 +83,12 @@ const ClientDashboard = () => {
     ? recentTxns
     : recentTxns.filter(tx => String(tx.machine_id) === String(selectedBoardId) || tx.machine_name?.includes(selectedBoardId));
 
-  const displayTodayRevenue = stats.todayRevenue || 0;
-  const displayMonthlyRevenue = stats.monthlyRevenue || 0;
-  const displayTotalCustomers = stats.totalCustomersCount || 0;
-  const displayPagesPrinted = stats.totalPagesPrinted || 0;
+  const hasNoMachines = machines.length === 0 && (stats.totalMachines === 0 || !stats.totalMachines);
+
+  const displayTodayRevenue = hasNoMachines ? 0 : (stats.todayRevenue || 0);
+  const displayMonthlyRevenue = hasNoMachines ? 0 : (stats.monthlyRevenue || 0);
+  const displayTotalCustomers = hasNoMachines ? 0 : (stats.totalCustomersCount || 0);
+  const displayPagesPrinted = hasNoMachines ? 0 : (stats.totalPagesPrinted || 0);
 
   // Y-Axis Max Scale calculations
   const maxRevenueVal = 10000;
@@ -102,6 +104,18 @@ const ClientDashboard = () => {
         {/* ──────────────────────────────────────────────────────────────
             TOP BOARD SELECTION FILTER HEADER BAR
         ────────────────────────────────────────────────────────────── */}
+        {hasNoMachines && (
+          <div className="bg-amber-50 border-2 border-amber-300 p-5 rounded-2xl flex items-center gap-3 text-amber-900 shadow-sm">
+            <Monitor className="w-6 h-6 text-amber-600 shrink-0" />
+            <div>
+              <h4 className="text-sm font-black uppercase tracking-wide">No Registered Kiosk Boards Assigned</h4>
+              <p className="text-xs font-bold text-amber-800 mt-0.5">
+                There are currently no active Xerox kiosk boards registered under this client partner account. All revenue metrics and customer statistics will display ₹0 until a board is linked by Super Admin.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white p-6 rounded-3xl border-2 border-blue-100 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
           <div>
             <h2 className="text-2xl font-black text-slate-950 font-heading flex items-center gap-2.5">

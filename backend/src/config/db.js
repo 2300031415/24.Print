@@ -155,6 +155,39 @@ function handleMockQuery(text, params) {
 
     // 0. Dashboard Aggregation Queries (COUNT / SUM)
     if ((cleanText.includes('select count(') || cleanText.includes('select coalesce(sum(')) && !cleanText.includes('select m.*')) {
+        if (cleanText.includes('client_id') && params.length > 0) {
+            const targetId = String(params[0] || '').trim();
+            const clientMachines = mockDb.machines.filter(m => 
+                String(m.client_id) === targetId || String(m.client_user_id) === targetId
+            );
+            const clientMachineIds = clientMachines.map(m => String(m.id));
+
+            const cTotalMachines = clientMachines.length;
+            const cOnlineMachines = clientMachines.filter(m => m.status === 'online').length;
+
+            const clientTxns = mockDb.transactions.filter(t => 
+                String(t.client_id) === targetId || clientMachineIds.includes(String(t.machine_id))
+            );
+            const cTotalRev = clientTxns.reduce((sum, t) => sum + (parseFloat(t.client_share || t.amount) || 0), 0);
+
+            const clientJobs = mockDb.print_jobs.filter(pj => 
+                clientMachineIds.includes(String(pj.machine_id)) && pj.status === 'completed'
+            );
+            const cTotalPages = clientJobs.reduce((sum, pj) => sum + ((pj.total_pages || 1) * (pj.copies || 1)), 0);
+
+            return {
+                rows: [{
+                    count: String(cTotalMachines),
+                    online_count: String(cOnlineMachines),
+                    total: String(cTotalRev),
+                    today: '0',
+                    pages: String(cTotalPages),
+                    month: String(cTotalRev)
+                }],
+                rowCount: 1
+            };
+        }
+
         const totalClients = mockDb.clients.filter(c => c.status === 'active' || !c.status).length;
         const totalMachines = mockDb.machines.length;
         const onlineMachines = mockDb.machines.filter(m => m.status === 'online').length;
@@ -800,7 +833,40 @@ function handleMockQuery(text, params) {
     }
 
     // 20. Admin / Client Dashboard Summaries
-    if (cleanText.includes('count(') || cleanText.includes('sum(amount)')) {
+    if (cleanText.includes('count(') || cleanText.includes('sum(amount)') || cleanText.includes('sum(client_share)')) {
+        if (cleanText.includes('client_id') && params.length > 0) {
+            const targetId = String(params[0] || '').trim();
+            const clientMachines = mockDb.machines.filter(m => 
+                String(m.client_id) === targetId || String(m.client_user_id) === targetId
+            );
+            const clientMachineIds = clientMachines.map(m => String(m.id));
+
+            const cTotalMachines = clientMachines.length;
+            const cOnlineMachines = clientMachines.filter(m => m.status === 'online').length;
+
+            const clientTxns = mockDb.transactions.filter(t => 
+                String(t.client_id) === targetId || clientMachineIds.includes(String(t.machine_id))
+            );
+            const cTotalRev = clientTxns.reduce((sum, t) => sum + (parseFloat(t.client_share || t.amount) || 0), 0);
+
+            const clientJobs = mockDb.print_jobs.filter(pj => 
+                clientMachineIds.includes(String(pj.machine_id)) && pj.status === 'completed'
+            );
+            const cTotalPages = clientJobs.reduce((sum, pj) => sum + ((pj.total_pages || 1) * (pj.copies || 1)), 0);
+
+            return {
+                rows: [{
+                    count: String(cTotalMachines),
+                    online_count: String(cOnlineMachines),
+                    total: String(cTotalRev),
+                    today: '0',
+                    pages: String(cTotalPages),
+                    month: String(cTotalRev)
+                }],
+                rowCount: 1
+            };
+        }
+
         const totalClients = mockDb.clients.filter(c => c.status === 'active' || !c.status).length;
         const totalMachines = mockDb.machines.length;
         const onlineMachines = mockDb.machines.filter(m => m.status === 'online').length;
