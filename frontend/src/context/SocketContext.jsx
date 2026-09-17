@@ -8,31 +8,39 @@ export const SocketProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const { hostname, port, protocol } = window.location;
-    const socketUrl = hostname === 'localhost'
-      ? window.location.origin
-      : (port === '5173' || port === '5174')
-        ? `http://${hostname}:5000`           // Direct :5173 → backend :5000
-        : `${protocol}//${hostname}`;         // Via Nginx → same host, proxied to :5000
+    let socketInstance;
+    try {
+      const { hostname, port, protocol } = window.location;
+      const socketUrl = (hostname === 'localhost' || hostname === '127.0.0.1')
+        ? window.location.origin
+        : (port === '5173' || port === '5174')
+          ? `http://${hostname}:5000`
+          : `${protocol}//${hostname}`;
 
-    const socketInstance = io(socketUrl, {
-      reconnectionDelay: 2000,
-      reconnectionAttempts: 10,
-      path: '/socket.io/'
-    });
+      socketInstance = io(socketUrl, {
+        reconnectionDelay: 3000,
+        reconnectionAttempts: 5,
+        path: '/socket.io/',
+        transports: ['websocket', 'polling']
+      });
 
-    socketInstance.on('connect', () => {
-      setIsConnected(true);
-    });
+      socketInstance.on('connect', () => {
+        setIsConnected(true);
+      });
 
-    socketInstance.on('disconnect', () => {
-      setIsConnected(false);
-    });
+      socketInstance.on('disconnect', () => {
+        setIsConnected(false);
+      });
 
-    setSocket(socketInstance);
+      setSocket(socketInstance);
+    } catch (err) {
+      console.warn('Socket connection error:', err);
+    }
 
     return () => {
-      socketInstance.disconnect();
+      if (socketInstance) {
+        try { socketInstance.disconnect(); } catch (e) {}
+      }
     };
   }, []);
 

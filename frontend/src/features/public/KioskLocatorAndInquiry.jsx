@@ -87,8 +87,25 @@ const KioskLocatorAndInquiry = () => {
     return matchesSearch && matchesCat;
   });
 
-  const handleInquirySubmit = (e) => {
+  const handleInquirySubmit = async (e) => {
     e.preventDefault();
+    try {
+      await fetch('/api/v1/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          city: formData.city,
+          venueType: formData.venueType,
+          message: `Venue Name: ${formData.venueName || 'N/A'} • Estimated Footfall: ${formData.footfall}`,
+          partnerModel: 'Host Location Inquiry'
+        })
+      });
+    } catch (err) {
+      console.error('Modal inquiry error:', err);
+    }
     setInquirySuccess(true);
     setTimeout(() => {
       setInquirySuccess(false);

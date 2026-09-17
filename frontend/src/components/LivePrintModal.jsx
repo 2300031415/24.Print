@@ -16,9 +16,7 @@ import {
   Award,
   Layers,
   FileCheck,
-  Check,
-  Sliders,
-  Maximize2
+  Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -28,14 +26,14 @@ const SAMPLE_DOCS = [
   { id: 'doc3', name: 'Executive_Resume_Portfolio.pdf', pages: 3, size: '1.1 MB', icon: FileCheck, color: 'text-purple-400', bg: 'bg-purple-500/10' },
 ];
 
-const InteractivePrintSimulator = ({ isOpen, onClose }) => {
-  const [step, setStep] = useState(1); // 1: Upload, 2: Options, 3: UPI Pay, 4: Printing, 5: Done
+export default function LivePrintModal({ isOpen, onClose }) {
+  const [step, setStep] = useState(1); // 1: Source, 2: Settings, 3: UPI, 4: Print, 5: Done
   const [selectedDoc, setSelectedDoc] = useState(SAMPLE_DOCS[0]);
   const [customFile, setCustomFile] = useState(null);
   
   // Print options
-  const [colorMode, setColorMode] = useState('bw'); // 'bw' or 'color'
-  const [duplex, setDuplex] = useState(true); // single or double sided
+  const [colorMode, setColorMode] = useState('bw');
+  const [duplex, setDuplex] = useState(true);
   const [copies, setCopies] = useState(1);
   const [paperSize, setPaperSize] = useState('A4');
   
@@ -61,13 +59,9 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
               setStep(5);
               try {
                 if (typeof confetti === 'function') {
-                  confetti({
-                    particleCount: 80,
-                    spread: 60,
-                    origin: { y: 0.6 }
-                  });
+                  confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
                 }
-              } catch (err) {}
+              } catch (e) {}
             }, 600);
             return 100;
           }
@@ -79,7 +73,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
   }, [step]);
 
   const handleCustomFileUpload = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       const customDoc = {
         id: 'custom',
@@ -145,7 +139,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-all"
+                className="p-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-all cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -259,13 +253,13 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                 <div className="p-6 border-2 border-dashed border-slate-800 rounded-2xl bg-slate-950/50 text-center hover:border-cyan-500/50 transition-all">
                   <input
                     type="file"
-                    id="simulator-file-input"
+                    id="simulator-file-input-live"
                     className="hidden"
                     accept=".pdf,.doc,.docx,.jpg,.png"
                     onChange={handleCustomFileUpload}
                   />
                   <label
-                    htmlFor="simulator-file-input"
+                    htmlFor="simulator-file-input-live"
                     className="cursor-pointer flex flex-col items-center justify-center gap-2 group"
                   >
                     <div className="w-12 h-12 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
@@ -329,7 +323,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                         <motion.button
                           whileTap={{ scale: 0.97 }}
                           onClick={() => setColorMode('bw')}
-                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all flex items-center justify-between ${
+                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all flex items-center justify-between cursor-pointer ${
                             colorMode === 'bw'
                               ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300 shadow-md ring-1 ring-cyan-400/30'
                               : 'border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700'
@@ -342,7 +336,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                         <motion.button
                           whileTap={{ scale: 0.97 }}
                           onClick={() => setColorMode('color')}
-                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all flex items-center justify-between ${
+                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all flex items-center justify-between cursor-pointer ${
                             colorMode === 'color'
                               ? 'border-purple-400 bg-purple-950/40 text-purple-300 shadow-md ring-1 ring-purple-400/30'
                               : 'border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700'
@@ -361,7 +355,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                         <motion.button
                           whileTap={{ scale: 0.97 }}
                           onClick={() => setDuplex(false)}
-                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all ${
+                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all cursor-pointer ${
                             !duplex
                               ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300'
                               : 'border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700'
@@ -373,7 +367,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                         <motion.button
                           whileTap={{ scale: 0.97 }}
                           onClick={() => setDuplex(true)}
-                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all flex items-center justify-center gap-2 ${
+                          className={`p-3.5 rounded-xl border-2 text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                             duplex
                               ? 'border-emerald-400 bg-emerald-950/40 text-emerald-300 shadow-md ring-1 ring-emerald-400/30'
                               : 'border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700'
@@ -392,7 +386,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                         <select
                           value={paperSize}
                           onChange={(e) => setPaperSize(e.target.value)}
-                          className="w-full p-3.5 bg-slate-900 border-2 border-slate-800 rounded-xl text-xs font-extrabold text-white focus:border-cyan-400 focus:outline-none"
+                          className="w-full p-3.5 bg-slate-900 border-2 border-slate-800 rounded-xl text-xs font-extrabold text-white focus:border-cyan-400 focus:outline-none cursor-pointer"
                         >
                           <option value="A4">Standard A4 Sheet</option>
                           <option value="A3">Large A3 Sheet (+₹5)</option>
@@ -404,14 +398,14 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                         <div className="flex items-center border-2 border-slate-800 rounded-xl overflow-hidden bg-slate-900">
                           <button
                             onClick={() => setCopies(Math.max(1, copies - 1))}
-                            className="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-extrabold text-sm text-slate-200 transition-colors"
+                            className="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-extrabold text-sm text-slate-200 transition-colors cursor-pointer"
                           >
                             -
                           </button>
                           <span className="flex-1 text-center font-black text-sm text-cyan-300">{copies}</span>
                           <button
                             onClick={() => setCopies(copies + 1)}
-                            className="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-extrabold text-sm text-slate-200 transition-colors"
+                            className="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-extrabold text-sm text-slate-200 transition-colors cursor-pointer"
                           >
                             +
                           </button>
@@ -469,7 +463,7 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                       <div className="flex gap-3">
                         <button
                           onClick={() => setStep(1)}
-                          className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all"
+                          className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all cursor-pointer"
                         >
                           Back
                         </button>
@@ -508,8 +502,6 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
 
                 {/* Animated QR Code Container with Laser Scanning Line */}
                 <div className="bg-slate-950 p-6 rounded-3xl border-2 border-cyan-500/40 shadow-2xl shadow-cyan-500/10 inline-block relative overflow-hidden group">
-                  
-                  {/* Laser Scanning Bar */}
                   <motion.div
                     animate={{ y: [0, 180, 0] }}
                     transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
@@ -518,8 +510,6 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
 
                   <div className="w-52 h-52 bg-white rounded-2xl flex items-center justify-center p-3 relative border border-cyan-400/50">
                     <QrCode className="w-44 h-44 text-slate-950" />
-                    
-                    {/* Center Overlay Brand Icon */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="bg-white p-1.5 rounded-xl border border-blue-400 shadow-lg">
                         <img src="/logo.png" alt="EasyXerox" className="h-6 w-auto object-contain" />
@@ -589,7 +579,6 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                   </p>
                 </div>
 
-                {/* Progress Bar */}
                 <div className="space-y-2">
                   <div className="h-4 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800 shadow-inner">
                     <motion.div
@@ -626,7 +615,6 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                   </p>
                 </div>
 
-                {/* Digital Receipt Card */}
                 <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 text-left shadow-2xl font-mono text-xs text-slate-300 relative">
                   <div className="border-b border-dashed border-slate-800 pb-3 mb-3 flex justify-between items-center font-sans">
                     <div className="flex items-center gap-2">
@@ -661,14 +649,14 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={resetSim}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all cursor-pointer"
                   >
                     <RefreshCw className="w-4 h-4" />
                     <span>Run Another Demo</span>
                   </motion.button>
                   <button
                     onClick={onClose}
-                    className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all"
+                    className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
                   >
                     Close Simulator
                   </button>
@@ -681,7 +669,4 @@ const InteractivePrintSimulator = ({ isOpen, onClose }) => {
       </div>
     </AnimatePresence>
   );
-};
-
-export default InteractivePrintSimulator;
-
+}

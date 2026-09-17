@@ -21,6 +21,7 @@ const printRoutes = require('./routes/printRoutes');
 const adRoutes = require('./routes/adRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const settingRoutes = require('./routes/settingRoutes');
+const inquiryRoutes = require('./routes/inquiryRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -95,6 +96,7 @@ app.use('/api/v1/print', printRoutes);
 app.use('/api/v1/ads', adRoutes);
 app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/settings', settingRoutes);
+app.use('/api/v1/inquiries', inquiryRoutes);
 
 // Global Error Handler
 app.use(errorHandler);
