@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Monitor, Plus, QrCode, MapPin, Printer, Wifi, ShieldCheck, X, ExternalLink } from 'lucide-react';
+import { Monitor, Plus, QrCode, MapPin, Printer, Wifi, ShieldCheck, X, ExternalLink, Cpu } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
 import PortalLayout from '../../components/PortalLayout';
@@ -8,12 +8,14 @@ import api from '../../services/api';
 const AdminMachines = () => {
   const [machines, setMachines] = useState([]);
   const [clients, setClients] = useState([]);
+  const [unregisteredHardware, setUnregisteredHardware] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedQrMachine, setSelectedQrMachine] = useState(null);
 
   const [formData, setFormData] = useState({
     machine_code: 'FFPVT_EasyXerox-001',
     name: 'FFPVT_EasyXerox-001',
+    mac_address: '',
     client_id: '',
     location_address: '',
     city: 'New Delhi',
@@ -22,12 +24,13 @@ const AdminMachines = () => {
     default_printer_name: 'Auto-Detecting Printer...'
   });
 
-  const openRegisterModal = () => {
+  const openRegisterModal = (prefillMac = '') => {
     const nextNum = String(machines.length + 1).padStart(3, '0');
     const defaultCode = `FFPVT_EasyXerox-${nextNum}`;
     setFormData({
       machine_code: defaultCode,
       name: defaultCode,
+      mac_address: prefillMac || (unregisteredHardware.length > 0 ? unregisteredHardware[0].mac_address : ''),
       client_id: clients.length > 0 ? clients[0].id : '',
       location_address: '',
       city: 'New Delhi',
@@ -46,17 +49,21 @@ const AdminMachines = () => {
       const clientRes = await api.get('/clients');
       if (clientRes.data.success) {
         setClients(clientRes.data.clients);
-        if (clientRes.data.clients.length > 0) {
-          setFormData((prev) => ({ ...prev, client_id: clientRes.data.clients[0].id }));
-        }
+      }
+
+      const unregRes = await api.get('/machines/unregistered');
+      if (unregRes.data.success) {
+        setUnregisteredHardware(unregRes.data.hardware || []);
       }
     } catch (err) {
-      console.error('Error loading machines:', err);
+      console.error('Error loading machines or hardware status:', err);
     }
   };
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleCreateMachine = async (e) => {
@@ -103,15 +110,37 @@ const AdminMachines = () => {
   };
 
   return (
-    <PortalLayout title="Kiosk Machine Registry & QR Generator" role="admin">
+    <PortalLayout title="Kiosk Machine Registry & Hardware Pairing" role="admin">
       <div className="w-full max-w-7xl mx-auto space-y-6 select-none font-sans">
+        
+        {/* DETECTED HARDWARE BANNER */}
+        {unregisteredHardware.length > 0 && (
+          <div className="bg-amber-50 border-2 border-amber-300 p-5 rounded-2xl flex items-center justify-between gap-4 text-amber-950 shadow-md">
+            <div className="flex items-center gap-3">
+              <Cpu className="w-6 h-6 text-amber-600 shrink-0" />
+              <div>
+                <h4 className="text-sm font-black uppercase tracking-wide">Detected Hardware Standby Boards ({unregisteredHardware.length})</h4>
+                <p className="text-xs font-bold text-amber-800 mt-0.5">
+                  New kiosk hardware detected! MAC: <span className="font-mono font-black">{unregisteredHardware.map(h => h.mac_address).join(', ')}</span>
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => openRegisterModal(unregisteredHardware[0].mac_address)}
+              className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-black rounded-xl text-xs shadow-md shrink-0 btn-touch"
+            >
+              Assign & Pair Board ⚡
+            </button>
+          </div>
+        )}
+
         <div className="bg-white p-6 rounded-3xl border-2 border-blue-100 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h3 className="text-xl font-black text-slate-950 font-heading">Registered Hardware Fleet</h3>
-            <p className="text-slate-600 font-bold text-xs mt-1">Register new Windows 11 Touch Kiosks and generate unique machine QR codes.</p>
+            <p className="text-slate-600 font-bold text-xs mt-1">Register new Kiosks, pair hardware MAC addresses, and generate machine QR codes.</p>
           </div>
           <button
-            onClick={openRegisterModal}
+            onClick={() => openRegisterModal()}
             className="px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-md flex items-center gap-2 btn-touch text-sm shrink-0"
           >
             <Plus className="w-5 h-5" />
@@ -154,8 +183,12 @@ const AdminMachines = () => {
                     <span className="text-slate-950 font-black">{machine.client_name || 'Metro Xerox & Print Zone'}</span>
                   </div>
                   <div className="flex justify-between">
+                    <span className="text-slate-500">Hardware MAC ID</span>
+                    <span className="text-blue-700 font-mono font-extrabold">{machine.mac_address || 'Auto-Paired'}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-slate-500">Default Printer</span>
-                    <span className="text-blue-700 font-mono font-bold">{machine.default_printer_name || 'No Active Printer Connected'}</span>
+                    <span className="text-blue-700 font-mono font-bold truncate max-w-[140px]">{machine.default_printer_name || 'No Printer'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Printed Jobs</span>
@@ -189,73 +222,6 @@ const AdminMachines = () => {
         </div>
       </div>
 
-      {/* VIEW QR MODAL */}
-      {selectedQrMachine && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
-          <div className="w-full max-w-sm bg-white border-2 border-blue-100 rounded-3xl p-8 shadow-2xl relative text-center text-slate-950">
-            <button onClick={() => setSelectedQrMachine(null)} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-950">
-              <X className="w-6 h-6" />
-            </button>
-            <h3 className="text-xl font-black text-slate-950 font-heading">{selectedQrMachine.machine_code}</h3>
-            <p className="text-xs text-blue-700 font-mono font-bold mt-1 mb-4">{selectedQrMachine.machine_code}</p>
-
-            <div className="p-4 bg-white border-2 border-blue-100 rounded-2xl inline-block shadow-xl mb-4">
-              <QRCodeSVG
-                value={`${import.meta.env.VITE_PUBLIC_DOMAIN || 'https://easyxerox.com'}/upload/${selectedQrMachine.machine_code}`}
-                size={200}
-                level="H"
-                includeMargin={true}
-              />
-            </div>
-
-            <div className="bg-slate-50 p-4 rounded-2xl border border-blue-100 text-left space-y-3 mb-5 text-xs">
-              <div>
-                <p className="text-slate-500 font-bold">📱 Scan Mobile Upload URL (For Customers):</p>
-                <a
-                  href={`https://easyxerox.com/upload/${selectedQrMachine.machine_code}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-600 font-mono text-[11px] font-black hover:underline block truncate"
-                >
-                  https://easyxerox.com/upload/{selectedQrMachine.machine_code}
-                </a>
-              </div>
-              <div className="border-t border-slate-200 pt-2">
-                <p className="text-slate-500 font-bold">🖥️ Touch Kiosk Board Screen URL (For Kiosk Hardware):</p>
-                <a
-                  href={`https://easyxerox.com/kiosk/${selectedQrMachine.machine_code}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-emerald-700 font-mono text-[11px] font-black hover:underline block truncate"
-                >
-                  https://easyxerox.com/kiosk/{selectedQrMachine.machine_code}
-                </a>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <a
-                href={`/kiosk/${selectedQrMachine.machine_code}`}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-md btn-touch"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>Open Kiosk Board Display Screen ↗️</span>
-              </a>
-
-              <button
-                onClick={handlePrintQr}
-                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-md btn-touch"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Print QR Code Sticker</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* CREATE MACHINE MODAL */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
@@ -263,9 +229,34 @@ const AdminMachines = () => {
             <button onClick={() => setShowModal(false)} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-950">
               <X className="w-6 h-6" />
             </button>
-            <h3 className="text-2xl font-black text-slate-950 font-heading mb-6">Register New Kiosk Hardware</h3>
+            <h3 className="text-2xl font-black text-slate-950 font-heading mb-6">Register & Pair Kiosk Hardware</h3>
 
             <form onSubmit={handleCreateMachine} className="space-y-4">
+              {/* MAC ADDRESS SELECTION / DISPLAY */}
+              <div>
+                <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Hardware MAC Address (Auto-Detected)</label>
+                {unregisteredHardware.length > 0 ? (
+                  <select
+                    value={formData.mac_address}
+                    onChange={(e) => setFormData({ ...formData, mac_address: e.target.value })}
+                    className="w-full bg-slate-50 border-2 border-amber-300 rounded-xl p-3.5 text-sm font-mono font-black text-slate-950 focus:border-blue-600 focus:bg-white cursor-pointer"
+                  >
+                    <option value="">Manual Entry / Auto-Detect Later</option>
+                    {unregisteredHardware.map((h) => (
+                      <option key={h.mac_address} value={h.mac_address}>⚡ Detected: {h.mac_address} ({h.ip_address})</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    placeholder="e.g. b4:2e:99:a1:c4:8f (or leave blank to auto-pair)"
+                    value={formData.mac_address}
+                    onChange={(e) => setFormData({ ...formData, mac_address: e.target.value })}
+                    className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3.5 text-sm text-slate-950 font-mono font-bold focus:border-blue-600 focus:bg-white"
+                  />
+                )}
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-black text-blue-700 uppercase tracking-wider block mb-1">Machine Code</label>
@@ -306,7 +297,7 @@ const AdminMachines = () => {
                 type="submit"
                 className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl transition-all shadow-md btn-touch text-base mt-4"
               >
-                Register & Generate QR
+                Register & Pair Board
               </button>
             </form>
           </div>

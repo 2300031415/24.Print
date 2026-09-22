@@ -3,6 +3,8 @@ const router = express.Router();
 const machineController = require('../controllers/machineController');
 const { authenticateToken, requireAdmin } = require('../middlewares/auth');
 
+router.get('/identify', machineController.identifyMachine);
+router.get('/unregistered', authenticateToken, requireAdmin, machineController.getUnregisteredHardware);
 router.get('/', authenticateToken, machineController.getMachines);
 router.get('/code/:machineCode', machineController.getMachineByCode);
 router.get('/code/:machineCode/ads', machineController.getMachineAds);

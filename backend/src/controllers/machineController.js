@@ -251,6 +251,60 @@ const getMachineAds = async (req, res, next) => {
     }
 };
 
+const unregisteredHardwareStore = new Map();
+
+const identifyMachine = async (req, res, next) => {
+    try {
+        const mac = (req.query.mac || req.body.mac || '').trim().toLowerCase();
+        if (!mac) {
+            return res.status(400).json({ success: false, message: 'MAC address or hardware ID is required.' });
+        }
+
+        const machineRes = await db.query(
+            `SELECT m.*, c.business_name as client_name, c.status as client_status 
+             FROM machines m
+             LEFT JOIN clients c ON m.client_id = c.id
+             WHERE LOWER(m.mac_address) = $1 OR LOWER(m.machine_code) = $1`,
+            [mac]
+        );
+
+        if (machineRes.rows.length > 0) {
+            const machine = machineRes.rows[0];
+            return res.json({
+                success: true,
+                registered: true,
+                machineCode: machine.machine_code,
+                name: machine.name,
+                status: machine.status
+            });
+        }
+
+        unregisteredHardwareStore.set(mac, {
+            mac_address: mac,
+            ip_address: req.ip || req.headers['x-forwarded-for'] || 'Unknown IP',
+            detected_at: new Date().toISOString()
+        });
+
+        res.json({
+            success: true,
+            registered: false,
+            mac,
+            message: 'Standing by. Hardware detected. Waiting for Super Admin registration.'
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const getUnregisteredHardware = async (req, res, next) => {
+    try {
+        const hardware = Array.from(unregisteredHardwareStore.values());
+        res.json({ success: true, hardware });
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
     getMachines,
     getMachineByCode,
@@ -259,5 +313,7 @@ module.exports = {
     toggleMachineStatus,
     updatePrinterStatus,
     deleteMachine,
-    getMachineAds
+    getMachineAds,
+    identifyMachine,
+    getUnregisteredHardware
 };
