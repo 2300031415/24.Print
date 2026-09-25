@@ -163,6 +163,11 @@ rsync -av --exclude="node_modules" --exclude="temp_print" "${PROJECT_ROOT}/print
 mkdir -p "${CHROOT_DIR}/opt/easyxerox/kiosk-launcher"
 rsync -av --exclude="node_modules" "${SCRIPT_DIR}/launcher/" "${CHROOT_DIR}/opt/easyxerox/kiosk-launcher/"
 
+# Deploy machine_config.json template into /etc/easyxerox/
+mkdir -p "${CHROOT_DIR}/etc/easyxerox"
+cp "${SCRIPT_DIR}/machine_config.json" "${CHROOT_DIR}/etc/easyxerox/config.json"
+chmod 664 "${CHROOT_DIR}/etc/easyxerox/config.json"
+
 # Deploy systemd services
 cp "${SCRIPT_DIR}/systemd/easyxerox-kiosk.service" "${CHROOT_DIR}/etc/systemd/system/easyxerox-kiosk.service"
 cp "${SCRIPT_DIR}/systemd/easyxerox-print.service" "${CHROOT_DIR}/etc/systemd/system/easyxerox-print.service"

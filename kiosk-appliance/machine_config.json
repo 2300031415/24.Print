@@ -1,0 +1,16 @@
+{
+  "_comment": "EasyXerox Kiosk Appliance — Hardware Config. Auto-written by setup wizard on first boot.",
+  "machine_code": "KIOSK-001",
+  "board_name": "EasyXerox Master Board",
+  "server_url": "https://easyxerox.com",
+  "printer_name": "",
+  "paper_size": "A4",
+  "color_supported": false,
+  "duplex_supported": false,
+  "configured": false,
+  "heartbeat_interval_seconds": 30,
+  "inactivity_timeout_seconds": 60,
+  "default_language": "en",
+  "kiosk_ui_version": "2.0.0",
+  "build_date": "2026-09-26"
+}

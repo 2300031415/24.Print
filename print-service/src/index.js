@@ -6,7 +6,7 @@ const FormData = require('form-data');
 const pdfPrinter = require('pdf-to-printer');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-const { getPrinterStatus } = require('./printerMonitor');
+const { getPrinterStatus, getSystemTelemetry, getPaperStatus, getTonerStatus } = require('./printerService');
 const { startUSBMonitoring, listDriveFiles, readDriveFile, getCurrentDrivesList } = require('./usbMonitor');
 
 const rawUrl = process.env.BACKEND_URL || '';
@@ -56,6 +56,7 @@ socket.on('connect', () => {
     console.log(`✅ Connected to Xerox Central Server (${BACKEND_URL}) Socket.IO!`);
     socket.emit('REGISTER_DAEMON', { machineCode: MACHINE_CODE });
     startPrinterMonitoring();
+    startHeartbeat();
 
     // Immediately sync any USB drive currently plugged into the PC on connect
     const activeDrives = getCurrentDrivesList();
@@ -233,9 +234,10 @@ async function updateJobStatus(printJobId, status, errorMessage = null) {
 }
 
 function startPrinterMonitoring() {
+    // Emit printer status every 15 seconds via Socket.IO
     setInterval(async () => {
         try {
-            const statusObj = await getPrinterStatus(PRINTER_NAME || 'default');
+            const statusObj = await getPrinterStatus(PRINTER_NAME || '');
             socket.emit('PRINTER_STATUS_CHANGE', {
                 machineCode: MACHINE_CODE,
                 status: statusObj.status,
@@ -246,4 +248,39 @@ function startPrinterMonitoring() {
             }).catch(() => {});
         } catch (err) {}
     }, 15000);
+}
+
+// ──────────────────────────────────────────────────────────────
+// HEARTBEAT — POST full telemetry to backend every 30 seconds
+// ──────────────────────────────────────────────────────────────
+function startHeartbeat() {
+    setInterval(async () => {
+        try {
+            const [telemetry, printerSt, paperSt, tonerSt] = await Promise.all([
+                getSystemTelemetry(),
+                getPrinterStatus(PRINTER_NAME || ''),
+                getPaperStatus(PRINTER_NAME || ''),
+                getTonerStatus(PRINTER_NAME || '')
+            ]);
+
+            await axios.post(
+                `${BACKEND_URL}/api/v1/machines/code/${MACHINE_CODE}/heartbeat`,
+                {
+                    cpu_percent:    telemetry.cpu_percent,
+                    ram_percent:    telemetry.ram_percent,
+                    disk_percent:   telemetry.disk_percent,
+                    temp_c:         telemetry.temp_c,
+                    uptime_seconds: telemetry.uptime_seconds,
+                    paper_level:    paperSt.level,
+                    toner_level:    tonerSt.level_pct < 20 ? 'low' : (tonerSt.level_pct === 0 ? 'empty' : 'ok'),
+                    printer_status: printerSt.status
+                },
+                { timeout: 8000 }
+            ).catch(e => console.warn('⚠️ Heartbeat POST failed:', e.message));
+
+            console.log(`💓 Heartbeat sent — CPU: ${telemetry.cpu_percent}%, RAM: ${telemetry.ram_percent}%, Printer: ${printerSt.status}`);
+        } catch (err) {
+            console.warn('⚠️ Heartbeat error:', err.message);
+        }
+    }, 30000);
 }
