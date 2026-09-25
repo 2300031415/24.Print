@@ -128,10 +128,14 @@ apt-get install -y --no-install-recommends \
   fonts-noto-core \
   fonts-freefont-ttf
 
-# Create Kiosk User
-useradd -m -s /bin/bash -G audio,video,netdev,lp,lpadmin,dialout kiosk
+# Create Kiosk User with full passwordless sudo rights
+useradd -m -s /bin/bash -G sudo,audio,video,netdev,lp,lpadmin,dialout kiosk
 passwd -d kiosk
 passwd -d root
+
+mkdir -p /etc/sudoers.d
+echo "kiosk ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/kiosk
+chmod 0440 /etc/sudoers.d/kiosk
 
 # Enable NetworkManager, CUPS, and NODM
 systemctl enable NetworkManager
