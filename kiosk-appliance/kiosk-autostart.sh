@@ -22,6 +22,12 @@ xset -dpms 2>/dev/null || true
 xset s noblank 2>/dev/null || true
 unclutter -idle 0.5 -root 2>/dev/null &
 
+# Start Openbox Window Manager if not already active
+if ! pgrep -x "openbox" >/dev/null 2>&1; then
+  openbox &
+fi
+
+
 # 3. Wait for Network to be Ready
 echo "⏳ Waiting for network connection..."
 for i in {1..30}; do
