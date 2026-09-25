@@ -1,0 +1,17 @@
+[Unit]
+Description=EasyXerox Kiosk Local Setup & Launcher Daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/easyxerox/kiosk-launcher
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+Environment=PORT=5050
+
+[Install]
+WantedBy=multi-user.target

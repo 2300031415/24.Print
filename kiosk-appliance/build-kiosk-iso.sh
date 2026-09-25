@@ -159,13 +159,21 @@ chmod +x "${CHROOT_DIR}/usr/local/bin/kiosk-autostart.sh"
 mkdir -p "${CHROOT_DIR}/opt/easyxerox/print-service"
 rsync -av --exclude="node_modules" --exclude="temp_print" "${PROJECT_ROOT}/print-service/" "${CHROOT_DIR}/opt/easyxerox/print-service/"
 
+# Copy kiosk-launcher into appliance
+mkdir -p "${CHROOT_DIR}/opt/easyxerox/kiosk-launcher"
+rsync -av --exclude="node_modules" "${SCRIPT_DIR}/launcher/" "${CHROOT_DIR}/opt/easyxerox/kiosk-launcher/"
+
 # Deploy systemd services
 cp "${SCRIPT_DIR}/systemd/easyxerox-kiosk.service" "${CHROOT_DIR}/etc/systemd/system/easyxerox-kiosk.service"
 cp "${SCRIPT_DIR}/systemd/easyxerox-print.service" "${CHROOT_DIR}/etc/systemd/system/easyxerox-print.service"
+cp "${SCRIPT_DIR}/systemd/easyxerox-launcher.service" "${CHROOT_DIR}/etc/systemd/system/easyxerox-launcher.service"
 
 chroot "${CHROOT_DIR}" /bin/bash << 'CHROOT_EOF'
 cd /opt/easyxerox/print-service
 npm install --omit=dev --no-audit --no-fund
+cd /opt/easyxerox/kiosk-launcher
+npm install --omit=dev --no-audit --no-fund
+systemctl enable easyxerox-launcher.service
 systemctl enable easyxerox-kiosk.service
 systemctl enable easyxerox-print.service
 CHROOT_EOF

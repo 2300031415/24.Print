@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>EasyXerox Kiosk Appliance Setup & Launcher</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #2563eb;
+      --primary-glow: #3b82f6;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, var(--bg) 60%, #030712 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ambient Lighting */
+    .ambient-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 70%);
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Appliance Bar */
+    header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 36px;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    }
+
+    .brand-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .dot-green { background: var(--success); box-shadow: 0 0 8px var(--success); }
+    .dot-red { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+    .dot-amber { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+
+    /* Main Container */
+    main {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Setup Cards Grid */
+    .setup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      color: #e2e8f0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary-glow);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .wifi-list {
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+      padding-right: 4px;
+    }
+
+    .wifi-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .wifi-item:hover, .wifi-item.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: var(--primary);
+    }
+
+    .wifi-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .wifi-ssid {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .wifi-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(37, 99, 235, 0.6);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-large {
+      padding: 16px 36px;
+      font-size: 16px;
+      border-radius: 16px;
+      width: 100%;
+      margin-top: 24px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Kiosk Fullscreen Viewport Mode */
+    #kiosk-viewport {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 100;
+      background: #000;
+    }
+
+    #kiosk-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Offline Branded Banner (Replaces Dinosaur) */
+    #offline-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 200;
+      background: radial-gradient(circle at center, #1e1b4b 0%, #090d16 80%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .offline-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 500px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    .gear-trigger {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      opacity: 0.3;
+      transition: opacity 0.2s;
+    }
+
+    .gear-trigger:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <!-- Hidden Quick Setup Access Button -->
+  <div class="gear-trigger" title="Settings" onclick="openSetup()">⚙️</div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🖨️</div>
+      <div class="brand-text">
+        <h1>EasyXerox Kiosk OS</h1>
+        <p>Industrial Autonomous Appliance v2.0</p>
+      </div>
+    </div>
+    <div class="header-badges">
+      <div class="badge">
+        <span class="badge-dot" id="network-dot"></span>
+        <span id="network-text">Checking Network...</span>
+      </div>
+      <div class="badge" style="font-family: 'JetBrains Mono', monospace;">
+        MAC: <span id="mac-text">--:--:--:--:--:--</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Setup Wizard Screen -->
+  <main id="setup-view">
+    <div class="setup-grid">
+      <!-- Left Card: Wi-Fi & Network Provisioning -->
+      <div class="card">
+        <div class="card-title">
+          <span>📶 Network Provisioning</span>
+          <button class="btn btn-secondary" style="margin-left:auto; padding: 6px 12px; font-size: 11px;" onclick="scanWifi()">🔄 Scan Wi-Fi</button>
+        </div>
+
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">
+          Available Wi-Fi Networks:
+        </div>
+        <div class="wifi-list" id="wifi-container">
+          <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+            Scanning for wireless access points...
+          </div>
+        </div>
+
+        <!-- Password Modal inline -->
+        <div id="wifi-pass-box" style="margin-top: 16px; display: none;">
+          <div class="form-group">
+            <label id="selected-ssid-label">Wi-Fi Password:</label>
+            <input type="password" id="wifi-password" class="form-input" placeholder="Enter WPA2 Key">
+          </div>
+          <button class="btn btn-primary" style="width: 100%;" onclick="connectWifi()">Connect Wi-Fi</button>
+        </div>
+      </div>
+
+      <!-- Right Card: Machine Identity & Live Backend -->
+      <div class="card">
+        <div class="card-title">
+          <span>🖥️ Machine & Central Server</span>
+        </div>
+
+        <div class="form-group">
+          <label>Machine Code (Identifier):</label>
+          <input type="text" id="machine-code" class="form-input" value="KIOSK-001">
+        </div>
+
+        <div class="form-group">
+          <label>Board / Branch Name:</label>
+          <input type="text" id="board-name" class="form-input" value="EasyXerox Master Unit">
+        </div>
+
+        <div class="form-group">
+          <label>Central Backend Server URL:</label>
+          <input type="text" id="server-url" class="form-input" value="https://easyxerox.com">
+        </div>
+
+        <button class="btn btn-secondary" style="width: 100%; margin-top: 4px;" onclick="testServer()">
+          ⚡ Test Server & Super Admin Pairing
+        </button>
+
+        <div id="server-test-result" style="font-size: 12px; margin-top: 10px; font-weight: 600; min-height: 18px;"></div>
+      </div>
+    </div>
+
+    <!-- Big Action Button -->
+    <button class="btn btn-primary btn-large" onclick="saveAndLaunchKiosk()">
+      🚀 SAVE & LAUNCH KIOSK APPLICATION
+    </button>
+  </main>
+
+  <!-- Live Kiosk Fullscreen Viewport -->
+  <div id="kiosk-viewport">
+    <iframe id="kiosk-frame" src="about:blank"></iframe>
+  </div>
+
+  <!-- High-Tech Offline Fallback Overlay (NO DINOSAUR GAME) -->
+  <div id="offline-overlay" style="display: none;">
+    <div class="offline-box">
+      <div style="font-size: 48px; margin-bottom: 16px;">📡</div>
+      <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">Reconnecting to EasyXerox Central</h2>
+      <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">
+        Internet connection was lost or network is initializing. The kiosk application will resume automatically.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button class="btn btn-secondary" onclick="openSetup()">⚙️ Network Settings</button>
+        <button class="btn btn-primary" onclick="retryConnection()">🔄 Retry Now</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentConfig = {};
+    let selectedSSID = '';
+
+    async function loadStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        currentConfig = data;
+
+        document.getElementById('mac-text').textContent = data.mac || 'b4:2e:99:a1:c4:8f';
+        document.getElementById('machine-code').value = data.machineCode || 'KIOSK-001';
+        document.getElementById('board-name').value = data.boardName || 'EasyXerox Unit';
+        document.getElementById('server-url').value = data.serverUrl || 'https://easyxerox.com';
+
+        const dot = document.getElementById('network-dot');
+        const text = document.getElementById('network-text');
+
+        if (data.isOnline) {
+          dot.className = 'badge-dot dot-green';
+          text.textContent = `Online (${data.connectionType} - ${data.ip})`;
+        } else {
+          dot.className = 'badge-dot dot-red';
+          text.textContent = 'Offline (No Internet)';
+        }
+
+        // Auto launch if already configured & online
+        if (data.configured && data.isOnline) {
+          launchKiosk(data);
+        } else if (data.configured && !data.isOnline) {
+          showOfflineOverlay();
+        }
+      } catch (err) {
+        console.error('Failed to load status:', err);
+      }
+    }
+
+    async function scanWifi() {
+      const container = document.getElementById('wifi-container');
+      container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--accent);">Scanning Wi-Fi channels...</div>';
+      try {
+        const res = await fetch('/api/wifi/scan');
+        const data = await res.json();
+        container.innerHTML = '';
+
+        if (!data.networks || data.networks.length === 0) {
+          container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">No wireless networks found. Plug in Ethernet cable.</div>';
+          return;
+        }
+
+        data.networks.forEach(net => {
+          const item = document.createElement('div');
+          item.className = 'wifi-item' + (net.connected ? ' active' : '');
+          item.onclick = () => selectWifi(net.ssid);
+          item.innerHTML = `
+            <div class="wifi-info">
+              <span style="font-size: 18px;">📶</span>
+              <div>
+                <div class="wifi-ssid">${net.ssid}</div>
+                <div class="wifi-meta">${net.security} • ${net.signal}% Signal</div>
+              </div>
+            </div>
+            ${net.connected ? '<span class="badge" style="color: var(--success);">Connected</span>' : '<button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">Connect</button>'}
+          `;
+          container.appendChild(item);
+        });
+      } catch (err) {
+        container.innerHTML = '<div style="padding: 20px; color: var(--danger);">Failed to scan Wi-Fi.</div>';
+      }
+    }
+
+    function selectWifi(ssid) {
+      selectedSSID = ssid;
+      document.getElementById('selected-ssid-label').textContent = `Password for "${ssid}":`;
+      document.getElementById('wifi-pass-box').style.display = 'block';
+      document.getElementById('wifi-password').focus();
+    }
+
+    async function connectWifi() {
+      const pass = document.getElementById('wifi-password').value;
+      const btn = event.target;
+      btn.textContent = 'Connecting...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/wifi/connect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ssid: selectedSSID, password: pass })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ Connected successfully!');
+          document.getElementById('wifi-pass-box').style.display = 'none';
+          loadStatus();
+          scanWifi();
+        } else {
+          alert('❌ ' + data.message);
+        }
+      } catch (err) {
+        alert('❌ Error connecting: ' + err.message);
+      } finally {
+        btn.textContent = 'Connect Wi-Fi';
+        btn.disabled = false;
+      }
+    }
+
+    async function testServer() {
+      const resultDiv = document.getElementById('server-test-result');
+      const url = document.getElementById('server-url').value;
+      resultDiv.style.color = 'var(--accent)';
+      resultDiv.textContent = 'Testing connection to central server...';
+
+      try {
+        const res = await fetch('/api/test-server', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ serverUrl: url })
+        });
+        const data = await res.json();
+        if (data.serverReachable) {
+          resultDiv.style.color = 'var(--success)';
+          resultDiv.textContent = '✅ Server connected! Auto-pairing route reachable.';
+        } else {
+          resultDiv.style.color = 'var(--danger)';
+          resultDiv.textContent = '❌ Server unreachable: ' + (data.message || 'Check URL/Internet');
+        }
+      } catch (err) {
+        resultDiv.style.color = 'var(--danger)';
+        resultDiv.textContent = '❌ Failed to contact server.';
+      }
+    }
+
+    async function saveAndLaunchKiosk() {
+      const machineCode = document.getElementById('machine-code').value.trim();
+      const boardName = document.getElementById('board-name').value.trim();
+      const serverUrl = document.getElementById('server-url').value.trim();
+
+      if (!machineCode || !serverUrl) {
+        alert('Please fill in Machine Code and Server URL.');
+        return;
+      }
+
+      const res = await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ machineCode, boardName, serverUrl, configured: true })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        launchKiosk(data.config);
+      }
+    }
+
+    function launchKiosk(config) {
+      const target = `${config.serverUrl}/kiosk/${config.machineCode}`;
+      console.log('🚀 Launching Kiosk Mode ->', target);
+
+      document.getElementById('setup-view').style.display = 'none';
+      document.getElementById('offline-overlay').style.display = 'none';
+      const viewport = document.getElementById('kiosk-viewport');
+      viewport.style.display = 'block';
+
+      const frame = document.getElementById('kiosk-frame');
+      frame.src = target;
+    }
+
+    function showOfflineOverlay() {
+      document.getElementById('setup-view').style.display = 'none';
+      document.getElementById('kiosk-viewport').style.display = 'none';
+      document.getElementById('offline-overlay').style.display = 'flex';
+    }
+
+    function openSetup() {
+      document.getElementById('kiosk-viewport').style.display = 'none';
+      document.getElementById('offline-overlay').style.display = 'none';
+      document.getElementById('setup-view').style.display = 'flex';
+      scanWifi();
+    }
+
+    function retryConnection() {
+      loadStatus();
+    }
+
+    // Auto-ping connectivity every 5 seconds
+    setInterval(async () => {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        if (data.configured) {
+          if (!data.isOnline && document.getElementById('kiosk-viewport').style.display === 'block') {
+            showOfflineOverlay();
+          } else if (data.isOnline && document.getElementById('offline-overlay').style.display === 'flex') {
+            launchKiosk(data);
+          }
+        }
+      } catch (_) {}
+    }, 5000);
+
+    // Initial load
+    loadStatus();
+    scanWifi();
+  </script>
+</body>
+</html>
