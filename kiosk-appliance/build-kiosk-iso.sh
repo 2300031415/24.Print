@@ -94,7 +94,7 @@ EOF
 
 # 5. Install Packages & Services inside Chroot
 echo "📦 [4/8] Installing Kiosk Kernel, X11, Chromium, CUPS, and Node.js inside appliance..."
-chroot "${CHROOT_DIR}" /bin/bash -c "
+chroot "${CHROOT_DIR}" /bin/bash << 'CHROOT_EOF'
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y --no-install-recommends \
@@ -146,7 +146,7 @@ systemctl set-default graphical.target
 # Clean APT caches to minimize squashfs size
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-"
+CHROOT_EOF
 
 # 6. Deploy Kiosk Appliance Scripts & Services
 echo "⚙️ [5/8] Configuring auto-start, kiosk autostart script, and print daemon..."
@@ -159,20 +159,16 @@ chmod +x "${CHROOT_DIR}/usr/local/bin/kiosk-autostart.sh"
 mkdir -p "${CHROOT_DIR}/opt/easyxerox/print-service"
 rsync -av --exclude="node_modules" --exclude="temp_print" "${PROJECT_ROOT}/print-service/" "${CHROOT_DIR}/opt/easyxerox/print-service/"
 
-# Install print-service production npm dependencies inside chroot
-chroot "${CHROOT_DIR}" /bin/bash -c "
-cd /opt/easyxerox/print-service
-npm install --omit=dev --no-audit --no-fund
-"
-
 # Deploy systemd services
 cp "${SCRIPT_DIR}/systemd/easyxerox-kiosk.service" "${CHROOT_DIR}/etc/systemd/system/easyxerox-kiosk.service"
 cp "${SCRIPT_DIR}/systemd/easyxerox-print.service" "${CHROOT_DIR}/etc/systemd/system/easyxerox-print.service"
 
-chroot "${CHROOT_DIR}" /bin/bash -c "
+chroot "${CHROOT_DIR}" /bin/bash << 'CHROOT_EOF'
+cd /opt/easyxerox/print-service
+npm install --omit=dev --no-audit --no-fund
 systemctl enable easyxerox-kiosk.service
 systemctl enable easyxerox-print.service
-"
+CHROOT_EOF
 
 # Configure Automatic Login on tty1 (No password, zero-click boot)
 mkdir -p "${CHROOT_DIR}/etc/systemd/system/getty@tty1.service.d"
