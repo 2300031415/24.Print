@@ -22,3 +22,10 @@ print-service/temp_print/
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Kiosk appliance build outputs & images (too large for git push)
+*.iso
+*.img
+kiosk-appliance/build-workspace/
+kiosk-appliance/easyxerox-kiosk-iso-build/
+

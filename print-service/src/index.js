@@ -187,13 +187,19 @@ async function processQueue() {
                     console.log(`✅ Dispatched to default printer spooler!`);
                 } catch (err2) {
                     const { execSync } = require('child_process');
-                    const targetP = options.printer ? `"${options.printer}"` : '';
-                    if (targetP) {
-                        execSync(`powershell -Command "Start-Process msedge -ArgumentList '--headless --print-to=${targetP} \\"${localPath}\\"' -WindowStyle Hidden"`, { stdio: 'ignore' });
+                    if (process.platform === 'win32') {
+                        const targetP = options.printer ? `"${options.printer}"` : '';
+                        if (targetP) {
+                            execSync(`powershell -Command "Start-Process msedge -ArgumentList '--headless --print-to=${targetP} \\"${localPath}\\"' -WindowStyle Hidden"`, { stdio: 'ignore' });
+                        } else {
+                            execSync(`powershell -Command "Start-Process msedge -ArgumentList '--headless --print-to-default \\"${localPath}\\"' -WindowStyle Hidden"`, { stdio: 'ignore' });
+                        }
+                        console.log(`✅ Dispatched via Microsoft Edge!`);
                     } else {
-                        execSync(`powershell -Command "Start-Process msedge -ArgumentList '--headless --print-to-default \\"${localPath}\\"' -WindowStyle Hidden"`, { stdio: 'ignore' });
+                        const lpTarget = options.printer ? `-d "${options.printer}"` : '';
+                        execSync(`lp ${lpTarget} "${localPath}" 2>/dev/null || true`, { stdio: 'ignore' });
+                        console.log(`✅ Dispatched via Linux CUPS lp command!`);
                     }
-                    console.log(`✅ Dispatched via Microsoft Edge!`);
                 }
             }
 

@@ -1,0 +1,50 @@
+name: Build EasyXerox Kiosk Bootable ISO
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'kiosk-appliance/**'
+      - 'print-service/**'
+      - '.github/workflows/build-kiosk-iso.yml'
+
+jobs:
+  build-iso:
+    name: Build Debian Live Hybrid Kiosk ISO
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install ISO Generation Tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            debootstrap \
+            squashfs-tools \
+            xorriso \
+            isolinux \
+            syslinux-common \
+            grub-pc-bin \
+            grub-efi-amd64-bin \
+            mtools \
+            dosfstools \
+            rsync
+
+      - name: Build Kiosk ISO Appliance
+        run: |
+          sudo chmod +x kiosk-appliance/build-kiosk-iso.sh
+          sudo ./kiosk-appliance/build-kiosk-iso.sh
+
+      - name: Verify ISO Output
+        run: |
+          ls -lh kiosk-appliance/EasyXerox-Kiosk-Appliance-v1.iso
+          file kiosk-appliance/EasyXerox-Kiosk-Appliance-v1.iso
+
+      - name: Upload Bootable ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EasyXerox-Kiosk-Appliance-v1.iso
+          path: kiosk-appliance/EasyXerox-Kiosk-Appliance-v1.iso
+          if-no-files-found: error
+          retention-days: 14

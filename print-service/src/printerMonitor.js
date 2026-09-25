@@ -3,6 +3,41 @@ const util = require('util');
 const execPromise = util.promisify(exec);
 
 /**
+ * Monitors printers across Windows and Linux (CUPS).
+ */
+async function getLinuxPrinters() {
+    try {
+        const { stdout } = await execPromise('lpstat -p -d 2>/dev/null || true');
+        if (!stdout || !stdout.trim()) return [];
+
+        const lines = stdout.split('\n');
+        const printers = [];
+
+        for (const line of lines) {
+            const match = line.match(/^printer\s+([^\s]+)\s+(.*)/i);
+            if (match) {
+                const name = match[1];
+                const desc = match[2] || '';
+                const isIdle = desc.includes('is idle');
+                const isProcessing = desc.includes('processing') || desc.includes('printing');
+                const isDisabled = desc.includes('disabled');
+
+                printers.push({
+                    Name: name,
+                    PrinterStatus: isDisabled ? 'Error' : (isProcessing ? 'Printing' : 'Normal'),
+                    WorkOffline: isDisabled,
+                    PaperOut: desc.toLowerCase().includes('paper'),
+                    TonerLow: desc.toLowerCase().includes('toner') || desc.toLowerCase().includes('ink')
+                });
+            }
+        }
+        return printers;
+    } catch (_) {
+        return [];
+    }
+}
+
+/**
  * Monitors Windows printers using PowerShell Get-Printer.
  */
 async function getWindowsPrinters() {
@@ -13,19 +48,34 @@ async function getWindowsPrinters() {
         const result = JSON.parse(stdout);
         return Array.isArray(result) ? result : [result];
     } catch (err) {
-        // Fallback mock printers if PowerShell command fails or non-Windows env
-        return [
-            { Name: 'HP_LaserJet_Pro_M404dn', PrinterStatus: 'Normal', WorkOffline: false, PaperOut: false, TonerLow: false },
-            { Name: 'Canon_ImageCLASS_MF244dw', PrinterStatus: 'Normal', WorkOffline: false, PaperOut: false, TonerLow: false }
-        ];
+        return [];
     }
+}
+
+/**
+ * Cross-platform printer discovery.
+ */
+async function getAllPrinters() {
+    if (process.platform === 'win32') {
+        const win = await getWindowsPrinters();
+        if (win.length > 0) return win;
+    } else {
+        const lin = await getLinuxPrinters();
+        if (lin.length > 0) return lin;
+    }
+
+    // Fallback mock printers if no physical printers attached yet
+    return [
+        { Name: 'HP_LaserJet_Pro_M404dn', PrinterStatus: 'Normal', WorkOffline: false, PaperOut: false, TonerLow: false },
+        { Name: 'Canon_ImageCLASS_MF244dw', PrinterStatus: 'Normal', WorkOffline: false, PaperOut: false, TonerLow: false }
+    ];
 }
 
 /**
  * Get detailed status of a specific printer by name.
  */
 async function getPrinterStatus(printerName) {
-    const printers = await getWindowsPrinters();
+    const printers = await getAllPrinters();
     const printer = printers.find(p => p.Name.toLowerCase() === (printerName || '').toLowerCase()) || printers[0];
 
     if (!printer) {
@@ -50,5 +100,8 @@ async function getPrinterStatus(printerName) {
 
 module.exports = {
     getWindowsPrinters,
+    getLinuxPrinters,
+    getAllPrinters,
     getPrinterStatus
 };
+

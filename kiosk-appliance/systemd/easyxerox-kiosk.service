@@ -1,0 +1,17 @@
+[Unit]
+Description=EasyXerox Kiosk Display Session
+After=network-online.target cups.service easyxerox-print.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kiosk
+PAMName=login
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/kiosk/.Xauthority
+ExecStart=/usr/bin/startx /etc/X11/Xsession /usr/local/bin/kiosk-autostart.sh -- -nocursor -s 0 -dpms
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=graphical.target

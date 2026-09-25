@@ -34,11 +34,10 @@ function getVolumeName(letter) {
 }
 
 /**
- * Scans drive letters D: through Z: instantly using fs.existsSync
+ * Scans Windows drive letters D: through Z:
  */
-function checkConnectedDrives() {
+function checkWindowsDrives() {
     const currentDrives = new Map();
-
     for (const letter of CHECK_LETTERS) {
         const rootPath = `${letter}\\`;
         try {
@@ -50,17 +49,73 @@ function checkConnectedDrives() {
                         driveLetter: letter,
                         volumeName: volName,
                         totalSize: 'Removable Storage',
-                        freeSpace: 'Ready'
+                        freeSpace: 'Ready',
+                        mountPath: rootPath
                     });
-                } catch (_) {
-                    // Unreadable drive, skip
+                } catch (_) {}
+            }
+        } catch (_) {}
+    }
+    return currentDrives;
+}
+
+/**
+ * Scans Linux mount locations (/media, /run/media, /mnt) for mounted USB drives.
+ */
+function checkLinuxDrives() {
+    const currentDrives = new Map();
+    const searchDirs = ['/media', '/mnt', '/run/media'];
+
+    for (const base of searchDirs) {
+        if (!fs.existsSync(base)) continue;
+        try {
+            const entries = fs.readdirSync(base, { withFileTypes: true });
+            for (const entry of entries) {
+                const fullPath = path.join(base, entry.name);
+                if (entry.isDirectory()) {
+                    // Check if it's a user directory (like /media/kiosk/USB) or direct mount (like /media/usb0)
+                    let targetPaths = [fullPath];
+                    try {
+                        const subEntries = fs.readdirSync(fullPath, { withFileTypes: true });
+                        for (const sub of subEntries) {
+                            if (sub.isDirectory()) {
+                                targetPaths.push(path.join(fullPath, sub.name));
+                            }
+                        }
+                    } catch (_) {}
+
+                    for (const mountDir of targetPaths) {
+                        try {
+                            const stats = fs.statSync(mountDir);
+                            // Avoid empty root base folders
+                            if (mountDir === '/media' || mountDir === '/mnt') continue;
+                            const folderName = path.basename(mountDir);
+                            currentDrives.set(mountDir, {
+                                driveLetter: mountDir,
+                                volumeName: folderName,
+                                totalSize: 'Removable Storage',
+                                freeSpace: 'Ready',
+                                mountPath: mountDir
+                            });
+                        } catch (_) {}
+                    }
                 }
             }
         } catch (_) {}
     }
-
     return currentDrives;
 }
+
+/**
+ * Cross-platform USB detection
+ */
+function checkConnectedDrives() {
+    if (process.platform === 'win32') {
+        return checkWindowsDrives();
+    }
+    return checkLinuxDrives();
+}
+
 
 /**
  * Recursive directory scanner to find all printable files (root + subfolders up to 4 levels deep)
@@ -103,9 +158,12 @@ function scanDirectory(dirPath, depth = 0, folderName = null, allFiles = []) {
 /**
  * Lists all printable files on the specified drive (root + nested subfolders)
  */
-async function listDriveFiles(driveLetter) {
+async function listDriveFiles(driveIdentifier) {
     try {
-        const root = `${driveLetter}\\`;
+        let root = driveIdentifier;
+        if (process.platform === 'win32') {
+            root = driveIdentifier.endsWith('\\') ? driveIdentifier : `${driveIdentifier}\\`;
+        }
         if (!fs.existsSync(root)) return [];
 
         const allFiles = scanDirectory(root, 0, null, []);

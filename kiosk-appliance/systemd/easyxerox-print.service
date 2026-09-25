@@ -1,0 +1,16 @@
+[Unit]
+Description=EasyXerox Silent Print & USB Daemon Service
+After=network.target cups.service
+Wants=cups.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/easyxerox/print-service
+ExecStart=/usr/bin/node src/index.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
