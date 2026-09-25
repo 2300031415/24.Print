@@ -14,4 +14,9 @@ router.put('/:id/status', authenticateToken, machineController.toggleMachineStat
 router.put('/code/:machine_code/printer-status', machineController.updatePrinterStatus);
 router.delete('/:id', authenticateToken, requireAdmin, machineController.deleteMachine);
 
+/* Phase 2 — Kiosk OS endpoints (no auth required; machine uses device_token) */
+router.post('/register', machineController.registerMachine);
+router.post('/code/:machineCode/heartbeat', machineController.machineHeartbeat);
+router.post('/code/:machineCode/command', authenticateToken, machineController.machineCommand);
+
 module.exports = router;

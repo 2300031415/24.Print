@@ -1,0 +1,79 @@
+{
+  "app_name": "EasyXerox",
+  "tagline": "Self-Service Printing & Xerox Vending Station",
+  "touch_to_start": "TOUCH SCREEN TO START",
+  "touch_subtitle": "Tap anywhere to select your service",
+  "services": {
+    "title": "Select Service",
+    "copy": "Photo Copy",
+    "copy_desc": "Scan and print instant physical copies",
+    "print_qr": "Print from Mobile",
+    "print_qr_desc": "Scan QR code with your phone camera to upload PDF or image",
+    "print_usb": "Print from USB",
+    "print_usb_desc": "Plug in your pendrive to select and print documents",
+    "scan": "Document Scan",
+    "scan_desc": "Scan pages directly to your phone via QR code"
+  },
+  "status": {
+    "printer_ready": "Printer Ready",
+    "printer_busy": "Printing Job...",
+    "printer_offline": "Printer Offline",
+    "paper_ok": "Paper: Normal",
+    "paper_low": "Paper: Low",
+    "paper_empty": "Paper: Empty",
+    "toner_ok": "Toner: Good",
+    "toner_low": "Toner: Low",
+    "online": "Online",
+    "offline": "Offline (Local Cache)"
+  },
+  "scan_qr": {
+    "heading": "Scan QR Code with Mobile",
+    "subheading": "Open your mobile camera or scanner app to upload your document directly.",
+    "machine_id": "Machine ID",
+    "waiting": "Waiting for document upload from your phone...",
+    "max_size": "Max upload: 100MB",
+    "formats": "Supported formats: PDF, Word, Images, Text"
+  },
+  "copy_flow": {
+    "heading": "Instant Photocopy",
+    "place_document": "Place your original document face down on the glass scanner.",
+    "num_copies": "Number of Copies",
+    "color_mode": "Color Mode",
+    "bw": "Black & White",
+    "color": "Full Color",
+    "sides": "Print Sides",
+    "single_sided": "Single Sided",
+    "double_sided": "Double Sided (Duplex)",
+    "paper_size": "Paper Size",
+    "total_price": "Total Price",
+    "proceed_payment": "Proceed to Payment",
+    "scanning": "Scanning document...",
+    "printing": "Printing your copy..."
+  },
+  "usb_modal": {
+    "title": "USB Pendrive Detected",
+    "subtitle": "Select a printable document from your drive",
+    "no_files": "No supported files found on this drive (.pdf, .doc, .jpg, .png)",
+    "reading": "Reading file from USB drive...",
+    "uploading": "Processing document..."
+  },
+  "maintenance": {
+    "title": "Station Under Maintenance",
+    "subtitle": "This self-service Xerox station is currently undergoing routine service or paper reload.",
+    "resuming": "Operations will resume automatically shortly. Thank you for your patience!"
+  },
+  "errors": {
+    "printer_offline": "Printer is currently offline. Please alert the operator.",
+    "paper_empty": "Paper tray empty. Please load A4 sheets.",
+    "toner_low": "Toner level is critically low.",
+    "internet_lost": "Internet connection unavailable. Reconnecting...",
+    "payment_failed": "Payment could not be verified. Please try again."
+  },
+  "admin": {
+    "title": "Technician & Admin Mode",
+    "enter_pin": "Enter 4-Digit Security PIN",
+    "unlock": "Unlock Diagnostic Console",
+    "wrong_pin": "Invalid Security PIN",
+    "close": "Close Admin Panel"
+  }
+}

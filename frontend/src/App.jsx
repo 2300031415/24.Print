@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 // Public Product Landing Page
 import LandingPage from './features/public/LandingPage';
@@ -51,9 +52,10 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <SocketProvider>
-        <Routes>
+    <LanguageProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <Routes>
           {/* 1. PUBLIC PRODUCT LANDING PAGE (easyxerox.com) */}
           <Route path="/" element={<LandingPage />} />
 
@@ -93,7 +95,8 @@ function App() {
         </Routes>
       </SocketProvider>
     </AuthProvider>
-  );
+  </LanguageProvider>
+);
 }
 
 export default App;

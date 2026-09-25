@@ -28,7 +28,7 @@ const FILE_ICONS = {
   TXT:  { icon: File,     color: '#94a3b8', bg: 'rgba(148,163,184,0.12)' },
 };
 
-export default function USBDriveModal({ machineId }) {
+export default function USBDriveModal({ machineId, isOpen = false, onClose }) {
   const { socket } = useSocket();
 
   // Drive state
@@ -41,6 +41,20 @@ export default function USBDriveModal({ machineId }) {
   // Upload state
   const [uploadState, setUploadState]       = useState(null);  // null | { status, fileName, error }
   const [selectedFile, setSelectedFile]     = useState(null);
+
+  // Synchronize when isOpen is explicitly triggered from parent UI
+  useEffect(() => {
+    if (isOpen) {
+      if (activeDrive) {
+        setShowToast(false);
+        setShowExplorer(true);
+        setLoadingFiles(true);
+        if (socket) {
+          socket.emit('USB_LIST_FILES', { machineCode: machineId, driveLetter: activeDrive.driveLetter });
+        }
+      }
+    }
+  }, [isOpen, activeDrive, socket, machineId]);
 
   // ─── Socket event listeners ────────────────────────────────
 
@@ -406,6 +420,55 @@ export default function USBDriveModal({ machineId }) {
                   Tap any file to automatically upload and open print preview.
                   PDFs go directly to the print flow.
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── INSERT USB DRIVE PROMPT MODAL ────────────────── */}
+      <AnimatePresence>
+        {isOpen && !activeDrive && !showExplorer && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed', inset: 0,
+              background: 'rgba(2, 6, 23, 0.85)',
+              backdropFilter: 'blur(12px)',
+              zIndex: 9990,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 24
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-slate-900 border-2 border-cyan-500/40 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl text-white relative"
+            >
+              <button
+                onClick={() => { if (typeof onClose === 'function') onClose(); }}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-cyan-500/20 border-2 border-cyan-400 flex items-center justify-center animate-pulse">
+                <Usb size={40} className="text-cyan-400" />
+              </div>
+
+              <h3 className="text-2xl font-black font-heading text-white mb-2">
+                Insert USB Flash Drive
+              </h3>
+              <p className="text-sm text-slate-300 mb-6 leading-relaxed">
+                Please plug your pendrive or USB flash drive into any of the available USB ports on the kiosk console.
+              </p>
+
+              <div className="flex items-center justify-center gap-3 p-3 bg-slate-800/80 rounded-2xl border border-slate-700 text-xs text-cyan-300 font-mono">
+                <Loader2 size={16} className="animate-spin text-cyan-400" />
+                <span>Listening for hardware mount event...</span>
               </div>
             </motion.div>
           </motion.div>

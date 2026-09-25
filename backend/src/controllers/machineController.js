@@ -253,6 +253,224 @@ const getMachineAds = async (req, res, next) => {
 
 const unregisteredHardwareStore = new Map();
 
+/* ─────────────────────────────────────────────────────────────
+   PHASE 2 — Kiosk First-Boot Registration
+   POST /api/machines/register
+   Body: { machine_code, mac_address, cpu_model, ram_gb, disk_gb, os_version }
+   Returns: { device_token, pricing, config }
+   ───────────────────────────────────────────────────────────── */
+const registerMachine = async (req, res, next) => {
+    try {
+        const {
+            machine_code, mac_address,
+            cpu_model, ram_gb, disk_gb, os_version
+        } = req.body;
+
+        if (!machine_code) {
+            return res.status(400).json({ success: false, message: 'machine_code is required.' });
+        }
+
+        // Find machine in fleet database
+        const mRes = await db.query(
+            `SELECT m.*, c.business_name as client_name, c.status as client_status
+             FROM machines m
+             JOIN clients c ON m.client_id = c.id
+             WHERE m.machine_code = $1`,
+            [machine_code.toUpperCase().trim()]
+        );
+
+        if (mRes.rows.length === 0) {
+            // Store unregistered hardware for admin review
+            unregisteredHardwareStore.set(machine_code, {
+                machine_code, mac_address,
+                cpu_model, ram_gb, disk_gb, os_version,
+                ip_address: req.ip || 'Unknown',
+                detected_at: new Date().toISOString()
+            });
+            return res.status(404).json({
+                success: false,
+                message: 'Machine code not registered in EasyXerox fleet. Contact admin.'
+            });
+        }
+
+        const machine = mRes.rows[0];
+
+        // Update hardware fingerprint
+        await db.query(
+            `UPDATE machines
+             SET mac_address = COALESCE($1, mac_address),
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = $2`,
+            [mac_address, machine.id]
+        );
+
+        // Fetch pricing
+        const pricingRes = await db.query(
+            `SELECT * FROM pricing
+             WHERE machine_id = $1 OR is_default = true
+             ORDER BY machine_id IS NOT NULL DESC, is_default DESC
+             LIMIT 1`,
+            [machine.id]
+        );
+        const pricing = pricingRes.rows[0] || {
+            bw_single_page_price: '2.00',
+            color_single_page_price: '10.00',
+            bw_duplex_page_price: '3.50',
+            color_duplex_page_price: '18.00'
+        };
+
+        // Build a simple device token (machine_id + timestamp — replace with JWT in prod)
+        const device_token = Buffer.from(`${machine.id}:${Date.now()}`).toString('base64');
+
+        return res.json({
+            success: true,
+            device_token,
+            machine_id: machine.id,
+            machine_code: machine.machine_code,
+            name: machine.name,
+            status: machine.status,
+            pricing,
+            config: {
+                heartbeat_interval_seconds: 30,
+                inactivity_timeout_seconds: 60,
+                default_language: 'en',
+                supported_languages: ['en', 'te', 'hi'],
+                max_upload_mb: 100
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+/* ─────────────────────────────────────────────────────────────
+   PHASE 2 — Machine Heartbeat / Telemetry
+   POST /api/machines/:machineCode/heartbeat
+   Body: { cpu_percent, ram_percent, disk_percent, temp_c, paper_level, toner_level, printer_status }
+   ───────────────────────────────────────────────────────────── */
+const machineHeartbeat = async (req, res, next) => {
+    try {
+        const { machineCode } = req.params;
+        const {
+            cpu_percent, ram_percent, disk_percent,
+            temp_c, paper_level, toner_level,
+            printer_status, uptime_seconds
+        } = req.body;
+
+        // Update machine heartbeat timestamp and live telemetry
+        const result = await db.query(
+            `UPDATE machines
+             SET last_heartbeat_at = CURRENT_TIMESTAMP,
+                 printer_status = COALESCE($1, printer_status),
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE machine_code = $2
+             RETURNING id, machine_code, status`,
+            [printer_status, machineCode.toUpperCase().trim()]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Machine not found.' });
+        }
+
+        // Broadcast live telemetry to admin dashboard via Socket.IO
+        const io = req.app.get('socketio');
+        if (io) {
+            io.to(`machine:${machineCode}`).emit('MACHINE_TELEMETRY', {
+                machineCode,
+                cpu_percent, ram_percent, disk_percent,
+                temp_c, paper_level, toner_level,
+                printer_status, uptime_seconds,
+                ts: new Date().toISOString()
+            });
+        }
+
+        // Check for low paper/toner and emit alerts
+        if (paper_level === 'empty' || paper_level === 'low') {
+            const io = req.app.get('socketio');
+            if (io) io.emit('MACHINE_ALERT', { machineCode, type: 'paper', level: paper_level });
+        }
+        if (toner_level === 'empty' || toner_level === 'low') {
+            const io = req.app.get('socketio');
+            if (io) io.emit('MACHINE_ALERT', { machineCode, type: 'toner', level: toner_level });
+        }
+
+        res.json({ success: true, ack: 'heartbeat_received', ts: new Date().toISOString() });
+    } catch (err) {
+        next(err);
+    }
+};
+
+/* ─────────────────────────────────────────────────────────────
+   PHASE 2 — Remote Command Dispatch
+   POST /api/machines/:machineCode/command
+   Body: { command, payload }
+   Allowed commands: CMD_RELOAD_APP | CMD_REBOOT_MACHINE | CMD_SET_PRICING | CMD_SET_MAINTENANCE
+   ───────────────────────────────────────────────────────────── */
+const ALLOWED_COMMANDS = new Set([
+    'CMD_RELOAD_APP',
+    'CMD_REBOOT_MACHINE',
+    'CMD_SET_PRICING',
+    'CMD_SET_MAINTENANCE',
+    'CMD_CLEAR_MAINTENANCE',
+    'CMD_PING'
+]);
+
+const machineCommand = async (req, res, next) => {
+    try {
+        const { machineCode } = req.params;
+        const { command, payload = {} } = req.body;
+
+        if (!command || !ALLOWED_COMMANDS.has(command)) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid or disallowed command. Allowed: ${[...ALLOWED_COMMANDS].join(', ')}`
+            });
+        }
+
+        // Verify machine exists
+        const mRes = await db.query(
+            'SELECT id, machine_code, status FROM machines WHERE machine_code = $1',
+            [machineCode.toUpperCase().trim()]
+        );
+        if (mRes.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Machine not found.' });
+        }
+
+        // Handle side-effects on the server side
+        if (command === 'CMD_SET_MAINTENANCE') {
+            await db.query(
+                `UPDATE machines SET status = 'maintenance', updated_at = CURRENT_TIMESTAMP WHERE machine_code = $1`,
+                [machineCode.toUpperCase().trim()]
+            );
+        } else if (command === 'CMD_CLEAR_MAINTENANCE') {
+            await db.query(
+                `UPDATE machines SET status = 'online', updated_at = CURRENT_TIMESTAMP WHERE machine_code = $1`,
+                [machineCode.toUpperCase().trim()]
+            );
+        }
+
+        // Dispatch command to the live kiosk via Socket.IO
+        const io = req.app.get('socketio');
+        if (io) {
+            io.to(`machine:${machineCode}`).emit('REMOTE_COMMAND', {
+                command,
+                payload,
+                issued_at: new Date().toISOString(),
+                issued_by: req.user?.email || 'system'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: `Command ${command} dispatched to machine ${machineCode}.`,
+            command,
+            payload
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
 const identifyMachine = async (req, res, next) => {
     try {
         const mac = (req.query.mac || req.body.mac || '').trim().toLowerCase();
@@ -315,5 +533,8 @@ module.exports = {
     deleteMachine,
     getMachineAds,
     identifyMachine,
-    getUnregisteredHardware
+    getUnregisteredHardware,
+    registerMachine,
+    machineHeartbeat,
+    machineCommand
 };
