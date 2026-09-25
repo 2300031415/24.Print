@@ -102,6 +102,9 @@ apt-get install -y --no-install-recommends \
   live-boot \
   systemd-sysv \
   xorg \
+  xinit \
+  nodm \
+  xterm \
   xserver-xorg-video-all \
   x11-xserver-utils \
   openbox \
@@ -130,9 +133,11 @@ useradd -m -s /bin/bash -G audio,video,netdev,lp,lpadmin,dialout kiosk
 passwd -d kiosk
 passwd -d root
 
-# Enable NetworkManager and CUPS
+# Enable NetworkManager, CUPS, and NODM
 systemctl enable NetworkManager
 systemctl enable cups
+systemctl enable nodm
+systemctl set-default graphical.target
 
 # Clean APT caches to minimize squashfs size
 apt-get clean
@@ -172,6 +177,21 @@ cat << 'EOF' > "${CHROOT_DIR}/etc/systemd/system/getty@tty1.service.d/autologin.
 ExecStart=
 ExecStart=-/sbin/agetty --autologin kiosk --noclear %I $TERM
 EOF
+
+# Configure NODM (Automatic Kiosk Display Manager)
+cat << 'EOF' > "${CHROOT_DIR}/etc/default/nodm"
+NODM_ENABLED=true
+NODM_USER=kiosk
+NODM_XSESSION=/home/kiosk/.xsession
+NODM_X_OPTIONS="-nocursor -s 0 -dpms"
+NODM_MIN_SESSION_TIME=5
+EOF
+
+cat << 'EOF' > "${CHROOT_DIR}/home/kiosk/.xsession"
+#!/bin/bash
+exec /usr/local/bin/kiosk-autostart.sh
+EOF
+chmod +x "${CHROOT_DIR}/home/kiosk/.xsession"
 
 # Configure Xwrapper to allow non-root user kiosk to start Xorg
 cat << 'EOF' > "${CHROOT_DIR}/etc/X11/Xwrapper.config"
