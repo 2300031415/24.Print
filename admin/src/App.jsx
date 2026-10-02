@@ -39,37 +39,19 @@ function App() {
       <Routes>
         {/* Auth Route */}
         <Route path="/login" element={<AdminLogin />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Protected Admin Routes (Support both /admin/path and /path) */}
+        {/* Protected Admin Routes */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-
         <Route path="/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-        <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-
         <Route path="/clients" element={<ProtectedRoute><AdminClients /></ProtectedRoute>} />
-        <Route path="/admin/clients" element={<ProtectedRoute><AdminClients /></ProtectedRoute>} />
-
         <Route path="/machines" element={<ProtectedRoute><AdminMachines /></ProtectedRoute>} />
-        <Route path="/admin/machines" element={<ProtectedRoute><AdminMachines /></ProtectedRoute>} />
-
         <Route path="/pricing" element={<ProtectedRoute><AdminPricing /></ProtectedRoute>} />
-        <Route path="/admin/pricing" element={<ProtectedRoute><AdminPricing /></ProtectedRoute>} />
-
         <Route path="/gst" element={<ProtectedRoute><AdminGst /></ProtectedRoute>} />
-        <Route path="/admin/gst" element={<ProtectedRoute><AdminGst /></ProtectedRoute>} />
-
         <Route path="/reports" element={<ProtectedRoute><AdminReports /></ProtectedRoute>} />
-        <Route path="/admin/reports" element={<ProtectedRoute><AdminReports /></ProtectedRoute>} />
-
         <Route path="/logs" element={<ProtectedRoute><AdminLogs /></ProtectedRoute>} />
-        <Route path="/admin/logs" element={<ProtectedRoute><AdminLogs /></ProtectedRoute>} />
-
         <Route path="/ads" element={<ProtectedRoute><AdminAds /></ProtectedRoute>} />
-        <Route path="/admin/ads" element={<ProtectedRoute><AdminAds /></ProtectedRoute>} />
 
-        {/* Catch-all redirect to Dashboard */}
+        {/* Catch-all fallback inside Admin App -> Navigate to /dashboard */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </AuthProvider>

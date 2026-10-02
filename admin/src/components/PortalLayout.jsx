@@ -49,14 +49,12 @@ const PortalLayout = ({ children, title = 'Super Admin Portal' }) => {
           <nav className="space-y-2">
             {adminNav.map((item) => {
               const Icon = item.icon;
-              const targetPath = isAdminPrefix ? `/admin${item.path}` : item.path;
               const isActive = location.pathname === item.path || 
-                               location.pathname === `/admin${item.path}` ||
                                location.pathname.replace('/admin', '') === item.path;
               return (
                 <Link
                   key={item.path}
-                  to={targetPath}
+                  to={item.path}
                   className={`flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-black transition-all ${
                     isActive
                       ? 'bg-white text-blue-600 shadow-xl'
