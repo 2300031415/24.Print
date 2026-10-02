@@ -58,7 +58,9 @@ const PortalLayout = ({ children, title = 'Dashboard', role = 'admin' }) => {
           <nav className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
+              const isActive = location.pathname === item.path || 
+                               location.pathname === item.path.replace('/admin', '') ||
+                               `/admin${location.pathname}` === item.path;
               return (
                 <Link
                   key={item.path}
