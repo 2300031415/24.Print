@@ -24,6 +24,10 @@ export const SocketProvider = ({ children }) => {
         transports: ['websocket', 'polling']
       });
 
+      if (socketInstance && typeof socketInstance.setMaxListeners === 'function') {
+        socketInstance.setMaxListeners(100);
+      }
+
       socketInstance.on('connect', () => {
         setIsConnected(true);
       });
