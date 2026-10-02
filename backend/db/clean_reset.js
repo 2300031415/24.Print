@@ -21,20 +21,20 @@ async function wipeDatabaseKeepAdminOnly() {
         `);
         console.log('✅ All existing database tables truncated cleanly!');
 
-        // Insert ONLY Super Admin User (admin@printkiosk.com / Admin@123)
+        // Insert ONLY Super Admin User (easyxerox@gmail.com / FFpvt@2026)
         await pool.query(`
             INSERT INTO users (id, email, password_hash, full_name, phone, role, status)
             VALUES (
                 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-                'admin@printkiosk.com',
-                '$2a$10$Eqh5x3Z6b7b0Yn4fMh11uuO2qXvV0Z3P4gX.Hk1Jz5w0Y1Z2X3Y4Z',
-                'System Super Admin',
+                'easyxerox@gmail.com',
+                '$2a$10$DisYba8P71miEbPqI.lVhOqj5ufZWUp2a3iUd2baggOlfObN9zFmy',
+                'EasyXerox Super Admin',
                 '+919876543210',
                 'admin',
                 'active'
             ) ON CONFLICT (email) DO NOTHING;
         `);
-        console.log('✅ Super Admin account created cleanly (admin@printkiosk.com / Admin@123)');
+        console.log('✅ Super Admin account created cleanly (easyxerox@gmail.com / FFpvt@2026)');
 
         // Insert Default Pricing
         await pool.query(`
@@ -69,12 +69,12 @@ async function wipeDatabaseKeepAdminOnly() {
         await pool.query(`
             INSERT INTO settings (setting_key, setting_value, description)
             VALUES 
-            ('company_info', '{"name": "EasyXerox Systems", "logo_url": "/logo.png", "support_email": "support@easyxerox.com", "support_phone": "+911800123456"}', 'Company details displayed on Kiosk Home'),
+            ('company_info', '{"name": "EasyXerox Systems", "logo_url": "/logo.png", "support_email": "easyxerox@gmail.com", "support_phone": "+911800123456"}', 'Company details displayed on Kiosk Home'),
             ('system_rules', '{"max_upload_size_mb": 100, "upload_expiry_minutes": 120, "ad_rotation_seconds": 10}', 'System operational boundaries')
             ON CONFLICT (setting_key) DO NOTHING;
         `);
 
-        console.log('🎉 Database reset complete! Database now contains ONLY Super Admin account.');
+        console.log('🎉 Database reset complete! Database now contains ONLY Super Admin account (easyxerox@gmail.com).');
         process.exit(0);
     } catch (err) {
         console.error('❌ Reset failed:', err);

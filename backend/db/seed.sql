@@ -1,13 +1,13 @@
 -- Seed Data for EasyXerox System (CLEAN PRODUCTION SEED: ONLY SUPER ADMIN)
 
--- Insert Super Admin (Login: admin@printkiosk.com / Password: Admin@123)
+-- Insert Super Admin (Login: easyxerox@gmail.com / Password: FFpvt@2026)
 -- Hash generated via bcrypt (10 rounds)
 INSERT INTO users (id, email, password_hash, full_name, phone, role, status)
 VALUES (
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-    'admin@printkiosk.com',
-    '$2a$10$Eqh5x3Z6b7b0Yn4fMh11uuO2qXvV0Z3P4gX.Hk1Jz5w0Y1Z2X3Y4Z', -- Admin@123
-    'System Super Admin',
+    'easyxerox@gmail.com',
+    '$2a$10$DisYba8P71miEbPqI.lVhOqj5ufZWUp2a3iUd2baggOlfObN9zFmy', -- FFpvt@2026
+    'EasyXerox Super Admin',
     '+919876543210',
     'admin',
     'active'
@@ -41,6 +41,6 @@ VALUES (
 -- Insert System Settings
 INSERT INTO settings (setting_key, setting_value, description)
 VALUES 
-('company_info', '{"name": "EasyXerox Systems", "logo_url": "/logo.png", "support_email": "support@easyxerox.com", "support_phone": "+911800123456"}', 'Company details displayed on Kiosk Home'),
+('company_info', '{"name": "EasyXerox Systems", "logo_url": "/logo.png", "support_email": "easyxerox@gmail.com", "support_phone": "+911800123456"}', 'Company details displayed on Kiosk Home'),
 ('system_rules', '{"max_upload_size_mb": 100, "upload_expiry_minutes": 120, "ad_rotation_seconds": 10}', 'System operational boundaries')
 ON CONFLICT (setting_key) DO NOTHING;
