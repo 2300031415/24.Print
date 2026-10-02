@@ -60,6 +60,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
 
           {/* 2. KIOSK APPLICATION ROUTES (Live Interactive Kiosk Hardware Board Display) */}
+          <Route path="/kiosk" element={<Navigate to="/kiosk/FFPVT_EasyXerox-001" replace />} />
           <Route path="/kiosk/:machineId" element={<KioskHome />} />
           <Route path="/kiosk/:machineId/preview/:uploadToken" element={<KioskPdfPreview />} />
           <Route path="/kiosk/:machineId/options/:uploadToken" element={<KioskPrintOptions />} />

@@ -2,7 +2,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
-const backendPort = process.env.BACKEND_PORT || 5000;
+// Connect local frontend directly to the LIVE production server at https://easyxerox.com
+const backendTarget = process.env.VITE_BACKEND_URL || (process.env.USE_LOCAL_BACKEND === 'true' ? 'http://localhost:5000' : 'https://easyxerox.com');
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -11,16 +12,20 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: `http://localhost:${backendPort}`,
-        changeOrigin: true
+        target: backendTarget,
+        changeOrigin: true,
+        secure: false
       },
       '/uploads': {
-        target: `http://localhost:${backendPort}`,
-        changeOrigin: true
+        target: backendTarget,
+        changeOrigin: true,
+        secure: false
       },
       '/socket.io': {
-        target: `http://localhost:${backendPort}`,
-        ws: true
+        target: backendTarget,
+        ws: true,
+        changeOrigin: true,
+        secure: false
       }
     }
   }
